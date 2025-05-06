@@ -5,7 +5,6 @@ import pandas as pd
 from mpl_toolkits.mplot3d import Axes3D
 
 st.set_page_config(layout="wide")
-
 st.title("Omega Multiverse Simulator PRO — AI Ultra Graphs Edition")
 st.write("Explore scientifically-grounded universes and visualize advanced scientific scenarios.")
 
@@ -33,8 +32,8 @@ else:
 
 st.divider()
 
-# ---- Tabs ----
-tabs = st.tabs([
+# ---- Create proper tabs (Fixed version) ----
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11 = st.tabs([
     "Stability Curve",
     "Periodic Table Stability",
     "Island of Instability",
@@ -48,8 +47,8 @@ tabs = st.tabs([
     "3D Dark Matter Expansion"
 ])
 
-# --- Graphs ---
-with tabs[0]:
+# ---- Graph Tabs ----
+with tab1:
     st.subheader("Element Stability vs Strong Force")
     x = np.linspace(0.5, 2.0, 500)
     y = np.exp(-((x - constants["Strong Force Multiplier"])**2)/0.02)
@@ -57,7 +56,7 @@ with tabs[0]:
     ax.plot(x, y)
     st.pyplot(fig)
 
-with tabs[1]:
+with tab2:
     st.subheader("Periodic Table Stability")
     stable_count = int(max(0, 30 - deviation * 5))
     st.write("Stable elements estimated:", stable_count)
@@ -65,7 +64,7 @@ with tabs[1]:
     for i in range(30):
         cols[i % 10].markdown(f"Element {i+1}: {'✅' if i < stable_count else '❌'}")
 
-with tabs[2]:
+with tab3:
     st.subheader("Island of Instability")
     x = np.linspace(0.5, 2.0, 500)
     y = np.abs(np.sin((x - constants["Strong Force Multiplier"]) * 5))
@@ -73,14 +72,14 @@ with tabs[2]:
     ax.plot(x, y, color='r')
     st.pyplot(fig)
 
-with tabs[3]:
+with tab4:
     st.subheader("Universe Probability")
     prob = np.exp(-deviation)
     fig, ax = plt.subplots()
     ax.bar(["Probability"], [prob])
     st.pyplot(fig)
 
-with tabs[4]:
+with tab5:
     st.subheader("Star Formation vs Gravity")
     x = np.linspace(0.1, 10.0, 500)
     y = np.exp(-((x - constants["Gravitational Constant Multiplier"])**2)/1.0)
@@ -88,14 +87,14 @@ with tabs[4]:
     ax.plot(x, y)
     st.pyplot(fig)
 
-with tabs[5]:
+with tab6:
     st.subheader("Life Probability")
     life_prob = np.exp(-deviation/2)
     fig, ax = plt.subplots()
     ax.bar(["Life Probability"], [life_prob])
     st.pyplot(fig)
 
-with tabs[6]:
+with tab7:
     st.subheader("Element Abundance vs Forces")
     forces = ["Strong", "EM", "Weak"]
     abundance = [np.exp(-abs(constants["Strong Force Multiplier"]-1)),
@@ -105,7 +104,7 @@ with tabs[6]:
     ax.bar(forces, abundance)
     st.pyplot(fig)
 
-with tabs[7]:
+with tab8:
     st.subheader("Radiation Risk vs EM Force")
     x = np.linspace(0.1, 10.0, 500)
     y = (x**2) / 100
@@ -114,14 +113,14 @@ with tabs[7]:
     ax.axvline(constants["Electromagnetic Force Multiplier"], color='r', linestyle='--')
     st.pyplot(fig)
 
-with tabs[8]:
+with tab9:
     st.subheader("Quantum Bonding Probability")
     bonding = np.exp(-abs(constants["Strong Force Multiplier"] - 1))
     fig, ax = plt.subplots()
     ax.bar(["Bonding Probability"], [bonding])
     st.pyplot(fig)
 
-with tabs[9]:
+with tab10:
     st.subheader("Star Lifespan vs Gravity")
     x = np.linspace(0.1, 10.0, 500)
     y = 1 / x
@@ -130,11 +129,10 @@ with tabs[9]:
     ax.axvline(constants["Gravitational Constant Multiplier"], color='r', linestyle='--')
     st.pyplot(fig)
 
-with tabs[10]:
+with tab11:
     st.subheader("3D Dark Matter Expansion Simulation")
 
     num_galaxies = 100
-    time_steps = 5
     dark_energy = constants["Dark Energy Multiplier"]
     np.random.seed(42)
     positions = np.random.normal(0, 50, (num_galaxies, 3))
