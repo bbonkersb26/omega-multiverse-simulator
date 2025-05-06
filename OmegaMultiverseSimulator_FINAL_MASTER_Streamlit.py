@@ -2,101 +2,160 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from mpl_toolkits.mplot3d import Axes3D
 
 st.set_page_config(layout="wide")
 
-# ---- HEADER ----
-st.title("Omega Multiverse Simulator - Perfect Periodic Table Version")
-st.write("Explore scientifically-grounded universes with final optimized periodic table layout.")
+st.title("Omega Multiverse Simulator PRO — AI Ultra Graphs Edition")
+st.write("Explore scientifically-grounded universes and visualize advanced scientific scenarios.")
 
-# ---- SIDEBAR INPUT ----
-st.sidebar.header("Physical Constants Sliders")
+# ---- Sidebar GUI ----
+st.sidebar.header("Physics Constants")
 
-standard_values = {
-    "Strong Force Multiplier": 1.0,
-    "Electromagnetic Force Multiplier": 1.0,
-    "Weak Force Multiplier": 1.0,
-    "Gravitational Constant Multiplier": 1.0,
-    "Dark Energy Multiplier": 1.0
+constants = {
+    "Strong Force Multiplier": st.sidebar.slider("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.1),
+    "Electromagnetic Force Multiplier": st.sidebar.slider("EM Force Multiplier", 0.1, 10.0, 1.0, 0.1),
+    "Weak Force Multiplier": st.sidebar.slider("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.1),
+    "Gravitational Constant Multiplier": st.sidebar.slider("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.1),
+    "Dark Energy Multiplier": st.sidebar.slider("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.1),
 }
 
-constants = {}
-for const, default in standard_values.items():
-    constants[const] = st.sidebar.slider(const, 0.1, 10.0, default, 0.1)
-
-# ---- UNIVERSE ANALYSIS ----
-st.header("Universe Simulation Overview")
-deviation = sum(abs(constants[c] - standard_values[c]) for c in constants)
-st.subheader("Standard Model Deviation")
-st.write(f"**Deviation from our universe:** {deviation:.2f}")
+deviation = sum(abs(v - 1.0) for v in constants.values())
+st.header("Universe Stability Summary")
+st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
 
 if deviation == 0:
-    st.success("Perfect Match → Chemistry & Life Stable")
+    st.success("This universe matches ours. Chemistry and life likely stable.")
 elif deviation < 3:
-    st.warning("Slightly Different → Some Instabilities Possible")
+    st.warning("Moderate deviations detected. Instability possible.")
 else:
-    st.error("Highly Unstable → Chemistry and Life unlikely")
+    st.error("High deviation. Stable chemistry and life unlikely.")
 
 st.divider()
 
-# ---- SCIENTIFIC GRAPH ANALYSIS ----
-st.header("Scientific Graph Analysis")
-tab1, tab2, tab3 = st.tabs(["Stability Curve", "Formation Probability", "Island of Instability"])
+# ---- Tabs ----
+tabs = st.tabs([
+    "Stability Curve",
+    "Periodic Table Stability",
+    "Island of Instability",
+    "Universe Probability",
+    "Star Formation",
+    "Life Probability",
+    "Element Abundance",
+    "Radiation Risk",
+    "Quantum Bonding Probability",
+    "Star Lifespan",
+    "3D Dark Matter Expansion"
+])
 
-with tab1:
+# --- Graphs ---
+with tabs[0]:
     st.subheader("Element Stability vs Strong Force")
     x = np.linspace(0.5, 2.0, 500)
-    stability = np.exp(-((x - 1.0) ** 2) / 0.01)
-
+    y = np.exp(-((x - constants["Strong Force Multiplier"])**2)/0.02)
     fig, ax = plt.subplots()
-    ax.plot(x, stability)
-    ax.set_xlabel("Strong Force Multiplier")
-    ax.set_ylabel("Stability (Relative)")
-    ax.set_title("Element Stability vs Strong Force")
+    ax.plot(x, y)
     st.pyplot(fig)
 
-with tab2:
-    st.write("Formation probability model coming soon.")
+with tabs[1]:
+    st.subheader("Periodic Table Stability")
+    stable_count = int(max(0, 30 - deviation * 5))
+    st.write("Stable elements estimated:", stable_count)
+    cols = st.columns(10)
+    for i in range(30):
+        cols[i % 10].markdown(f"Element {i+1}: {'✅' if i < stable_count else '❌'}")
 
-with tab3:
-    st.write("Island of instability coming soon.")
+with tabs[2]:
+    st.subheader("Island of Instability")
+    x = np.linspace(0.5, 2.0, 500)
+    y = np.abs(np.sin((x - constants["Strong Force Multiplier"]) * 5))
+    fig, ax = plt.subplots()
+    ax.plot(x, y, color='r')
+    st.pyplot(fig)
+
+with tabs[3]:
+    st.subheader("Universe Probability")
+    prob = np.exp(-deviation)
+    fig, ax = plt.subplots()
+    ax.bar(["Probability"], [prob])
+    st.pyplot(fig)
+
+with tabs[4]:
+    st.subheader("Star Formation vs Gravity")
+    x = np.linspace(0.1, 10.0, 500)
+    y = np.exp(-((x - constants["Gravitational Constant Multiplier"])**2)/1.0)
+    fig, ax = plt.subplots()
+    ax.plot(x, y)
+    st.pyplot(fig)
+
+with tabs[5]:
+    st.subheader("Life Probability")
+    life_prob = np.exp(-deviation/2)
+    fig, ax = plt.subplots()
+    ax.bar(["Life Probability"], [life_prob])
+    st.pyplot(fig)
+
+with tabs[6]:
+    st.subheader("Element Abundance vs Forces")
+    forces = ["Strong", "EM", "Weak"]
+    abundance = [np.exp(-abs(constants["Strong Force Multiplier"]-1)),
+                 np.exp(-abs(constants["Electromagnetic Force Multiplier"]-1)),
+                 np.exp(-abs(constants["Weak Force Multiplier"]-1))]
+    fig, ax = plt.subplots()
+    ax.bar(forces, abundance)
+    st.pyplot(fig)
+
+with tabs[7]:
+    st.subheader("Radiation Risk vs EM Force")
+    x = np.linspace(0.1, 10.0, 500)
+    y = (x**2) / 100
+    fig, ax = plt.subplots()
+    ax.plot(x, y)
+    ax.axvline(constants["Electromagnetic Force Multiplier"], color='r', linestyle='--')
+    st.pyplot(fig)
+
+with tabs[8]:
+    st.subheader("Quantum Bonding Probability")
+    bonding = np.exp(-abs(constants["Strong Force Multiplier"] - 1))
+    fig, ax = plt.subplots()
+    ax.bar(["Bonding Probability"], [bonding])
+    st.pyplot(fig)
+
+with tabs[9]:
+    st.subheader("Star Lifespan vs Gravity")
+    x = np.linspace(0.1, 10.0, 500)
+    y = 1 / x
+    fig, ax = plt.subplots()
+    ax.plot(x, y)
+    ax.axvline(constants["Gravitational Constant Multiplier"], color='r', linestyle='--')
+    st.pyplot(fig)
+
+with tabs[10]:
+    st.subheader("3D Dark Matter Expansion Simulation")
+
+    num_galaxies = 100
+    time_steps = 5
+    dark_energy = constants["Dark Energy Multiplier"]
+    np.random.seed(42)
+    positions = np.random.normal(0, 50, (num_galaxies, 3))
+    expanded = positions * (1 + dark_energy)
+
+    fig = plt.figure(figsize=(8, 6))
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(expanded[:,0], expanded[:,1], expanded[:,2], c='purple', alpha=0.7)
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.set_zlabel("Z")
+    st.pyplot(fig)
 
 st.divider()
 
-# ---- FINAL FIXED PERIODIC TABLE ----
-st.header("Periodic Table (Final Fixed Grid Layout)")
+st.header("AI Scientific Analysis")
+if deviation < 1:
+    st.success("Universe likely viable for chemistry and stars.")
+elif deviation < 3:
+    st.warning("Universe marginal → unusual element formation possible.")
+else:
+    st.error("Universe extremely unstable → likely no stars or chemistry.")
 
-periodic_table_grid = """
-<style>
-.periodic-table {
-    display: grid;
-    grid-template-columns: repeat(18, 40px);
-    grid-gap: 4px;
-    justify-content: center;
-}
-.periodic-table div {
-    width: 38px;
-    height: 38px;
-    background-color: #f0f0f0;
-    text-align: center;
-    line-height: 38px;
-    border-radius: 4px;
-    font-size: 12px;
-}
-.periodic-table .empty {
-    background-color: transparent;
-}
-</style>
-
-<div class="periodic-table">
-<div>H</div> <div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div>He</div>
-<div>Li</div><div>Be</div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div>B</div><div>C</div><div>N</div><div>O</div><div>F</div><div>Ne</div>
-<div>Na</div><div>Mg</div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div><div>Al</div><div>Si</div><div>P</div><div>S</div><div>Cl</div><div>Ar</div>
-<div>K</div><div>Ca</div><div>Sc</div><div>Ti</div><div>V</div><div>Cr</div><div>Mn</div><div>Fe</div><div>Co</div><div>Ni</div><div>Cu</div><div>Zn</div><div>Ga</div><div>Ge</div><div>As</div><div>Se</div><div>Br</div><div>Kr</div>
-</div>
-"""
-
-st.markdown(periodic_table_grid, unsafe_allow_html=True)
-
-st.divider()
-st.write("Final periodic table grid locked and optimized for all screens.")
+st.write("Simulation complete.")
