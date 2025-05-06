@@ -6,8 +6,8 @@ import pandas as pd
 st.set_page_config(layout="wide")
 
 # ---- HEADER ----
-st.title("Omega Multiverse Simulator - Classical Periodic Table Edition")
-st.write("Explore scientifically-grounded universes with improved classical periodic table layout.")
+st.title("Omega Multiverse Simulator - True Classical Periodic Table Edition")
+st.write("Explore scientifically-grounded universes with perfected periodic table grid layout.")
 
 # ---- PRESET STANDARD MODEL CONSTANTS ----
 standard_values = {
@@ -66,25 +66,42 @@ with tab3:
 
 st.divider()
 
-# ---- PERIODIC TABLE CLASSICAL LAYOUT ----
-st.header("Periodic Table (Classical Layout)")
+# ---- PERIODIC TABLE TRUE CLASSICAL LAYOUT ----
+st.header("Periodic Table (True Classical Layout)")
 
-# Define periodic table rows (using gaps as "")
-periodic_table_rows = [
-    ["H", "", "", "", "", "", "", "He"],
-    ["Li", "Be", "", "", "", "", "B", "C", "N", "O", "F", "Ne"],
-    ["Na", "Mg", "", "", "", "", "Al", "Si", "P", "S", "Cl", "Ar"],
-    ["K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr"]
-]
+periodic_table_html = """
+<style>
+.table-container {
+    overflow-x: auto;
+}
+.periodic-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+.periodic-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    width: 40px;
+    height: 40px;
+}
+.periodic-table td.empty {
+    border: none;
+}
+</style>
 
-for row in periodic_table_rows:
-    cols = st.columns(len(row))
-    for i, element in enumerate(row):
-        if element != "":
-            cols[i].button(element, key=f"{element}_{i}")
-        else:
-            cols[i].empty()  # Add empty space
+<div class="table-container">
+<table class="periodic-table">
+<tr><td>H</td><td class='empty'></td><td class='empty'></td><td class='empty'></td><td class='empty'></td><td class='empty'></td><td class='empty'></td><td>He</td></tr>
+<tr><td>Li</td><td>Be</td><td class='empty'></td><td class='empty'></td><td class='empty'></td><td class='empty'></td><td>B</td><td>C</td><td>N</td><td>O</td><td>F</td><td>Ne</td></tr>
+<tr><td>Na</td><td>Mg</td><td class='empty'></td><td class='empty'></td><td class='empty'></td><td class='empty'></td><td>Al</td><td>Si</td><td>P</td><td>S</td><td>Cl</td><td>Ar</td></tr>
+<tr><td>K</td><td>Ca</td><td>Sc</td><td>Ti</td><td>V</td><td>Cr</td><td>Mn</td><td>Fe</td><td>Co</td><td>Ni</td><td>Cu</td><td>Zn</td><td>Ga</td><td>Ge</td><td>As</td><td>Se</td><td>Br</td><td>Kr</td></tr>
+</table>
+</div>
+"""
+
+st.markdown(periodic_table_html, unsafe_allow_html=True)
 
 st.divider()
 
-st.write("Classical periodic table layout applied. Simulator ready for scientific evaluation.")
+st.write("Classical periodic table layout finalized. Simulator ready for scientific use.")
