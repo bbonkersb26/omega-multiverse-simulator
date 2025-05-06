@@ -6,8 +6,8 @@ import pandas as pd
 st.set_page_config(layout="wide")
 
 # ---- HEADER ----
-st.title("Omega Multiverse Simulator - Scientific Layout Edition")
-st.write("Explore universes with scientifically-grounded constants and cleaner visuals.")
+st.title("Omega Multiverse Simulator - Classical Periodic Table Edition")
+st.write("Explore scientifically-grounded universes with improved classical periodic table layout.")
 
 # ---- PRESET STANDARD MODEL CONSTANTS ----
 standard_values = {
@@ -66,15 +66,25 @@ with tab3:
 
 st.divider()
 
-# ---- PERIODIC TABLE GRID (BETTER LAYOUT) ----
-st.header("Periodic Table Grid (Simplified View)")
+# ---- PERIODIC TABLE CLASSICAL LAYOUT ----
+st.header("Periodic Table (Classical Layout)")
 
-elements = ["H", "He", "Li", "Be", "Na", "Mg", "K", "Ca", "Cu"]
-cols = st.columns(5)
+# Define periodic table rows (using gaps as "")
+periodic_table_rows = [
+    ["H", "", "", "", "", "", "", "He"],
+    ["Li", "Be", "", "", "", "", "B", "C", "N", "O", "F", "Ne"],
+    ["Na", "Mg", "", "", "", "", "Al", "Si", "P", "S", "Cl", "Ar"],
+    ["K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr"]
+]
 
-for index, element in enumerate(elements):
-    cols[index % 5].button(element)
+for row in periodic_table_rows:
+    cols = st.columns(len(row))
+    for i, element in enumerate(row):
+        if element != "":
+            cols[i].button(element, key=f"{element}_{i}")
+        else:
+            cols[i].empty()  # Add empty space
 
 st.divider()
 
-st.write("Simulator running with updated clean layout. Further AI upgrades paused pending approval.")
+st.write("Classical periodic table layout applied. Simulator ready for scientific evaluation.")
