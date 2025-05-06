@@ -6,8 +6,8 @@ import pandas as pd
 st.set_page_config(layout="wide")
 
 # ---- HEADER ----
-st.title("Omega Multiverse Simulator FINAL MASTER SCIENTIFIC EDITION + AI MODULE")
-st.write("Explore scientifically-grounded universes with AI enhanced explanations and advanced graphing.")
+st.title("Omega Multiverse Simulator - Scientific Layout Edition")
+st.write("Explore universes with scientifically-grounded constants and cleaner visuals.")
 
 # ---- PRESET STANDARD MODEL CONSTANTS ----
 standard_values = {
@@ -18,50 +18,63 @@ standard_values = {
     "Dark Energy Multiplier": 1.0
 }
 
+# ---- SIDEBAR INPUT ----
 st.sidebar.header("Physical Constants Sliders")
 
-# ---- USER INPUT SLIDERS ----
 constants = {}
 for const, default in standard_values.items():
     constants[const] = st.sidebar.slider(const, 0.1, 10.0, default, 0.1)
 
 # ---- UNIVERSE ANALYSIS ----
-st.header("Universe Simulation Outputs")
+st.header("Universe Simulation Overview")
+with st.container():
+    deviation = sum(abs(constants[c] - standard_values[c]) for c in constants)
+    st.subheader("Standard Model Deviation")
+    st.write(f"**Deviation from our universe:** {deviation:.2f}")
 
-# Simple example analysis
-st.subheader("Standard Model Deviation")
-deviation = sum(abs(constants[c] - standard_values[c]) for c in constants)
-st.write(f"Total deviation from our universe: **{deviation:.2f}**")
+    if deviation == 0:
+        st.success("Perfect Match → Chemistry & Life Stable")
+    elif deviation < 3:
+        st.warning("Slightly Different → Some Instabilities Possible")
+    else:
+        st.error("Highly Unstable → Chemistry and Life unlikely")
 
-# ---- AI Analysis (Starter AI Explanation Module) ----
-st.subheader("AI Analysis of Universe Stability")
-if deviation == 0:
-    st.success("This universe matches ours → Chemistry and Life are likely stable.")
-elif deviation < 3:
-    st.warning("This universe is slightly different → Some chemical and biological systems may destabilize.")
-else:
-    st.error("This universe is highly unstable → Life and stable chemistry likely impossible.")
+st.divider()
 
-# ---- PERIODIC TABLE (Simple AI Output for now) ----
-st.subheader("Periodic Table Stability AI Commentary")
-if deviation < 2:
-    st.write("Periodic table expected to be mostly stable → heavy elements like Uranium still viable.")
-else:
-    st.write("Heavy elements may not form → island of stability collapses.")
+# ---- SCIENTIFIC GRAPH ANALYSIS ----
+st.header("Scientific Graph Analysis")
+tab1, tab2, tab3 = st.tabs(["Stability Curve", "Formation Probability", "Island of Instability"])
 
-# ---- SAMPLE GRAPH (Force Multiplier Graph) ----
-st.subheader("Force Multiplier Effects")
+with tab1:
+    st.subheader("Element Stability vs Strong Force")
+    x = np.linspace(0.5, 2.0, 500)
+    stability = np.exp(-((x - 1.0) ** 2) / 0.01)
 
-forces = list(constants.keys())
-values = list(constants.values())
+    fig, ax = plt.subplots()
+    ax.plot(x, stability)
+    ax.set_xlabel("Strong Force Multiplier")
+    ax.set_ylabel("Stability (Relative)")
+    ax.set_title("Element Stability vs Strong Force")
 
-fig, ax = plt.subplots()
-ax.bar(forces, values, color='cyan')
-ax.set_ylabel("Multiplier Value")
-ax.set_title("Current Universe Constants")
-plt.xticks(rotation=45)
+    st.pyplot(fig)
 
-st.pyplot(fig)
+with tab2:
+    st.write("Formation probability model will be added in expansion pack.")
 
-st.write("---")
-st.write("More advanced AI graphing modules will be added in next version.")
+with tab3:
+    st.write("Island of instability visualization coming soon.")
+
+st.divider()
+
+# ---- PERIODIC TABLE GRID (BETTER LAYOUT) ----
+st.header("Periodic Table Grid (Simplified View)")
+
+elements = ["H", "He", "Li", "Be", "Na", "Mg", "K", "Ca", "Cu"]
+cols = st.columns(5)
+
+for index, element in enumerate(elements):
+    cols[index % 5].button(element)
+
+st.divider()
+
+st.write("Simulator running with updated clean layout. Further AI upgrades paused pending approval.")
