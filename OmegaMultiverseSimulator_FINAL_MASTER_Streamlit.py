@@ -11,16 +11,28 @@ st.title("Multiverse Physics Simulation")
 st.sidebar.header("Adjust Physical Constants")
 
 
+
+
 def slider_with_percent(label, min_value, max_value, value, step):
     col1, col2 = st.sidebar.columns([3, 1])
-    slider_val = col1.slider(label, min_value, max_value, value, step)
-    precise_val = col2.text_input(f"{label} precise", str(slider_val))
+
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
+
     try:
-        slider_val = float(precise_val)
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
     except:
-        pass
+        precise_val = value
+
+    slider_val = col1.slider(label, min_value, max_value, precise_val, step)
+
     percent_change = (slider_val - 1.0) * 100
-    st.sidebar.markdown(f"<span style='font-size:12px;'>Change from baseline: {percent_change:+.1f}%</span>", unsafe_allow_html=True)
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
     return slider_val
 
 constants = {
