@@ -267,7 +267,6 @@ with tabs[9]:
     st.markdown("- **Higher Gravity Multiplier** compresses clusters and tightens tendrils.")
     st.markdown("- **Higher Dark Energy Multiplier** stretches cosmic web, expanding voids and diffusing structures.")
     st.plotly_chart(fig, use_container_width=True)
-    st.markdown("This advanced 3D visualization simulates dark matter distributions with tendrils and clusters, emulating gravitational wells where galaxies may form and evolve. The clusters represent denser dark matter nodes, while filaments suggest cosmic web structures that bind galaxies together in the multiverse.")
     
 # === 3D Atomic Stability Probability ===
 with tabs[10]:
