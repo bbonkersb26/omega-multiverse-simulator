@@ -106,6 +106,9 @@ with tabs[0]:
                                        colorscale='Viridis', colorbar=dict(title='Stability')))])
     fig.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='EM Force Multiplier', zaxis_title='Stability Probability'))
     st.plotly_chart(fig, use_container_width=True)
+    st.markdown("### AI Analysis — Scientific Interpretation")
+    st.markdown("This simulation visualizes how element stability varies across the periodic table as the electromagnetic force multiplier changes. Higher EM force favors tighter atomic binding, stabilizing lighter elements, while reducing stability of heavier atoms.")
+
 
     st.markdown("### AI Analysis → Scientific Interpretation")
     st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
@@ -271,6 +274,9 @@ with tabs[1]:
     fig = go.Figure(data=[go.Surface(z=instability, x=strong_grid, y=atomic_grid, colorscale='Inferno', colorbar=dict(title='Instability'))])
     fig.update_layout(scene=dict(xaxis_title='Strong Force Multiplier', yaxis_title='Atomic Number', zaxis_title='Instability Level'))
     st.plotly_chart(fig, use_container_width=True)
+    st.markdown("### AI Analysis — Scientific Interpretation")
+    st.markdown("This graph highlights the sensitivity of heavy element nuclei to the strong nuclear force multiplier. Small changes can destabilize or stabilize heavy isotopes, impacting superheavy element formation.")
+
 
     st.markdown("### AI Analysis → Scientific Interpretation")
     st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
@@ -435,6 +441,9 @@ with tabs[2]:
     fig = go.Figure(data=[go.Surface(z=star_potential, x=gravity_grid, y=dark_grid, colorscale='Viridis', colorbar=dict(title='Potential'))])
     fig.update_layout(scene=dict(xaxis_title='Gravity Multiplier', yaxis_title='Dark Energy Multiplier', zaxis_title='Star Formation Potential'))
     st.plotly_chart(fig, use_container_width=True)
+    st.markdown("### AI Analysis — Scientific Interpretation")
+    st.markdown("Star formation depends critically on the balance between gravitational attraction and dark energy repulsion. This plot shows how different force multipliers affect star birth rates.")
+
 
     st.markdown("### AI Analysis → Scientific Interpretation")
     st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
@@ -599,6 +608,9 @@ with tabs[3]:
     fig = go.Figure(data=go.Heatmap(z=life_prob, x=strong_force_values, y=em_force_values, colorscale='Viridis', colorbar=dict(title='Life Probability')))
     fig.update_layout(xaxis_title="Strong Force Multiplier", yaxis_title="EM Force Multiplier")
     st.plotly_chart(fig, use_container_width=True)
+    st.markdown("### AI Analysis — Scientific Interpretation")
+    st.markdown("Life-supporting chemistry relies on a careful balance of forces. Strong and electromagnetic force multipliers determine molecular stability and reaction pathways.")
+
 
     st.markdown("### AI Analysis → Scientific Interpretation")
     st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
@@ -763,6 +775,9 @@ with tabs[4]:
     fig = go.Figure(data=[go.Surface(z=bonding_prob, x=strong_grid, y=em_grid, colorscale='Viridis', colorbar=dict(title='Bonding Probability'))])
     fig.update_layout(scene=dict(xaxis_title='Strong Force Multiplier', yaxis_title='EM Force Multiplier', zaxis_title='Bonding Probability'))
     st.plotly_chart(fig, use_container_width=True)
+    st.markdown("### AI Analysis — Scientific Interpretation")
+    st.markdown("Quantum bonding probabilities are influenced by nuclear and electromagnetic forces. Altering these can affect molecular formation and stability.")
+
 
     st.markdown("### AI Analysis → Scientific Interpretation")
     st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
@@ -927,6 +942,9 @@ with tabs[5]:
     ax.set_ylabel('Probability')
     ax.set_title('Universe Probability vs Deviation')
     st.pyplot(fig)
+    st.markdown("### AI Analysis — Scientific Interpretation")
+    st.markdown("Overall universe stability reflects how constants deviate from our own. Extreme deviations may prevent matter, stars, or life from existing.")
+
 
     st.markdown("### AI Analysis → Scientific Interpretation")
     st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
@@ -1094,6 +1112,9 @@ with tabs[6]:
     ax.set_ylabel('Relative Abundance')
     ax.set_title('Element Abundance based on Fundamental Forces')
     st.pyplot(fig)
+    st.markdown("### AI Analysis — Scientific Interpretation")
+    st.markdown("Relative abundance of elements depends on force magnitudes which influence nuclear fusion pathways. This affects available elements in a universe.")
+
 
     st.markdown("### AI Analysis → Scientific Interpretation")
     st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
@@ -1258,6 +1279,9 @@ with tabs[7]:
     ax.axvline(constants["Electromagnetic Force Multiplier"], color='r', linestyle='--', label="Current EM Force")
     ax.legend()
     st.pyplot(fig)
+    st.markdown("### AI Analysis — Scientific Interpretation")
+    st.markdown("Electromagnetic force intensity affects radiation interaction with matter. Higher values increase destructive radiation which harms life.")
+
 
     st.markdown("### AI Analysis → Scientific Interpretation")
     st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
@@ -1422,6 +1446,9 @@ with tabs[8]:
     ax.axvline(constants["Gravitational Constant Multiplier"], color='r', linestyle='--', label="Current Gravity Multiplier")
     ax.legend()
     st.pyplot(fig)
+    st.markdown("### AI Analysis — Scientific Interpretation")
+    st.markdown("Gravity affects star pressure and fuel consumption. High gravity shortens star lives, while lower values prolong them.")
+
 
     st.markdown("### AI Analysis → Scientific Interpretation")
     st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
@@ -1586,6 +1613,9 @@ with tabs[9]:
     fig.colorbar(c, ax=ax)
     ax.set_title("Simulated 2D Dark Matter Plasma Density")
     st.pyplot(fig)
+    st.markdown("### AI Analysis — Scientific Interpretation")
+    st.markdown("Dark matter clumping affects cosmic web structure. This simulation shows random density variations that impact galaxy formation.")
+
 
     st.markdown("### AI Analysis → Scientific Interpretation")
     st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
@@ -1761,6 +1791,9 @@ with tabs[10]:
                                        marker=dict(size=5, color=Stability_vals, colorscale='Plasma', colorbar=dict(title='Stability')))])
     fig.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='Isotope Number', zaxis_title='Stability Probability'))
     st.plotly_chart(fig, use_container_width=True)
+    st.markdown("### AI Analysis — Scientific Interpretation")
+    st.markdown("This 3D scatter shows isotope stability probabilities affected by nuclear forces. Stable isotopes allow richer chemistry and longer-lived elements.")
+
 
     st.markdown("### AI Analysis → Scientific Interpretation")
     st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
