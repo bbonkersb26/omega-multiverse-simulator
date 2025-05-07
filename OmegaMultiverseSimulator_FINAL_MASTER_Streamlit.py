@@ -1,9 +1,9 @@
-# Omega Multiverse Simulator PRO — Scientific Final Version
 
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import plotly.graph_objs as go
 from mpl_toolkits.mplot3d import Axes3D
 import pyvista as pv
 
@@ -33,7 +33,7 @@ else:
 
 st.divider()
 
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12 = st.tabs([
     "Stability Curve",
     "Periodic Table Probability",
     "Island of Instability",
@@ -44,7 +44,8 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11 = st.tabs([
     "Radiation Risk",
     "Quantum Bonding",
     "Star Lifespan",
-    "3D Dark Matter Expansion"
+    "3D Dark Matter Expansion",
+    "3D Atomic Stability (New!)"
 ])
 
 with tab1:
@@ -52,7 +53,7 @@ with tab1:
     x = np.linspace(0.5, 2.0, 500)
     y = np.exp(-((x - constants["Strong Force Multiplier"])**2)/0.02)
     fig, ax = plt.subplots()
-    ax.plot(x, y)
+    ax.plot(x, y, color='blue', linewidth=2)
     st.pyplot(fig)
 
 with tab2:
@@ -61,8 +62,6 @@ with tab2:
     probabilities = np.exp(-abs(deviation) * (element_numbers / 20))
     fig, ax = plt.subplots()
     ax.bar(element_numbers, probabilities, color='cyan', edgecolor='black')
-    ax.set_xlabel("Atomic Number")
-    ax.set_ylabel("Stability Probability")
     st.pyplot(fig)
 
 with tab3:
@@ -70,14 +69,14 @@ with tab3:
     x = np.linspace(0.5, 2.0, 500)
     y = np.abs(np.sin((x - constants["Strong Force Multiplier"]) * 5))
     fig, ax = plt.subplots()
-    ax.plot(x, y, color='r')
+    ax.plot(x, y, color='red', linewidth=2)
     st.pyplot(fig)
 
 with tab4:
     st.subheader("Universe Probability")
     prob = np.exp(-deviation)
     fig, ax = plt.subplots()
-    ax.bar(["Universe Probability"], [prob])
+    ax.bar(["Universe Probability"], [prob], color='purple')
     st.pyplot(fig)
 
 with tab5:
@@ -85,14 +84,14 @@ with tab5:
     x = np.linspace(0.1, 10.0, 500)
     y = np.exp(-((x - constants["Gravitational Constant Multiplier"])**2)/1.0)
     fig, ax = plt.subplots()
-    ax.plot(x, y)
+    ax.plot(x, y, color='orange', linewidth=2)
     st.pyplot(fig)
 
 with tab6:
     st.subheader("Life Probability")
     life_prob = np.exp(-deviation/2)
     fig, ax = plt.subplots()
-    ax.bar(["Life Probability"], [life_prob])
+    ax.bar(["Life Probability"], [life_prob], color='green')
     st.pyplot(fig)
 
 with tab7:
@@ -102,7 +101,7 @@ with tab7:
                  np.exp(-abs(constants["Electromagnetic Force Multiplier"]-1)),
                  np.exp(-abs(constants["Weak Force Multiplier"]-1))]
     fig, ax = plt.subplots()
-    ax.bar(forces, abundance)
+    ax.bar(forces, abundance, color=['blue', 'magenta', 'yellow'])
     st.pyplot(fig)
 
 with tab8:
@@ -110,15 +109,19 @@ with tab8:
     x = np.linspace(0.1, 10.0, 500)
     y = (x**2) / 100
     fig, ax = plt.subplots()
-    ax.plot(x, y)
-    ax.axvline(constants["Electromagnetic Force Multiplier"], color='r', linestyle='--')
+    ax.plot(x, y, color='purple', linewidth=2)
+    ax.axvline(constants["Electromagnetic Force Multiplier"], color='r', linestyle='--', label="Current EM Force")
+    ax.set_xlabel("Electromagnetic Force Multiplier")
+    ax.set_ylabel("Radiation Risk")
+    ax.legend()
     st.pyplot(fig)
 
 with tab9:
     st.subheader("Quantum Bonding Probability")
-    bonding = np.exp(-abs(constants["Strong Force Multiplier"] - 1))
+    bonding_prob = np.exp(-abs(constants["Strong Force Multiplier"] - 1))
     fig, ax = plt.subplots()
-    ax.bar(["Bonding Probability"], [bonding])
+    ax.bar(["Bonding Probability"], [bonding_prob], color='violet')
+    ax.set_ylabel("Probability")
     st.pyplot(fig)
 
 with tab10:
@@ -126,20 +129,87 @@ with tab10:
     x = np.linspace(0.1, 10.0, 500)
     y = 1 / x
     fig, ax = plt.subplots()
-    ax.plot(x, y)
-    ax.axvline(constants["Gravitational Constant Multiplier"], color='r', linestyle='--')
+    ax.plot(x, y, color='darkgreen', linewidth=2)
+    ax.axvline(constants["Gravitational Constant Multiplier"], color='r', linestyle='--', label="Current Gravity Multiplier")
+    ax.set_xlabel("Gravitational Constant Multiplier")
+    ax.set_ylabel("Relative Star Lifespan")
+    ax.legend()
     st.pyplot(fig)
 
 with tab11:
     st.subheader("3D Dark Matter Plasma Web")
+
     grid_size = 50
     density = np.random.normal(0, 1, (grid_size, grid_size, grid_size))
+
     grid = pv.UniformGrid()
     grid.dimensions = np.array(density.shape) + 1
     grid.origin = (0, 0, 0)
     grid.spacing = (1, 1, 1)
     grid.cell_arrays["density"] = density.flatten(order="F")
+
     plotter = pv.Plotter(off_screen=True)
     plotter.add_volume(grid, cmap="plasma", opacity="sigmoid")
-    plotter.screenshot("darkmatter.png")
-    st.image("darkmatter.png", caption="Dark Matter Plasma Simulation")
+    screenshot_path = "darkmatter.png"
+    plotter.screenshot(screenshot_path)
+
+    st.image(screenshot_path, caption="Dark Matter Plasma Simulation")
+
+with tab12:
+    st.subheader("3D Atomic Stability Probability per Isotope (Dynamic Universe Constants)")
+
+    atomic_numbers = np.arange(1, 121)
+    isotopes_per_element = 20
+
+    np.random.seed(42)
+    base_stability = np.linspace(0.2, 0.98, len(atomic_numbers))
+
+    modified_stability = base_stability * constants["Strong Force Multiplier"] / constants["Electromagnetic Force Multiplier"]
+    modified_stability = np.clip(modified_stability, 0, 1)
+
+    stability_matrix = np.array([modified_stability + np.random.normal(0, 0.05 * constants["Weak Force Multiplier"], len(atomic_numbers))
+                                 for _ in range(isotopes_per_element)]).T
+    stability_matrix = np.clip(stability_matrix, 0, 1)
+
+    Z_vals = []
+    Stability_vals = []
+    Isotope_vals = []
+    Labels = []
+
+    for Z in atomic_numbers:
+        for iso in range(1, isotopes_per_element + 1):
+            Z_vals.append(Z)
+            Stability_vals.append(stability_matrix[Z - 1, iso - 1])
+            Isotope_vals.append(iso)
+            Labels.append(f"Z{Z}-Iso{iso}")
+
+    fig3d = go.Figure()
+
+    fig3d.add_trace(go.Scatter3d(
+        x=Z_vals,
+        y=Isotope_vals,
+        z=Stability_vals,
+        mode='markers',
+        marker=dict(
+            size=5,
+            color=Stability_vals,
+            colorscale='Plasma',
+            opacity=0.9,
+            colorbar=dict(title="Stability")
+        ),
+        text=Labels,
+        hovertemplate="Element: %{text}<br>Atomic Number: %{x}<br>Isotope: %{y}<br>Stability: %{z:.2f}<extra></extra>"
+    ))
+
+    fig3d.update_layout(
+        title="3D Atomic Stability Probability per Isotope",
+        scene=dict(
+            xaxis_title='Atomic Number',
+            yaxis_title='Isotope Number',
+            zaxis_title='Stability Probability'
+        ),
+        width=900,
+        height=700
+    )
+
+    st.plotly_chart(fig3d, use_container_width=True)
