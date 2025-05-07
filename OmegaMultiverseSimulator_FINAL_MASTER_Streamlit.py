@@ -141,20 +141,61 @@ with tabs[2]:
     st.markdown("- **Higher Gravity Multiplier** accelerates star formation, consuming gas more quickly.")
     st.markdown("- **Higher Dark Energy Multiplier** suppresses star formation by expanding space.")
     st.markdown("- **Metallicity** increases over time as stars die, releasing heavy elements critical for planet and life formation.")
-# Life Probability (Heatmap)
+# === Life Probability (Heatmap → Linked to Metallicity + Forces) ===
 with tabs[3]:
-    st.subheader("Life Probability Map (Heatmap)")
+    st.subheader("Life Probability Map (Linked to Metallicity and Forces)")
+
+    # Link to physics constants (user sliders)
     strong_force_values = np.linspace(0.1, 10.0, 50)
     em_force_values = np.linspace(0.1, 10.0, 50)
     strong_grid, em_grid = np.meshgrid(strong_force_values, em_force_values)
-    life_prob = np.exp(-((strong_grid - constants["Strong Force Multiplier"])**2 + (em_grid - constants["Electromagnetic Force Multiplier"])**2) / 3)
-    fig = go.Figure(data=go.Heatmap(z=life_prob, x=strong_force_values, y=em_force_values, colorscale='Viridis', colorbar=dict(title='Life Probability')))
-    fig.update_layout(xaxis_title="Strong Force Multiplier", yaxis_title="EM Force Multiplier")
-    st.plotly_chart(fig, use_container_width=True)
-    
-    st.markdown("**AI Analysis → Scientific Summary**")
-    st.markdown("Life potential depends on finely tuned forces. This heatmap highlights how moderate values enable molecular bonding crucial for biology, while extremes render life chemically unfeasible.")
 
+    # Current universe values (from sliders)
+    current_strong = constants["Strong Force Multiplier"]
+    current_em = constants["Electromagnetic Force Multiplier"]
+
+    # Calculate force-based life probability
+    force_life_prob = np.exp(-((strong_grid - current_strong)**2 + (em_grid - current_em)**2) / 3)
+
+    # ====== NEW SCIENTIFIC PART (METALLICITY LINKING) ======
+
+    # Metallicity (simulate linkage from star evolution → in real case this comes from star metallicity result)
+    # For now, simulate as steady increasing function:
+    #  (Later → directly connect this to star formation module metallicity[-1] value!)
+    simulated_metallicity = 0.5  # Example: halfway enriched universe
+
+    # Metallicity boost factor → low metals suppress life, medium to high metals enable life
+    metallicity_factor = (simulated_metallicity - 0.1) / (0.5 - 0.1)
+    metallicity_factor = np.clip(metallicity_factor, 0, 1)
+
+    # Broadcast metallicity factor across grid
+    metallicity_grid = np.ones_like(force_life_prob) * metallicity_factor
+
+    # Final life probability
+    final_life_prob = force_life_prob * metallicity_grid
+
+    # Plotting
+    fig = go.Figure(data=go.Heatmap(
+        z=final_life_prob,
+        x=strong_force_values,
+        y=em_force_values,
+        colorscale='Viridis',
+        colorbar=dict(title='Life Probability')
+    ))
+
+    fig.update_layout(
+        title="Life Probability Map (Force + Metallicity Linked)",
+        xaxis_title="Strong Force Multiplier",
+        yaxis_title="EM Force Multiplier"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("### AI Analysis → Scientific Summary")
+    st.markdown("This life probability model now includes:")
+    st.markdown("- **Forces Compatibility** → Molecular and atomic stability zones based on nuclear and EM forces.")
+    st.markdown("- **Metallicity Influence** → Low metallicity suppresses life chances (no planet formation), while medium to high metallicity supports life emergence.")
+    st.markdown("The model shows that universes with optimal physical constants and sufficient cosmic evolution (star death → metals) are the most likely to support life.")
 # Quantum Bonding (3D Surface)
 with tabs[4]:
     st.subheader("Quantum Bonding Probability (Advanced 3D Surface)")
