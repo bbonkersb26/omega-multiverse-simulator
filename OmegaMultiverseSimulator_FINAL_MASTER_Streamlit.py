@@ -3,7 +3,6 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
-from streamlit import plotly_chart
 
 # 3D Graph Optimizer (prevents cutoff)
 
@@ -93,7 +92,7 @@ with tabs[0]:
                                            colorscale='Viridis', colorbar=dict(title='Stability')))])
         fig.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='EM Force Multiplier', zaxis_title='Stability Probability'))
         fig = optimize_3d_layout(fig, fig.layout.scene.xaxis.title.text, fig.layout.scene.yaxis.title.text, fig.layout.scene.zaxis.title.text)
-plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
 
 # Island of Instability (3D Surface)
 with tabs[1]:
@@ -106,7 +105,7 @@ with tabs[1]:
         fig = go.Figure(data=[go.Surface(z=instability, x=strong_grid, y=atomic_grid, colorscale='Inferno', colorbar=dict(title='Instability'))])
         fig.update_layout(scene=dict(xaxis_title='Strong Force Multiplier', yaxis_title='Atomic Number', zaxis_title='Instability Level'))
         fig = optimize_3d_layout(fig, fig.layout.scene.xaxis.title.text, fig.layout.scene.yaxis.title.text, fig.layout.scene.zaxis.title.text)
-plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
 
 # Star Formation Potential (3D Surface)
 with tabs[2]:
@@ -119,7 +118,7 @@ with tabs[2]:
         fig = go.Figure(data=[go.Surface(z=star_potential, x=gravity_grid, y=dark_grid, colorscale='Viridis', colorbar=dict(title='Potential'))])
         fig.update_layout(scene=dict(xaxis_title='Gravity Multiplier', yaxis_title='Dark Energy Multiplier', zaxis_title='Star Formation Potential'))
         fig = optimize_3d_layout(fig, fig.layout.scene.xaxis.title.text, fig.layout.scene.yaxis.title.text, fig.layout.scene.zaxis.title.text)
-plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
 
 # Life Probability (Heatmap)
 with tabs[3]:
@@ -132,7 +131,7 @@ with tabs[3]:
         fig = go.Figure(data=go.Heatmap(z=life_prob, x=strong_force_values, y=em_force_values, colorscale='Viridis', colorbar=dict(title='Life Probability')))
         fig.update_layout(xaxis_title="Strong Force Multiplier", yaxis_title="EM Force Multiplier")
         fig = optimize_3d_layout(fig, fig.layout.scene.xaxis.title.text, fig.layout.scene.yaxis.title.text, fig.layout.scene.zaxis.title.text)
-plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
 
 
 
@@ -147,7 +146,7 @@ with tabs[4]:
         fig = go.Figure(data=[go.Surface(z=bonding_prob, x=strong_grid, y=em_grid, colorscale='Viridis', colorbar=dict(title='Bonding Probability'))])
         fig.update_layout(scene=dict(xaxis_title='Strong Force Multiplier', yaxis_title='EM Force Multiplier', zaxis_title='Bonding Probability'))
         fig = optimize_3d_layout(fig, fig.layout.scene.xaxis.title.text, fig.layout.scene.yaxis.title.text, fig.layout.scene.zaxis.title.text)
-plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
 
 # Universe Probability
 with tabs[5]:
@@ -223,5 +222,5 @@ with tabs[10]:
                                            marker=dict(size=5, color=Stability_vals, colorscale='Plasma', colorbar=dict(title='Stability')))])
         fig.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='Isotope Number', zaxis_title='Stability Probability'))
         fig = optimize_3d_layout(fig, fig.layout.scene.xaxis.title.text, fig.layout.scene.yaxis.title.text, fig.layout.scene.zaxis.title.text)
-plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
 
