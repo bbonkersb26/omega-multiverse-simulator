@@ -188,29 +188,73 @@ with tabs[8]:
     st.markdown("Stars burn fuel more quickly in universes with stronger gravity. This plot visualizes how stellar lifespans shorten as gravity increases, impacting planet formation and time available for life.")
 
 # === 2D Dark Matter Simulation ===
+# === 3D Dark Matter Tendril + Galaxy Simulation ===
 with tabs[9]:
-    st.subheader("2D Dark Matter Simulation")
-    density_2d = np.random.normal(0, 1, (100, 100))
-    fig, ax = plt.subplots(figsize=(8, 6))
-    c = ax.imshow(density_2d, cmap="plasma", interpolation="nearest", origin="lower")
-    fig.colorbar(c, ax=ax)
-    ax.set_title("Simulated 2D Dark Matter Plasma Density")
-    ax.set_xlabel("X Position")
-    ax.set_ylabel("Y Position")
-    st.pyplot(fig)
+    st.subheader("3D Dark Matter Tendril + Galaxy Cluster Simulation")
+
+    size = 50  # Grid size
+    scale = 10  # Spatial scale
+    num_clusters = 5  # Number of dark matter clusters
+
+    # Generate 3D grid
+    x = np.linspace(-scale, scale, size)
+    y = np.linspace(-scale, scale, size)
+    z = np.linspace(-scale, scale, size)
+    X, Y, Z = np.meshgrid(x, y, z)
+
+    # Initialize dark matter density
+    density = np.zeros_like(X)
+
+    # Generate random cluster centers
+    np.random.seed(42)
+    cluster_centers = np.random.uniform(-scale, scale, (num_clusters, 3))
+
+    # Generate tendril-like Gaussian blobs
+    for cx, cy, cz in cluster_centers:
+        dist = np.sqrt((X - cx)**2 + (Y - cy)**2 + (Z - cz)**2)
+        blob = np.exp(-(dist**2) / 4)
+        density += blob
+
+    # Normalize density
+    density /= np.max(density)
+
+    # Filter significant density points
+    threshold = 0.2
+    points = np.where(density > threshold)
+    x_points = X[points]
+    y_points = Y[points]
+    z_points = Z[points]
+    density_points = density[points]
+
+    # Plot 3D dark matter density
+    fig = go.Figure(data=[go.Scatter3d(
+        x=x_points,
+        y=y_points,
+        z=z_points,
+        mode='markers',
+        marker=dict(
+            size=3,
+            color=density_points,
+            colorscale='Inferno',
+            opacity=0.7,
+            colorbar=dict(title='Dark Matter Density')
+        )
+    )])
+
+    fig.update_layout(
+        title="Simulated 3D Dark Matter Tendrils and Galaxy Clusters",
+        scene=dict(
+            xaxis_title='X Position',
+            yaxis_title='Y Position',
+            zaxis_title='Z Position'
+        )
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("### AI Analysis → Scientific Summary")
-    st.markdown("This heatmap displays simulated 2D dark matter distributions. Denser clumps suggest gravitational potential wells where galaxies and stars could cluster.")
-
-    st.markdown("### AI Analysis → Scientific Summary")
-    st.markdown("The periodic table stability visualization reflects the balance between electromagnetic repulsion and nuclear cohesion.")
-    st.markdown("Higher EM forces destabilize heavy elements, while optimal strong force tuning expands elemental stability.")
-    st.markdown("")
-    st.markdown("A deeper look: In universes where EM force increases even slightly, proton-proton repulsion becomes catastrophic, destabilizing nuclei beyond iron or zinc.")
-    st.markdown("Without stable heavy elements, key transition metals like copper, iron, and zinc—crucial for electron transport in biology—cannot form.")
-    st.markdown("If strong force is finely enhanced, superheavy elements may become stable, potentially forming new chemistry. However, if too strong, all matter may clump into dense neutron-heavy elements, stifling complex chemistry altogether.")
-
-
+    st.markdown("This advanced 3D visualization simulates dark matter distributions with tendrils and clusters, emulating gravitational wells where galaxies may form and evolve. The clusters represent denser dark matter nodes, while filaments suggest cosmic web structures that bind galaxies together in the multiverse.")
+    
 # === 3D Atomic Stability Probability ===
 with tabs[10]:
     st.subheader("3D Atomic Stability Probability per Isotope")
