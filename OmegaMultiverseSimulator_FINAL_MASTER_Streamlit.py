@@ -5,21 +5,73 @@ import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 
 st.set_page_config(layout="wide")
-st.title("Omega Multiverse Simulator — ABSOLUTE FINAL PROFESSIONAL FIX")
+st.title("Multiverse Physics Simulation")
 
+# Sidebar - Universe Constants with % change display
 st.sidebar.header("Adjust Physical Constants")
-def render_slider(label, min_val, max_val, default, step):
-    val = st.sidebar.slider(label, min_val, max_val, default, step=step)
-    change_percent = (val - 1.0) * 100
-    st.sidebar.markdown(f"<small>Change from baseline: {change_percent:+.2f}%</small>", unsafe_allow_html=True)
-    return val
+
+
+
+
+
+def slider_with_percent(label, min_value, max_value, value, step):
+    col1, col2 = st.sidebar.columns([3, 1])
+
+    # Text input first for user-defined value
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
+
+    # Validate user input
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    # Apply button to sync value
+    apply_key = f"{label}_apply"
+    if st.sidebar.button("Apply", key=apply_key):
+        slider_val = precise_val
+    else:
+        slider_val = value
+
+    # Always render slider
+    slider_val = col1.slider(label, min_value, max_value, slider_val, step)
+
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+
+    return slider_val
+
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
+
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    slider_val = col1.slider(label, min_value, max_value, precise_val, step)
+
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+    return slider_val
 
 constants = {
-    "Strong Force Multiplier": render_slider("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-    "Electromagnetic Force Multiplier": render_slider("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-    "Weak Force Multiplier": render_slider("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-    "Gravitational Constant Multiplier": render_slider("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
-    "Dark Energy Multiplier": render_slider("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
 }
 
 deviation = sum(abs(v - 1.0) for v in constants.values())
@@ -34,1138 +86,1068 @@ else:
 
 st.divider()
 
-def render_periodic_table_stability_3d():
-    st.subheader("Periodic Table Stability (3D)")
-    import streamlit as st
-    import numpy as np
-    import plotly.graph_objs as go
-    import matplotlib.pyplot as plt
-    
-    st.set_page_config(layout="wide")
-    st.title("Multiverse Physics Simulation")
-    
-    # Sidebar - Universe Constants with % change display
-    st.sidebar.header("Adjust Physical Constants")
-    
-    
-    
-    
-    
-    def slider_with_percent(label, min_value, max_value, value, step):
-        col1, col2 = st.sidebar.columns([3, 1])
-    
-        # Text input first for user-defined value
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
-    
-        # Validate user input
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        # Apply button to sync value
-        apply_key = f"{label}_apply"
-        if st.sidebar.button("Apply", key=apply_key):
-            slider_val = precise_val
-        else:
-            slider_val = value
-    
-        # Always render slider
-        slider_val = col1.slider(label, min_value, max_value, slider_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-    
-        return slider_val
-    
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
-    
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        slider_val = col1.slider(label, min_value, max_value, precise_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-        return slider_val
-    
-    constants = {
-        "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
-    }
-    
-    deviation = sum(abs(v - 1.0) for v in constants.values())
-    st.header("Universe Stability Summary")
-    st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
-    if deviation == 0:
-        st.success("This universe matches our own. Chemistry and life likely stable.")
-    elif deviation < 3:
-        st.warning("Moderate deviation detected. Instability possible.")
+# Tabs
+tabs = st.tabs([
+    "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
+    "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
+    "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
+])
+
+# Graphs autogenerated per tab selected
+
+
+import streamlit as st
+import numpy as np
+import plotly.graph_objs as go
+import matplotlib.pyplot as plt
+
+st.set_page_config(layout="wide")
+st.title("Multiverse Physics Simulation")
+
+# Sidebar - Universe Constants with % change display
+st.sidebar.header("Adjust Physical Constants")
+
+
+
+
+
+def slider_with_percent(label, min_value, max_value, value, step):
+    col1, col2 = st.sidebar.columns([3, 1])
+
+    # Text input first for user-defined value
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
+
+    # Validate user input
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    # Apply button to sync value
+    apply_key = f"{label}_apply"
+    if st.sidebar.button("Apply", key=apply_key):
+        slider_val = precise_val
     else:
-        st.error("High deviation. Unstable universe likely.")
-    
-    st.divider()
-    
-    # Tabs
-    tabs = st.tabs([
-        "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
-        "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
-        "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
-    ])
-    
-    # Graphs autogenerated per tab selected
+        slider_val = value
 
-    st.markdown("### AI Analysis — Scientific Summary")
-    st.markdown("Electromagnetic force impacts element stability. Higher EM stabilizes lighter elements and destabilizes heavier ones.")
+    # Always render slider
+    slider_val = col1.slider(label, min_value, max_value, slider_val, step)
 
-def render_island_of_instability_3d():
-    st.subheader("Island of Instability (3D)")
-    import streamlit as st
-    import numpy as np
-    import plotly.graph_objs as go
-    import matplotlib.pyplot as plt
-    
-    st.set_page_config(layout="wide")
-    st.title("Multiverse Physics Simulation")
-    
-    # Sidebar - Universe Constants with % change display
-    st.sidebar.header("Adjust Physical Constants")
-    
-    
-    
-    
-    
-    def slider_with_percent(label, min_value, max_value, value, step):
-        col1, col2 = st.sidebar.columns([3, 1])
-    
-        # Text input first for user-defined value
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
-    
-        # Validate user input
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        # Apply button to sync value
-        apply_key = f"{label}_apply"
-        if st.sidebar.button("Apply", key=apply_key):
-            slider_val = precise_val
-        else:
-            slider_val = value
-    
-        # Always render slider
-        slider_val = col1.slider(label, min_value, max_value, slider_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-    
-        return slider_val
-    
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
-    
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        slider_val = col1.slider(label, min_value, max_value, precise_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-        return slider_val
-    
-    constants = {
-        "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
-    }
-    
-    deviation = sum(abs(v - 1.0) for v in constants.values())
-    st.header("Universe Stability Summary")
-    st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
-    if deviation == 0:
-        st.success("This universe matches our own. Chemistry and life likely stable.")
-    elif deviation < 3:
-        st.warning("Moderate deviation detected. Instability possible.")
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+
+    return slider_val
+
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
+
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    slider_val = col1.slider(label, min_value, max_value, precise_val, step)
+
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+    return slider_val
+
+constants = {
+    "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
+}
+
+deviation = sum(abs(v - 1.0) for v in constants.values())
+st.header("Universe Stability Summary")
+st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
+if deviation == 0:
+    st.success("This universe matches our own. Chemistry and life likely stable.")
+elif deviation < 3:
+    st.warning("Moderate deviation detected. Instability possible.")
+else:
+    st.error("High deviation. Unstable universe likely.")
+
+st.divider()
+
+# Tabs
+tabs = st.tabs([
+    "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
+    "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
+    "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
+])
+
+# Graphs autogenerated per tab selected
+
+import streamlit as st
+import numpy as np
+import plotly.graph_objs as go
+import matplotlib.pyplot as plt
+
+st.set_page_config(layout="wide")
+st.title("Multiverse Physics Simulation")
+
+# Sidebar - Universe Constants with % change display
+st.sidebar.header("Adjust Physical Constants")
+
+
+
+
+
+def slider_with_percent(label, min_value, max_value, value, step):
+    col1, col2 = st.sidebar.columns([3, 1])
+
+    # Text input first for user-defined value
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
+
+    # Validate user input
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    # Apply button to sync value
+    apply_key = f"{label}_apply"
+    if st.sidebar.button("Apply", key=apply_key):
+        slider_val = precise_val
     else:
-        st.error("High deviation. Unstable universe likely.")
-    
-    st.divider()
-    
-    # Tabs
-    tabs = st.tabs([
-        "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
-        "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
-        "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
-    ])
-    
-    # Graphs autogenerated per tab selected
+        slider_val = value
 
-    st.markdown("### AI Analysis — Scientific Summary")
-    st.markdown("Strong force changes shift heavy element stability. Larger values compress instability regions, lower values expand them.")
+    # Always render slider
+    slider_val = col1.slider(label, min_value, max_value, slider_val, step)
 
-def render_star_formation_potential_3d():
-    st.subheader("Star Formation Potential (3D)")
-    import streamlit as st
-    import numpy as np
-    import plotly.graph_objs as go
-    import matplotlib.pyplot as plt
-    
-    st.set_page_config(layout="wide")
-    st.title("Multiverse Physics Simulation")
-    
-    # Sidebar - Universe Constants with % change display
-    st.sidebar.header("Adjust Physical Constants")
-    
-    
-    
-    
-    
-    def slider_with_percent(label, min_value, max_value, value, step):
-        col1, col2 = st.sidebar.columns([3, 1])
-    
-        # Text input first for user-defined value
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
-    
-        # Validate user input
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        # Apply button to sync value
-        apply_key = f"{label}_apply"
-        if st.sidebar.button("Apply", key=apply_key):
-            slider_val = precise_val
-        else:
-            slider_val = value
-    
-        # Always render slider
-        slider_val = col1.slider(label, min_value, max_value, slider_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-    
-        return slider_val
-    
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
-    
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        slider_val = col1.slider(label, min_value, max_value, precise_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-        return slider_val
-    
-    constants = {
-        "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
-    }
-    
-    deviation = sum(abs(v - 1.0) for v in constants.values())
-    st.header("Universe Stability Summary")
-    st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
-    if deviation == 0:
-        st.success("This universe matches our own. Chemistry and life likely stable.")
-    elif deviation < 3:
-        st.warning("Moderate deviation detected. Instability possible.")
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+
+    return slider_val
+
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
+
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    slider_val = col1.slider(label, min_value, max_value, precise_val, step)
+
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+    return slider_val
+
+constants = {
+    "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
+}
+
+deviation = sum(abs(v - 1.0) for v in constants.values())
+st.header("Universe Stability Summary")
+st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
+if deviation == 0:
+    st.success("This universe matches our own. Chemistry and life likely stable.")
+elif deviation < 3:
+    st.warning("Moderate deviation detected. Instability possible.")
+else:
+    st.error("High deviation. Unstable universe likely.")
+
+st.divider()
+
+# Tabs
+tabs = st.tabs([
+    "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
+    "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
+    "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
+])
+
+# Graphs autogenerated per tab selected
+
+import streamlit as st
+import numpy as np
+import plotly.graph_objs as go
+import matplotlib.pyplot as plt
+
+st.set_page_config(layout="wide")
+st.title("Multiverse Physics Simulation")
+
+# Sidebar - Universe Constants with % change display
+st.sidebar.header("Adjust Physical Constants")
+
+
+
+
+
+def slider_with_percent(label, min_value, max_value, value, step):
+    col1, col2 = st.sidebar.columns([3, 1])
+
+    # Text input first for user-defined value
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
+
+    # Validate user input
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    # Apply button to sync value
+    apply_key = f"{label}_apply"
+    if st.sidebar.button("Apply", key=apply_key):
+        slider_val = precise_val
     else:
-        st.error("High deviation. Unstable universe likely.")
-    
-    st.divider()
-    
-    # Tabs
-    tabs = st.tabs([
-        "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
-        "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
-        "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
-    ])
-    
-    # Graphs autogenerated per tab selected
+        slider_val = value
 
-    st.markdown("### AI Analysis — Scientific Summary")
-    st.markdown("Star formation occurs under balanced gravity and dark energy. Extremes inhibit star creation.")
+    # Always render slider
+    slider_val = col1.slider(label, min_value, max_value, slider_val, step)
 
-def render_life_probability_heatmap():
-    st.subheader("Life Probability (Heatmap)")
-    import streamlit as st
-    import numpy as np
-    import plotly.graph_objs as go
-    import matplotlib.pyplot as plt
-    
-    st.set_page_config(layout="wide")
-    st.title("Multiverse Physics Simulation")
-    
-    # Sidebar - Universe Constants with % change display
-    st.sidebar.header("Adjust Physical Constants")
-    
-    
-    
-    
-    
-    def slider_with_percent(label, min_value, max_value, value, step):
-        col1, col2 = st.sidebar.columns([3, 1])
-    
-        # Text input first for user-defined value
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
-    
-        # Validate user input
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        # Apply button to sync value
-        apply_key = f"{label}_apply"
-        if st.sidebar.button("Apply", key=apply_key):
-            slider_val = precise_val
-        else:
-            slider_val = value
-    
-        # Always render slider
-        slider_val = col1.slider(label, min_value, max_value, slider_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-    
-        return slider_val
-    
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
-    
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        slider_val = col1.slider(label, min_value, max_value, precise_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-        return slider_val
-    
-    constants = {
-        "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
-    }
-    
-    deviation = sum(abs(v - 1.0) for v in constants.values())
-    st.header("Universe Stability Summary")
-    st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
-    if deviation == 0:
-        st.success("This universe matches our own. Chemistry and life likely stable.")
-    elif deviation < 3:
-        st.warning("Moderate deviation detected. Instability possible.")
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+
+    return slider_val
+
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
+
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    slider_val = col1.slider(label, min_value, max_value, precise_val, step)
+
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+    return slider_val
+
+constants = {
+    "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
+}
+
+deviation = sum(abs(v - 1.0) for v in constants.values())
+st.header("Universe Stability Summary")
+st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
+if deviation == 0:
+    st.success("This universe matches our own. Chemistry and life likely stable.")
+elif deviation < 3:
+    st.warning("Moderate deviation detected. Instability possible.")
+else:
+    st.error("High deviation. Unstable universe likely.")
+
+st.divider()
+
+# Tabs
+tabs = st.tabs([
+    "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
+    "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
+    "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
+])
+
+# Graphs autogenerated per tab selected
+
+import streamlit as st
+import numpy as np
+import plotly.graph_objs as go
+import matplotlib.pyplot as plt
+
+st.set_page_config(layout="wide")
+st.title("Multiverse Physics Simulation")
+
+# Sidebar - Universe Constants with % change display
+st.sidebar.header("Adjust Physical Constants")
+
+
+
+
+
+def slider_with_percent(label, min_value, max_value, value, step):
+    col1, col2 = st.sidebar.columns([3, 1])
+
+    # Text input first for user-defined value
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
+
+    # Validate user input
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    # Apply button to sync value
+    apply_key = f"{label}_apply"
+    if st.sidebar.button("Apply", key=apply_key):
+        slider_val = precise_val
     else:
-        st.error("High deviation. Unstable universe likely.")
-    
-    st.divider()
-    
-    # Tabs
-    tabs = st.tabs([
-        "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
-        "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
-        "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
-    ])
-    
-    # Graphs autogenerated per tab selected
+        slider_val = value
 
-    st.markdown("### AI Analysis — Scientific Summary")
-    st.markdown("Balanced strong and EM forces enable complex chemistry. This heatmap shows probable life-supporting ranges.")
+    # Always render slider
+    slider_val = col1.slider(label, min_value, max_value, slider_val, step)
 
-def render_quantum_bonding_3d():
-    st.subheader("Quantum Bonding (3D)")
-    import streamlit as st
-    import numpy as np
-    import plotly.graph_objs as go
-    import matplotlib.pyplot as plt
-    
-    st.set_page_config(layout="wide")
-    st.title("Multiverse Physics Simulation")
-    
-    # Sidebar - Universe Constants with % change display
-    st.sidebar.header("Adjust Physical Constants")
-    
-    
-    
-    
-    
-    def slider_with_percent(label, min_value, max_value, value, step):
-        col1, col2 = st.sidebar.columns([3, 1])
-    
-        # Text input first for user-defined value
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
-    
-        # Validate user input
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        # Apply button to sync value
-        apply_key = f"{label}_apply"
-        if st.sidebar.button("Apply", key=apply_key):
-            slider_val = precise_val
-        else:
-            slider_val = value
-    
-        # Always render slider
-        slider_val = col1.slider(label, min_value, max_value, slider_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-    
-        return slider_val
-    
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
-    
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        slider_val = col1.slider(label, min_value, max_value, precise_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-        return slider_val
-    
-    constants = {
-        "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
-    }
-    
-    deviation = sum(abs(v - 1.0) for v in constants.values())
-    st.header("Universe Stability Summary")
-    st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
-    if deviation == 0:
-        st.success("This universe matches our own. Chemistry and life likely stable.")
-    elif deviation < 3:
-        st.warning("Moderate deviation detected. Instability possible.")
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+
+    return slider_val
+
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
+
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    slider_val = col1.slider(label, min_value, max_value, precise_val, step)
+
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+    return slider_val
+
+constants = {
+    "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
+}
+
+deviation = sum(abs(v - 1.0) for v in constants.values())
+st.header("Universe Stability Summary")
+st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
+if deviation == 0:
+    st.success("This universe matches our own. Chemistry and life likely stable.")
+elif deviation < 3:
+    st.warning("Moderate deviation detected. Instability possible.")
+else:
+    st.error("High deviation. Unstable universe likely.")
+
+st.divider()
+
+# Tabs
+tabs = st.tabs([
+    "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
+    "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
+    "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
+])
+
+# Graphs autogenerated per tab selected
+
+import streamlit as st
+import numpy as np
+import plotly.graph_objs as go
+import matplotlib.pyplot as plt
+
+st.set_page_config(layout="wide")
+st.title("Multiverse Physics Simulation")
+
+# Sidebar - Universe Constants with % change display
+st.sidebar.header("Adjust Physical Constants")
+
+
+
+
+
+def slider_with_percent(label, min_value, max_value, value, step):
+    col1, col2 = st.sidebar.columns([3, 1])
+
+    # Text input first for user-defined value
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
+
+    # Validate user input
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    # Apply button to sync value
+    apply_key = f"{label}_apply"
+    if st.sidebar.button("Apply", key=apply_key):
+        slider_val = precise_val
     else:
-        st.error("High deviation. Unstable universe likely.")
-    
-    st.divider()
-    
-    # Tabs
-    tabs = st.tabs([
-        "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
-        "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
-        "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
-    ])
-    
-    # Graphs autogenerated per tab selected
+        slider_val = value
 
-    st.markdown("### AI Analysis — Scientific Summary")
-    st.markdown("Molecular bonding depends on nuclear and EM forces. Extreme values disrupt molecule formation.")
+    # Always render slider
+    slider_val = col1.slider(label, min_value, max_value, slider_val, step)
 
-def render_universe_probability():
-    st.subheader("Universe Probability")
-    import streamlit as st
-    import numpy as np
-    import plotly.graph_objs as go
-    import matplotlib.pyplot as plt
-    
-    st.set_page_config(layout="wide")
-    st.title("Multiverse Physics Simulation")
-    
-    # Sidebar - Universe Constants with % change display
-    st.sidebar.header("Adjust Physical Constants")
-    
-    
-    
-    
-    
-    def slider_with_percent(label, min_value, max_value, value, step):
-        col1, col2 = st.sidebar.columns([3, 1])
-    
-        # Text input first for user-defined value
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
-    
-        # Validate user input
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        # Apply button to sync value
-        apply_key = f"{label}_apply"
-        if st.sidebar.button("Apply", key=apply_key):
-            slider_val = precise_val
-        else:
-            slider_val = value
-    
-        # Always render slider
-        slider_val = col1.slider(label, min_value, max_value, slider_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-    
-        return slider_val
-    
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
-    
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        slider_val = col1.slider(label, min_value, max_value, precise_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-        return slider_val
-    
-    constants = {
-        "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
-    }
-    
-    deviation = sum(abs(v - 1.0) for v in constants.values())
-    st.header("Universe Stability Summary")
-    st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
-    if deviation == 0:
-        st.success("This universe matches our own. Chemistry and life likely stable.")
-    elif deviation < 3:
-        st.warning("Moderate deviation detected. Instability possible.")
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+
+    return slider_val
+
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
+
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    slider_val = col1.slider(label, min_value, max_value, precise_val, step)
+
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+    return slider_val
+
+constants = {
+    "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
+}
+
+deviation = sum(abs(v - 1.0) for v in constants.values())
+st.header("Universe Stability Summary")
+st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
+if deviation == 0:
+    st.success("This universe matches our own. Chemistry and life likely stable.")
+elif deviation < 3:
+    st.warning("Moderate deviation detected. Instability possible.")
+else:
+    st.error("High deviation. Unstable universe likely.")
+
+st.divider()
+
+# Tabs
+tabs = st.tabs([
+    "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
+    "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
+    "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
+])
+
+# Graphs autogenerated per tab selected
+
+import streamlit as st
+import numpy as np
+import plotly.graph_objs as go
+import matplotlib.pyplot as plt
+
+st.set_page_config(layout="wide")
+st.title("Multiverse Physics Simulation")
+
+# Sidebar - Universe Constants with % change display
+st.sidebar.header("Adjust Physical Constants")
+
+
+
+
+
+def slider_with_percent(label, min_value, max_value, value, step):
+    col1, col2 = st.sidebar.columns([3, 1])
+
+    # Text input first for user-defined value
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
+
+    # Validate user input
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    # Apply button to sync value
+    apply_key = f"{label}_apply"
+    if st.sidebar.button("Apply", key=apply_key):
+        slider_val = precise_val
     else:
-        st.error("High deviation. Unstable universe likely.")
-    
-    st.divider()
-    
-    # Tabs
-    tabs = st.tabs([
-        "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
-        "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
-        "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
-    ])
-    
-    # Graphs autogenerated per tab selected
+        slider_val = value
 
-    st.markdown("### AI Analysis — Scientific Summary")
-    st.markdown("Deviation from fundamental constants reduces universe stability probability.")
+    # Always render slider
+    slider_val = col1.slider(label, min_value, max_value, slider_val, step)
 
-def render_element_abundance():
-    st.subheader("Element Abundance")
-    import streamlit as st
-    import numpy as np
-    import plotly.graph_objs as go
-    import matplotlib.pyplot as plt
-    
-    st.set_page_config(layout="wide")
-    st.title("Multiverse Physics Simulation")
-    
-    # Sidebar - Universe Constants with % change display
-    st.sidebar.header("Adjust Physical Constants")
-    
-    
-    
-    
-    
-    def slider_with_percent(label, min_value, max_value, value, step):
-        col1, col2 = st.sidebar.columns([3, 1])
-    
-        # Text input first for user-defined value
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
-    
-        # Validate user input
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        # Apply button to sync value
-        apply_key = f"{label}_apply"
-        if st.sidebar.button("Apply", key=apply_key):
-            slider_val = precise_val
-        else:
-            slider_val = value
-    
-        # Always render slider
-        slider_val = col1.slider(label, min_value, max_value, slider_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-    
-        return slider_val
-    
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
-    
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        slider_val = col1.slider(label, min_value, max_value, precise_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-        return slider_val
-    
-    constants = {
-        "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
-    }
-    
-    deviation = sum(abs(v - 1.0) for v in constants.values())
-    st.header("Universe Stability Summary")
-    st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
-    if deviation == 0:
-        st.success("This universe matches our own. Chemistry and life likely stable.")
-    elif deviation < 3:
-        st.warning("Moderate deviation detected. Instability possible.")
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+
+    return slider_val
+
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
+
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    slider_val = col1.slider(label, min_value, max_value, precise_val, step)
+
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+    return slider_val
+
+constants = {
+    "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
+}
+
+deviation = sum(abs(v - 1.0) for v in constants.values())
+st.header("Universe Stability Summary")
+st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
+if deviation == 0:
+    st.success("This universe matches our own. Chemistry and life likely stable.")
+elif deviation < 3:
+    st.warning("Moderate deviation detected. Instability possible.")
+else:
+    st.error("High deviation. Unstable universe likely.")
+
+st.divider()
+
+# Tabs
+tabs = st.tabs([
+    "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
+    "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
+    "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
+])
+
+# Graphs autogenerated per tab selected
+
+import streamlit as st
+import numpy as np
+import plotly.graph_objs as go
+import matplotlib.pyplot as plt
+
+st.set_page_config(layout="wide")
+st.title("Multiverse Physics Simulation")
+
+# Sidebar - Universe Constants with % change display
+st.sidebar.header("Adjust Physical Constants")
+
+
+
+
+
+def slider_with_percent(label, min_value, max_value, value, step):
+    col1, col2 = st.sidebar.columns([3, 1])
+
+    # Text input first for user-defined value
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
+
+    # Validate user input
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    # Apply button to sync value
+    apply_key = f"{label}_apply"
+    if st.sidebar.button("Apply", key=apply_key):
+        slider_val = precise_val
     else:
-        st.error("High deviation. Unstable universe likely.")
-    
-    st.divider()
-    
-    # Tabs
-    tabs = st.tabs([
-        "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
-        "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
-        "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
-    ])
-    
-    # Graphs autogenerated per tab selected
+        slider_val = value
 
-    st.markdown("### AI Analysis — Scientific Summary")
-    st.markdown("Nuclear forces shape element creation. This shows how abundances change with constants.")
+    # Always render slider
+    slider_val = col1.slider(label, min_value, max_value, slider_val, step)
 
-def render_radiation_risk():
-    st.subheader("Radiation Risk")
-    import streamlit as st
-    import numpy as np
-    import plotly.graph_objs as go
-    import matplotlib.pyplot as plt
-    
-    st.set_page_config(layout="wide")
-    st.title("Multiverse Physics Simulation")
-    
-    # Sidebar - Universe Constants with % change display
-    st.sidebar.header("Adjust Physical Constants")
-    
-    
-    
-    
-    
-    def slider_with_percent(label, min_value, max_value, value, step):
-        col1, col2 = st.sidebar.columns([3, 1])
-    
-        # Text input first for user-defined value
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
-    
-        # Validate user input
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        # Apply button to sync value
-        apply_key = f"{label}_apply"
-        if st.sidebar.button("Apply", key=apply_key):
-            slider_val = precise_val
-        else:
-            slider_val = value
-    
-        # Always render slider
-        slider_val = col1.slider(label, min_value, max_value, slider_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-    
-        return slider_val
-    
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
-    
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        slider_val = col1.slider(label, min_value, max_value, precise_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-        return slider_val
-    
-    constants = {
-        "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
-    }
-    
-    deviation = sum(abs(v - 1.0) for v in constants.values())
-    st.header("Universe Stability Summary")
-    st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
-    if deviation == 0:
-        st.success("This universe matches our own. Chemistry and life likely stable.")
-    elif deviation < 3:
-        st.warning("Moderate deviation detected. Instability possible.")
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+
+    return slider_val
+
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
+
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    slider_val = col1.slider(label, min_value, max_value, precise_val, step)
+
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+    return slider_val
+
+constants = {
+    "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
+}
+
+deviation = sum(abs(v - 1.0) for v in constants.values())
+st.header("Universe Stability Summary")
+st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
+if deviation == 0:
+    st.success("This universe matches our own. Chemistry and life likely stable.")
+elif deviation < 3:
+    st.warning("Moderate deviation detected. Instability possible.")
+else:
+    st.error("High deviation. Unstable universe likely.")
+
+st.divider()
+
+# Tabs
+tabs = st.tabs([
+    "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
+    "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
+    "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
+])
+
+# Graphs autogenerated per tab selected
+
+import streamlit as st
+import numpy as np
+import plotly.graph_objs as go
+import matplotlib.pyplot as plt
+
+st.set_page_config(layout="wide")
+st.title("Multiverse Physics Simulation")
+
+# Sidebar - Universe Constants with % change display
+st.sidebar.header("Adjust Physical Constants")
+
+
+
+
+
+def slider_with_percent(label, min_value, max_value, value, step):
+    col1, col2 = st.sidebar.columns([3, 1])
+
+    # Text input first for user-defined value
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
+
+    # Validate user input
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    # Apply button to sync value
+    apply_key = f"{label}_apply"
+    if st.sidebar.button("Apply", key=apply_key):
+        slider_val = precise_val
     else:
-        st.error("High deviation. Unstable universe likely.")
-    
-    st.divider()
-    
-    # Tabs
-    tabs = st.tabs([
-        "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
-        "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
-        "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
-    ])
-    
-    # Graphs autogenerated per tab selected
+        slider_val = value
 
-    st.markdown("### AI Analysis — Scientific Summary")
-    st.markdown("EM force affects radiation harm. Higher EM increases radiation risks.")
+    # Always render slider
+    slider_val = col1.slider(label, min_value, max_value, slider_val, step)
 
-def render_star_lifespan():
-    st.subheader("Star Lifespan")
-    import streamlit as st
-    import numpy as np
-    import plotly.graph_objs as go
-    import matplotlib.pyplot as plt
-    
-    st.set_page_config(layout="wide")
-    st.title("Multiverse Physics Simulation")
-    
-    # Sidebar - Universe Constants with % change display
-    st.sidebar.header("Adjust Physical Constants")
-    
-    
-    
-    
-    
-    def slider_with_percent(label, min_value, max_value, value, step):
-        col1, col2 = st.sidebar.columns([3, 1])
-    
-        # Text input first for user-defined value
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
-    
-        # Validate user input
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        # Apply button to sync value
-        apply_key = f"{label}_apply"
-        if st.sidebar.button("Apply", key=apply_key):
-            slider_val = precise_val
-        else:
-            slider_val = value
-    
-        # Always render slider
-        slider_val = col1.slider(label, min_value, max_value, slider_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-    
-        return slider_val
-    
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
-    
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        slider_val = col1.slider(label, min_value, max_value, precise_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-        return slider_val
-    
-    constants = {
-        "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
-    }
-    
-    deviation = sum(abs(v - 1.0) for v in constants.values())
-    st.header("Universe Stability Summary")
-    st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
-    if deviation == 0:
-        st.success("This universe matches our own. Chemistry and life likely stable.")
-    elif deviation < 3:
-        st.warning("Moderate deviation detected. Instability possible.")
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+
+    return slider_val
+
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
+
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    slider_val = col1.slider(label, min_value, max_value, precise_val, step)
+
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+    return slider_val
+
+constants = {
+    "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
+}
+
+deviation = sum(abs(v - 1.0) for v in constants.values())
+st.header("Universe Stability Summary")
+st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
+if deviation == 0:
+    st.success("This universe matches our own. Chemistry and life likely stable.")
+elif deviation < 3:
+    st.warning("Moderate deviation detected. Instability possible.")
+else:
+    st.error("High deviation. Unstable universe likely.")
+
+st.divider()
+
+# Tabs
+tabs = st.tabs([
+    "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
+    "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
+    "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
+])
+
+# Graphs autogenerated per tab selected
+
+import streamlit as st
+import numpy as np
+import plotly.graph_objs as go
+import matplotlib.pyplot as plt
+
+st.set_page_config(layout="wide")
+st.title("Multiverse Physics Simulation")
+
+# Sidebar - Universe Constants with % change display
+st.sidebar.header("Adjust Physical Constants")
+
+
+
+
+
+def slider_with_percent(label, min_value, max_value, value, step):
+    col1, col2 = st.sidebar.columns([3, 1])
+
+    # Text input first for user-defined value
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
+
+    # Validate user input
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    # Apply button to sync value
+    apply_key = f"{label}_apply"
+    if st.sidebar.button("Apply", key=apply_key):
+        slider_val = precise_val
     else:
-        st.error("High deviation. Unstable universe likely.")
-    
-    st.divider()
-    
-    # Tabs
-    tabs = st.tabs([
-        "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
-        "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
-        "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
-    ])
-    
-    # Graphs autogenerated per tab selected
+        slider_val = value
 
-    st.markdown("### AI Analysis — Scientific Summary")
-    st.markdown("Gravity intensity governs star fuel consumption. Stronger gravity shortens lifespans.")
+    # Always render slider
+    slider_val = col1.slider(label, min_value, max_value, slider_val, step)
 
-def render_2d_dark_matter_simulation():
-    st.subheader("2D Dark Matter Simulation")
-    import streamlit as st
-    import numpy as np
-    import plotly.graph_objs as go
-    import matplotlib.pyplot as plt
-    
-    st.set_page_config(layout="wide")
-    st.title("Multiverse Physics Simulation")
-    
-    # Sidebar - Universe Constants with % change display
-    st.sidebar.header("Adjust Physical Constants")
-    
-    
-    
-    
-    
-    def slider_with_percent(label, min_value, max_value, value, step):
-        col1, col2 = st.sidebar.columns([3, 1])
-    
-        # Text input first for user-defined value
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
-    
-        # Validate user input
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        # Apply button to sync value
-        apply_key = f"{label}_apply"
-        if st.sidebar.button("Apply", key=apply_key):
-            slider_val = precise_val
-        else:
-            slider_val = value
-    
-        # Always render slider
-        slider_val = col1.slider(label, min_value, max_value, slider_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-    
-        return slider_val
-    
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
-    
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        slider_val = col1.slider(label, min_value, max_value, precise_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-        return slider_val
-    
-    constants = {
-        "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
-    }
-    
-    deviation = sum(abs(v - 1.0) for v in constants.values())
-    st.header("Universe Stability Summary")
-    st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
-    if deviation == 0:
-        st.success("This universe matches our own. Chemistry and life likely stable.")
-    elif deviation < 3:
-        st.warning("Moderate deviation detected. Instability possible.")
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+
+    return slider_val
+
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
+
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    slider_val = col1.slider(label, min_value, max_value, precise_val, step)
+
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+    return slider_val
+
+constants = {
+    "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
+}
+
+deviation = sum(abs(v - 1.0) for v in constants.values())
+st.header("Universe Stability Summary")
+st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
+if deviation == 0:
+    st.success("This universe matches our own. Chemistry and life likely stable.")
+elif deviation < 3:
+    st.warning("Moderate deviation detected. Instability possible.")
+else:
+    st.error("High deviation. Unstable universe likely.")
+
+st.divider()
+
+# Tabs
+tabs = st.tabs([
+    "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
+    "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
+    "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
+])
+
+# Graphs autogenerated per tab selected
+
+import streamlit as st
+import numpy as np
+import plotly.graph_objs as go
+import matplotlib.pyplot as plt
+
+st.set_page_config(layout="wide")
+st.title("Multiverse Physics Simulation")
+
+# Sidebar - Universe Constants with % change display
+st.sidebar.header("Adjust Physical Constants")
+
+
+
+
+
+def slider_with_percent(label, min_value, max_value, value, step):
+    col1, col2 = st.sidebar.columns([3, 1])
+
+    # Text input first for user-defined value
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
+
+    # Validate user input
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    # Apply button to sync value
+    apply_key = f"{label}_apply"
+    if st.sidebar.button("Apply", key=apply_key):
+        slider_val = precise_val
     else:
-        st.error("High deviation. Unstable universe likely.")
-    
-    st.divider()
-    
-    # Tabs
-    tabs = st.tabs([
-        "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
-        "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
-        "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
-    ])
-    
-    # Graphs autogenerated per tab selected
+        slider_val = value
 
-    st.markdown("### AI Analysis — Scientific Summary")
-    st.markdown("Dark matter density fluctuations shape cosmic structures. This simulates random density variations.")
+    # Always render slider
+    slider_val = col1.slider(label, min_value, max_value, slider_val, step)
 
-def render_3d_atomic_stability():
-    st.subheader("3D Atomic Stability")
-    import streamlit as st
-    import numpy as np
-    import plotly.graph_objs as go
-    import matplotlib.pyplot as plt
-    
-    st.set_page_config(layout="wide")
-    st.title("Multiverse Physics Simulation")
-    
-    # Sidebar - Universe Constants with % change display
-    st.sidebar.header("Adjust Physical Constants")
-    
-    
-    
-    
-    
-    def slider_with_percent(label, min_value, max_value, value, step):
-        col1, col2 = st.sidebar.columns([3, 1])
-    
-        # Text input first for user-defined value
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
-    
-        # Validate user input
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        # Apply button to sync value
-        apply_key = f"{label}_apply"
-        if st.sidebar.button("Apply", key=apply_key):
-            slider_val = precise_val
-        else:
-            slider_val = value
-    
-        # Always render slider
-        slider_val = col1.slider(label, min_value, max_value, slider_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-    
-        return slider_val
-    
-        with col2:
-            st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
-            precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
-    
-        try:
-            precise_val = float(precise_val_input)
-            if precise_val < min_value:
-                precise_val = min_value
-            elif precise_val > max_value:
-                precise_val = max_value
-        except:
-            precise_val = value
-    
-        slider_val = col1.slider(label, min_value, max_value, precise_val, step)
-    
-        percent_change = (slider_val - 1.0) * 100
-        st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
-        return slider_val
-    
-    constants = {
-        "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
-        "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
-    }
-    
-    deviation = sum(abs(v - 1.0) for v in constants.values())
-    st.header("Universe Stability Summary")
-    st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
-    if deviation == 0:
-        st.success("This universe matches our own. Chemistry and life likely stable.")
-    elif deviation < 3:
-        st.warning("Moderate deviation detected. Instability possible.")
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+
+    return slider_val
+
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
+
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    slider_val = col1.slider(label, min_value, max_value, precise_val, step)
+
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+    return slider_val
+
+constants = {
+    "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
+}
+
+deviation = sum(abs(v - 1.0) for v in constants.values())
+st.header("Universe Stability Summary")
+st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
+if deviation == 0:
+    st.success("This universe matches our own. Chemistry and life likely stable.")
+elif deviation < 3:
+    st.warning("Moderate deviation detected. Instability possible.")
+else:
+    st.error("High deviation. Unstable universe likely.")
+
+st.divider()
+
+# Tabs
+tabs = st.tabs([
+    "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
+    "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
+    "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
+])
+
+# Graphs autogenerated per tab selected
+
+import streamlit as st
+import numpy as np
+import plotly.graph_objs as go
+import matplotlib.pyplot as plt
+
+st.set_page_config(layout="wide")
+st.title("Multiverse Physics Simulation")
+
+# Sidebar - Universe Constants with % change display
+st.sidebar.header("Adjust Physical Constants")
+
+
+
+
+
+def slider_with_percent(label, min_value, max_value, value, step):
+    col1, col2 = st.sidebar.columns([3, 1])
+
+    # Text input first for user-defined value
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
+
+    # Validate user input
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    # Apply button to sync value
+    apply_key = f"{label}_apply"
+    if st.sidebar.button("Apply", key=apply_key):
+        slider_val = precise_val
     else:
-        st.error("High deviation. Unstable universe likely.")
-    
-    st.divider()
-    
-    # Tabs
-    tabs = st.tabs([
-        "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
-        "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
-        "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
-    ])
-    
-    # Graphs autogenerated per tab selected
+        slider_val = value
 
-    st.markdown("### AI Analysis — Scientific Summary")
-    st.markdown("Nuclear forces determine isotope stability. This shows isotope survivability under force changes.")
+    # Always render slider
+    slider_val = col1.slider(label, min_value, max_value, slider_val, step)
 
-tabs = st.tabs(['Periodic Table Stability (3D)', 'Island of Instability (3D)', 'Star Formation Potential (3D)', 'Life Probability (Heatmap)', 'Quantum Bonding (3D)', 'Universe Probability', 'Element Abundance', 'Radiation Risk', 'Star Lifespan', '2D Dark Matter Simulation', '3D Atomic Stability'])
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
 
-with tabs[0]:
-    render_periodic_table_stability_3d()
-with tabs[1]:
-    render_island_of_instability_3d()
-with tabs[2]:
-    render_star_formation_potential_3d()
-with tabs[3]:
-    render_life_probability_heatmap()
-with tabs[4]:
-    render_quantum_bonding_3d()
-with tabs[5]:
-    render_universe_probability()
-with tabs[6]:
-    render_element_abundance()
-with tabs[7]:
-    render_radiation_risk()
-with tabs[8]:
-    render_star_lifespan()
-with tabs[9]:
-    render_2d_dark_matter_simulation()
-with tabs[10]:
-    render_3d_atomic_stability()
+    return slider_val
+
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
+
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    slider_val = col1.slider(label, min_value, max_value, precise_val, step)
+
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+    return slider_val
+
+constants = {
+    "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
+}
+
+deviation = sum(abs(v - 1.0) for v in constants.values())
+st.header("Universe Stability Summary")
+st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
+if deviation == 0:
+    st.success("This universe matches our own. Chemistry and life likely stable.")
+elif deviation < 3:
+    st.warning("Moderate deviation detected. Instability possible.")
+else:
+    st.error("High deviation. Unstable universe likely.")
+
+st.divider()
+
+# Tabs
+tabs = st.tabs([
+    "Periodic Table Stability (3D)", "Island of Instability (3D)", "Star Formation Potential (3D)", 
+    "Life Probability (Heatmap)", "Quantum Bonding (3D)", "Universe Probability",
+    "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
+])
+
+# Graphs autogenerated per tab selected
