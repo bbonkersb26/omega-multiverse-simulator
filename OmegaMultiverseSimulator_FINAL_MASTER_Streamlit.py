@@ -81,20 +81,66 @@ with tabs[1]:
     st.markdown("**AI Analysis → Scientific Summary**")
     st.markdown("This surface graph explores nuclear instability regions. As the strong force multiplier shifts, peaks and valleys show zones where nuclei are more or less prone to decay or collapse.")
 
-# Star Formation Potential (3D Surface)
+# === Star Formation and Evolution (Scientific Physics Model) ===
 with tabs[2]:
-    st.subheader("Star Formation Potential (Advanced 3D Surface)")
-    gravity_values = np.linspace(0.1, 10.0, 50)
-    dark_energy_values = np.linspace(0.1, 10.0, 50)
-    gravity_grid, dark_grid = np.meshgrid(gravity_values, dark_energy_values)
-    star_potential = np.exp(-((gravity_grid - constants["Gravitational Constant Multiplier"])**2 + (dark_grid - constants["Dark Energy Multiplier"])**2) / 4)
-    fig = go.Figure(data=[go.Surface(z=star_potential, x=gravity_grid, y=dark_grid, colorscale='Viridis', colorbar=dict(title='Potential'))])
-    fig.update_layout(scene=dict(xaxis_title='Gravity Multiplier', yaxis_title='Dark Energy Multiplier', zaxis_title='Star Formation Potential'))
-    st.plotly_chart(fig, use_container_width=True)
-    
-    st.markdown("**AI Analysis → Scientific Summary**")
-    st.markdown("Star formation is influenced by gravity and dark energy. This simulation shows that optimal values lead to efficient star birth, while too much or too little makes star formation improbable.")
+    st.subheader("Star Formation and Evolution (Linked to Gravity and Dark Energy)")
 
+    # Link to physical constants (user sliders)
+    gravity_multiplier = constants["Gravitational Constant Multiplier"]
+    dark_energy_multiplier = constants["Dark Energy Multiplier"]
+
+    time_steps = 100
+    initial_gas_density = 1.0
+    star_formation_efficiency_base = 0.05
+
+    # Effects of gravity and dark energy
+    gravity_effect = gravity_multiplier
+    dark_energy_effect = 1 / dark_energy_multiplier
+
+    time = np.arange(time_steps)
+    gas_density = np.zeros(time_steps)
+    star_density = np.zeros(time_steps)
+    metallicity = np.zeros(time_steps)
+
+    gas_density[0] = initial_gas_density
+    star_density[0] = 0
+    metallicity[0] = 0.01  # Initial trace metals
+
+    # Simulation loop
+    for t in range(1, time_steps):
+        star_formation_efficiency = star_formation_efficiency_base * gravity_effect * dark_energy_effect
+        stars_formed = gas_density[t-1] * star_formation_efficiency
+
+        gas_density[t] = gas_density[t-1] - stars_formed
+        star_density[t] = star_density[t-1] + stars_formed
+
+        # Metal enrichment from star death and recycling
+        metallicity[t] = metallicity[t-1] + stars_formed * 0.02
+
+        if gas_density[t] < 0:
+            gas_density[t] = 0
+
+    # Plotting
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(x=time, y=gas_density, mode='lines', name='Gas Density', line=dict(color='blue')))
+    fig.add_trace(go.Scatter(x=time, y=star_density, mode='lines', name='Star Density', line=dict(color='orange')))
+    fig.add_trace(go.Scatter(x=time, y=metallicity, mode='lines', name='Metallicity', line=dict(color='green')))
+
+    fig.update_layout(
+        title="Star Formation and Evolution (Linked to Gravity and Dark Energy)",
+        xaxis_title='Time (Arbitrary Units ~ Billions of Years)',
+        yaxis_title='Relative Density / Metallicity',
+        legend_title="Components"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("### AI Analysis → Scientific Summary")
+    st.markdown("This scientific model simulates the evolution of stars and heavy elements over cosmic time.")
+    st.markdown("- **Higher Gravity Multiplier** accelerates star formation, consuming gas more quickly.")
+    st.markdown("- **Higher Dark Energy Multiplier** suppresses star formation by expanding space.")
+    st.markdown("- **Metallicity** increases over time as stars die, releasing heavy elements critical for planet and life formation.")
 # Life Probability (Heatmap)
 with tabs[3]:
     st.subheader("Life Probability Map (Heatmap)")
