@@ -203,9 +203,12 @@ with tabs[9]:
     st.markdown("This heatmap displays simulated 2D dark matter distributions. Denser clumps suggest gravitational potential wells where galaxies and stars could cluster.")
 
     st.markdown("### AI Analysis → Scientific Summary")
-    st.markdown("The periodic table stability visualization reflects the delicate balance between electromagnetic repulsion and nuclear strong force cohesion.")
-    st.markdown("In universes where electromagnetic forces increase, Coulombic repulsion between protons overwhelms nuclear binding, causing heavy elements to become highly unstable or non-existent.")
-    st.markdown("Conversely, if the strong force strengthens moderately, nuclei become more tightly bound, allowing stability into higher atomic numbers, possibly expanding the periodic table beyond familiar limits.")
+    st.markdown("The periodic table stability visualization reflects the balance between electromagnetic repulsion and nuclear cohesion.")
+    st.markdown("Higher EM forces destabilize heavy elements, while optimal strong force tuning expands elemental stability.")
+    st.markdown("")
+    st.markdown("A deeper look: In universes where EM force increases even slightly, proton-proton repulsion becomes catastrophic, destabilizing nuclei beyond iron or zinc.")
+    st.markdown("Without stable heavy elements, key transition metals like copper, iron, and zinc—crucial for electron transport in biology—cannot form.")
+    st.markdown("If strong force is finely enhanced, superheavy elements may become stable, potentially forming new chemistry. However, if too strong, all matter may clump into dense neutron-heavy elements, stifling complex chemistry altogether.")
 
 
 # === 3D Atomic Stability Probability ===
