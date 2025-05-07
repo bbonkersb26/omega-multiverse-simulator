@@ -267,27 +267,80 @@ with tabs[9]:
     st.markdown("- **Higher Gravity Multiplier** compresses clusters and tightens tendrils.")
     st.markdown("- **Higher Dark Energy Multiplier** stretches cosmic web, expanding voids and diffusing structures.")
     st.markdown("This creates a scientifically inspired visualization of how changes in universal constants shape the cosmic web.")
-# === 3D Atomic Stability Probability ===
+# === 3D Atomic Stability Probability (Scientific Physics Model) ===
 with tabs[10]:
-    st.subheader("3D Atomic Stability Probability per Isotope")
+    st.subheader("3D Atomic Stability Probability per Isotope (Scientific Model)")
+
+    # Semi-Empirical Mass Formula coefficients
+    a_v = 15.8
+    a_s = 18.3
+    a_c = 0.714
+    a_a = 23.2
+    a_p = 12.0
+
+    def binding_energy(Z, A):
+        if A <= 0 or Z <= 0 or Z > A:
+            return 0
+        N = A - Z
+        B = a_v * A
+        B -= a_s * A**(2/3)
+        B -= a_c * (Z * (Z - 1)) / A**(1/3)
+        B -= a_a * ((A - 2*Z)**2) / A
+        if A % 2 == 1:
+            delta = 0
+        else:
+            if Z % 2 == 0:
+                delta = +a_p / A**0.5
+            else:
+                delta = -a_p / A**0.5
+        B += delta
+        return B
+
+    # Atomic numbers and isotopes
     atomic_numbers = np.arange(1, 121)
     isotopes_per_element = 20
-    np.random.seed(42)
-    base_stability = np.linspace(0.2, 0.98, len(atomic_numbers))
-    modified_stability = base_stability * constants["Strong Force Multiplier"] / constants["Electromagnetic Force Multiplier"]
-    modified_stability = np.clip(modified_stability, 0, 1)
-    stability_matrix = np.array([modified_stability + np.random.normal(0, 0.05 * constants["Weak Force Multiplier"], len(atomic_numbers)) for _ in range(isotopes_per_element)]).T
-    stability_matrix = np.clip(stability_matrix, 0, 1)
-    Z_vals, Isotope_vals, Stability_vals = [], [], []
+
+    stability_matrix = []
+
     for Z in atomic_numbers:
-        for iso in range(1, isotopes_per_element + 1):
+        isotope_stabilities = []
+        for iso in range(Z, Z + isotopes_per_element):
+            BE = binding_energy(Z, iso)
+            BE_per_nucleon = BE / iso if iso > 0 else 0
+
+            # Stability logic: > 7 MeV/nucleon → stable-ish
+            stability = np.clip((BE_per_nucleon - 7) / 3, 0, 1)
+            isotope_stabilities.append(stability)
+        stability_matrix.append(isotope_stabilities)
+
+    stability_matrix = np.array(stability_matrix)
+
+    # Prepare plot
+    Z_vals, Isotope_vals, Stability_vals = [], [], []
+    for i, Z in enumerate(atomic_numbers):
+        for j in range(isotopes_per_element):
             Z_vals.append(Z)
-            Isotope_vals.append(iso)
-            Stability_vals.append(stability_matrix[Z - 1, iso - 1])
-    fig = go.Figure(data=[go.Scatter3d(x=Z_vals, y=Isotope_vals, z=Stability_vals, mode='markers',
-                                       marker=dict(size=5, color=Stability_vals, colorscale='Plasma', colorbar=dict(title='Stability')))])
-    fig.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='Isotope Number', zaxis_title='Stability Probability'))
-    st.plotly_chart(fig, use_container_width=True, key="atomic_stability")
+            Isotope_vals.append(j + 1)
+            Stability_vals.append(stability_matrix[i, j])
+
+    fig = go.Figure(data=[go.Scatter3d(
+        x=Z_vals,
+        y=Isotope_vals,
+        z=Stability_vals,
+        mode='markers',
+        marker=dict(size=5, color=Stability_vals, colorscale='Plasma', colorbar=dict(title='Stability')))
+    ])
+
+    fig.update_layout(
+        title="3D Atomic Stability Probability per Isotope (Scientific Model)",
+        scene=dict(
+            xaxis_title='Atomic Number',
+            yaxis_title='Isotope Number',
+            zaxis_title='Stability Probability'
+        )
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("### AI Analysis → Scientific Summary")
-    st.markdown("This advanced 3D scatter plot highlights how isotope stability is influenced by changes in nuclear and electromagnetic forces. Heavier elements and extreme forces reduce isotope stability, limiting potential element formation beyond familiar periodic tables.")
+    st.markdown("This version uses the Semi-Empirical Mass Formula to calculate binding energies and isotope stability. Isotopes with high binding energy per nucleon are more stable. As atomic number increases, stability generally decreases due to increased Coulomb repulsion.")
