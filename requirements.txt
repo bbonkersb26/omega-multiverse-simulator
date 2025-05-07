@@ -1,7 +1,6 @@
 streamlit
 numpy
-pandas
 matplotlib
+pandas
+plotly
 pyvista
-pyvistaqt
-vtk
