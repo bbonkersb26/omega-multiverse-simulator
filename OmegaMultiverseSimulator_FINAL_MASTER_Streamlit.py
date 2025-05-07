@@ -10,18 +10,25 @@ st.title("Multiverse Physics Simulation")
 # Sidebar - Universe Constants with % change display
 st.sidebar.header("Adjust Physical Constants")
 
+
 def slider_with_percent(label, min_value, max_value, value, step):
-    mult = st.sidebar.slider(label, min_value, max_value, value, step)
-    percent_change = (mult - 1.0) * 100
-    st.sidebar.write(f"**{label} Change:** {percent_change:+.1f}% from baseline")
-    return mult
+    col1, col2 = st.sidebar.columns([3, 1])
+    slider_val = col1.slider(label, min_value, max_value, value, step)
+    precise_val = col2.text_input(f"{label} precise", str(slider_val))
+    try:
+        slider_val = float(precise_val)
+    except:
+        pass
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>Change from baseline: {percent_change:+.1f}%</span>", unsafe_allow_html=True)
+    return slider_val
 
 constants = {
-    "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.1),
-    "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.1),
-    "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.1),
-    "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.1),
-    "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.1),
+    "Strong Force Multiplier": slider_with_percent("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Electromagnetic Force Multiplier": slider_with_percent("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Weak Force Multiplier": slider_with_percent("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Gravitational Constant Multiplier": slider_with_percent("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Dark Energy Multiplier": slider_with_percent("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
 }
 
 deviation = sum(abs(v - 1.0) for v in constants.values())
@@ -113,6 +120,9 @@ with tabs[6]:
                  np.exp(-abs(constants["Weak Force Multiplier"]-1))]
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.bar(forces, abundance, color=['blue', 'magenta', 'yellow'])
+    ax.set_xlabel('Forces')
+    ax.set_ylabel('Relative Abundance')
+    ax.set_title('Element Abundance based on Fundamental Forces')
     st.pyplot(fig)
 
 with tabs[7]:
