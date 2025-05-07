@@ -5,8 +5,8 @@ import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 
 
+st.set_page_configst.set_page_config(layout="wide")
 st.set_page_config(layout="wide")
-(layout="wide")
 st.title("Multiverse Physics Simulation")
 
 # Sidebar - Universe Constants with % change display
@@ -103,7 +103,7 @@ import numpy as np
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 
-st.set_page_config(layout="wide")
+st.set_page_configst.set_page_config(layout="wide")
 st.title("Multiverse Physics Simulation")
 
 # Sidebar - Universe Constants with % change display
@@ -199,7 +199,7 @@ import numpy as np
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 
-st.set_page_config(layout="wide")
+st.set_page_configst.set_page_config(layout="wide")
 st.title("Multiverse Physics Simulation")
 
 # Sidebar - Universe Constants with % change display
@@ -295,7 +295,7 @@ import numpy as np
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 
-st.set_page_config(layout="wide")
+st.set_page_configst.set_page_config(layout="wide")
 st.title("Multiverse Physics Simulation")
 
 # Sidebar - Universe Constants with % change display
@@ -391,7 +391,7 @@ import numpy as np
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 
-st.set_page_config(layout="wide")
+st.set_page_configst.set_page_config(layout="wide")
 st.title("Multiverse Physics Simulation")
 
 # Sidebar - Universe Constants with % change display
@@ -487,7 +487,7 @@ import numpy as np
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 
-st.set_page_config(layout="wide")
+st.set_page_configst.set_page_config(layout="wide")
 st.title("Multiverse Physics Simulation")
 
 # Sidebar - Universe Constants with % change display
@@ -583,7 +583,7 @@ import numpy as np
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 
-st.set_page_config(layout="wide")
+st.set_page_configst.set_page_config(layout="wide")
 st.title("Multiverse Physics Simulation")
 
 # Sidebar - Universe Constants with % change display
@@ -679,7 +679,7 @@ import numpy as np
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 
-st.set_page_config(layout="wide")
+st.set_page_configst.set_page_config(layout="wide")
 st.title("Multiverse Physics Simulation")
 
 # Sidebar - Universe Constants with % change display
@@ -775,7 +775,7 @@ import numpy as np
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 
-st.set_page_config(layout="wide")
+st.set_page_configst.set_page_config(layout="wide")
 st.title("Multiverse Physics Simulation")
 
 # Sidebar - Universe Constants with % change display
@@ -871,7 +871,7 @@ import numpy as np
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 
-st.set_page_config(layout="wide")
+st.set_page_configst.set_page_config(layout="wide")
 st.title("Multiverse Physics Simulation")
 
 # Sidebar - Universe Constants with % change display
@@ -967,7 +967,7 @@ import numpy as np
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 
-st.set_page_config(layout="wide")
+st.set_page_configst.set_page_config(layout="wide")
 st.title("Multiverse Physics Simulation")
 
 # Sidebar - Universe Constants with % change display
@@ -1063,7 +1063,7 @@ import numpy as np
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 
-st.set_page_config(layout="wide")
+st.set_page_configst.set_page_config(layout="wide")
 st.title("Multiverse Physics Simulation")
 
 # Sidebar - Universe Constants with % change display
