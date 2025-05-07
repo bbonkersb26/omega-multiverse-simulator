@@ -233,4 +233,3 @@ fig = optimize_3d_layout(fig, "Atomic Number", "Isotope Number", "Stability Prob
             fig = optimize_3d_layout(fig, "X Axis", "Y Axis", "Z Axis")
     fig.update_layout(height=800)
 st.plotly_chart(fig, use_container_width=True)
-
