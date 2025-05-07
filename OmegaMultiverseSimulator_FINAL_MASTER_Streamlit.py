@@ -5,7 +5,7 @@ import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 
 st.set_page_config(layout="wide")
-st.title("Multiverse Physics Simulation")
+st.title("Multiverse Physics Simulation (Verbose Scientific Dev Version)")
 
 # Sidebar - Universe Constants
 st.sidebar.header("Adjust Physical Constants")
@@ -42,13 +42,15 @@ tabs = st.tabs(["Periodic Table Stability (3D)", "Island of Instability (3D)", "
 with tabs[0]:
     st.subheader("Periodic Table Stability (3D)")
 
-    x = np.linspace(0.1, 10.0, 50)
-    y = np.linspace(0.1, 10.0, 50)
-    X, Y = np.meshgrid(x, y)
-    Z = np.exp(-((X - constants["Strong Force Multiplier"])**2 + (Y - constants["Electromagnetic Force Multiplier"])**2) / 4)
-    fig = go.Figure(data=[go.Surface(z=Z, x=X, y=Y, colorscale='Viridis')])
-    fig.update_layout(scene=dict(xaxis_title='X', yaxis_title='Y', zaxis_title='Z'))
-    st.plotly_chart(fig, use_container_width=True)
+atomic_numbers = np.arange(1, 121)
+em_force_values = np.linspace(0.1, 10.0, 50)
+atomic_grid, em_grid = np.meshgrid(atomic_numbers, em_force_values)
+stability_probability = np.exp(-np.abs(atomic_grid - 30) / 20) * np.exp(-np.abs(em_grid - constants["Electromagnetic Force Multiplier"]))
+fig = go.Figure(data=[go.Scatter3d(x=atomic_grid.flatten(), y=em_grid.flatten(), z=stability_probability.flatten(),
+                                   mode='markers', marker=dict(size=5, color=stability_probability.flatten(),
+                                   colorscale='Viridis', colorbar=dict(title='Stability')))])
+fig.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='EM Force Multiplier', zaxis_title='Stability Probability'))
+st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("### AI Analysis → Scientific Interpretation")
     st.markdown("This simulation visualizes how element stability varies across the periodic table as the electromagnetic force multiplier changes. Higher EM force favors tighter atomic binding, stabilizing lighter elements, while reducing stability of heavier atoms.")
@@ -56,13 +58,13 @@ with tabs[0]:
 with tabs[1]:
     st.subheader("Island of Instability (3D)")
 
-    x = np.linspace(0.1, 10.0, 50)
-    y = np.linspace(0.1, 10.0, 50)
-    X, Y = np.meshgrid(x, y)
-    Z = np.exp(-((X - constants["Strong Force Multiplier"])**2 + (Y - constants["Electromagnetic Force Multiplier"])**2) / 4)
-    fig = go.Figure(data=[go.Surface(z=Z, x=X, y=Y, colorscale='Viridis')])
-    fig.update_layout(scene=dict(xaxis_title='X', yaxis_title='Y', zaxis_title='Z'))
-    st.plotly_chart(fig, use_container_width=True)
+strong_force_values = np.linspace(0.1, 10.0, 50)
+atomic_number_values = np.linspace(50, 120, 50)
+strong_grid, atomic_grid = np.meshgrid(strong_force_values, atomic_number_values)
+instability = np.abs(np.sin((strong_grid - constants["Strong Force Multiplier"]) * 5)) * (atomic_grid / 120)
+fig = go.Figure(data=[go.Surface(z=instability, x=strong_grid, y=atomic_grid, colorscale='Inferno', colorbar=dict(title='Instability'))])
+fig.update_layout(scene=dict(xaxis_title='Strong Force Multiplier', yaxis_title='Atomic Number', zaxis_title='Instability Level'))
+st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("### AI Analysis → Scientific Interpretation")
     st.markdown("This graph highlights the sensitivity of heavy element nuclei to the strong nuclear force multiplier. Small changes can destabilize or stabilize heavy isotopes, impacting superheavy element formation.")
@@ -70,125 +72,13 @@ with tabs[1]:
 with tabs[2]:
     st.subheader("Star Formation Potential (3D)")
 
-    x = np.linspace(0.1, 10.0, 50)
-    y = np.linspace(0.1, 10.0, 50)
-    X, Y = np.meshgrid(x, y)
-    Z = np.exp(-((X - constants["Strong Force Multiplier"])**2 + (Y - constants["Electromagnetic Force Multiplier"])**2) / 4)
-    fig = go.Figure(data=[go.Surface(z=Z, x=X, y=Y, colorscale='Viridis')])
-    fig.update_layout(scene=dict(xaxis_title='X', yaxis_title='Y', zaxis_title='Z'))
-    st.plotly_chart(fig, use_container_width=True)
+gravity_values = np.linspace(0.1, 10.0, 50)
+dark_energy_values = np.linspace(0.1, 10.0, 50)
+gravity_grid, dark_grid = np.meshgrid(gravity_values, dark_energy_values)
+star_potential = np.exp(-((gravity_grid - constants["Gravitational Constant Multiplier"])**2 + (dark_grid - constants["Dark Energy Multiplier"])**2) / 4)
+fig = go.Figure(data=[go.Surface(z=star_potential, x=gravity_grid, y=dark_grid, colorscale='Viridis', colorbar=dict(title='Potential'))])
+fig.update_layout(scene=dict(xaxis_title='Gravity Multiplier', yaxis_title='Dark Energy Multiplier', zaxis_title='Star Formation Potential'))
+st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("### AI Analysis → Scientific Interpretation")
     st.markdown("Star formation relies on gravitational collapse balanced by dark energy. This graph models how these factors affect the ability of galaxies to form stars.")
-
-with tabs[3]:
-    st.subheader("Life Probability (Heatmap)")
-
-    x = np.linspace(0.1, 10.0, 50)
-    y = np.linspace(0.1, 10.0, 50)
-    X, Y = np.meshgrid(x, y)
-    Z = np.exp(-((X - constants["Strong Force Multiplier"])**2 + (Y - constants["Electromagnetic Force Multiplier"])**2) / 4)
-    fig = go.Figure(data=[go.Surface(z=Z, x=X, y=Y, colorscale='Viridis')])
-    fig.update_layout(scene=dict(xaxis_title='X', yaxis_title='Y', zaxis_title='Z'))
-    st.plotly_chart(fig, use_container_width=True)
-
-    st.markdown("### AI Analysis → Scientific Interpretation")
-    st.markdown("This heatmap reflects the life-friendly chemistry probability, influenced by strong and electromagnetic forces altering reaction stability.")
-
-with tabs[4]:
-    st.subheader("Quantum Bonding (3D)")
-
-    x = np.linspace(0.1, 10.0, 50)
-    y = np.linspace(0.1, 10.0, 50)
-    X, Y = np.meshgrid(x, y)
-    Z = np.exp(-((X - constants["Strong Force Multiplier"])**2 + (Y - constants["Electromagnetic Force Multiplier"])**2) / 4)
-    fig = go.Figure(data=[go.Surface(z=Z, x=X, y=Y, colorscale='Viridis')])
-    fig.update_layout(scene=dict(xaxis_title='X', yaxis_title='Y', zaxis_title='Z'))
-    st.plotly_chart(fig, use_container_width=True)
-
-    st.markdown("### AI Analysis → Scientific Interpretation")
-    st.markdown("Quantum bonding strength varies with strong and EM forces, affecting molecule formation and stability across universes.")
-
-with tabs[5]:
-    st.subheader("Universe Probability")
-
-    prob = np.exp(-deviation)
-    fig, ax = plt.subplots()
-    ax.bar(["Universe Probability"], [prob], color='purple')
-    st.pyplot(fig)
-
-    st.markdown("### AI Analysis → Scientific Interpretation")
-    st.markdown("Overall universe viability is modeled as a function of deviation from known physical constants, predicting fundamental stability.")
-
-with tabs[6]:
-    st.subheader("Element Abundance")
-
-    forces = ["Strong", "EM", "Weak"]
-    abundance = [np.exp(-abs(constants["Strong Force Multiplier"]-1)),
-                 np.exp(-abs(constants["Electromagnetic Force Multiplier"]-1)),
-                 np.exp(-abs(constants["Weak Force Multiplier"]-1))]
-    fig, ax = plt.subplots()
-    ax.bar(forces, abundance, color=['blue', 'magenta', 'yellow'])
-    ax.set_xlabel("Force Type")
-    ax.set_ylabel("Relative Abundance")
-    st.pyplot(fig)
-
-    st.markdown("### AI Analysis → Scientific Interpretation")
-    st.markdown("Element abundance is affected by nuclear forces influencing stellar fusion pathways and decay rates.")
-
-with tabs[7]:
-    st.subheader("Radiation Risk")
-
-    x = np.linspace(0.1, 10.0, 500)
-    y = (x**2) / 100
-    fig, ax = plt.subplots()
-    ax.plot(x, y, color='purple', linewidth=2)
-    ax.axvline(constants["Electromagnetic Force Multiplier"], color='r', linestyle='--')
-    ax.set_xlabel("Electromagnetic Force Multiplier")
-    ax.set_ylabel("Radiation Risk")
-    st.pyplot(fig)
-
-    st.markdown("### AI Analysis → Scientific Interpretation")
-    st.markdown("Higher EM force increases radiation hazards to life by enhancing photon-matter interaction cross-sections.")
-
-with tabs[8]:
-    st.subheader("Star Lifespan")
-
-    x = np.linspace(0.1, 10.0, 500)
-    y = 1 / x
-    fig, ax = plt.subplots()
-    ax.plot(x, y, color='darkgreen', linewidth=2)
-    ax.axvline(constants["Gravitational Constant Multiplier"], color='r', linestyle='--')
-    ax.set_xlabel("Gravity Multiplier")
-    ax.set_ylabel("Relative Star Lifespan")
-    st.pyplot(fig)
-
-    st.markdown("### AI Analysis → Scientific Interpretation")
-    st.markdown("Gravitational intensity affects fuel consumption, determining star longevity and potential habitable planet stability.")
-
-with tabs[9]:
-    st.subheader("2D Dark Matter Simulation")
-
-    density_2d = np.random.normal(0, 1, (100, 100))
-    fig, ax = plt.subplots(figsize=(8, 6))
-    c = ax.imshow(density_2d, cmap="plasma", interpolation="nearest", origin="lower")
-    fig.colorbar(c, ax=ax)
-    ax.set_title("Simulated 2D Dark Matter Plasma Density")
-    st.pyplot(fig)
-
-    st.markdown("### AI Analysis → Scientific Interpretation")
-    st.markdown("Dark matter density patterns influence large scale structure formation and galactic stability.")
-
-with tabs[10]:
-    st.subheader("3D Atomic Stability")
-
-    x = np.linspace(0.1, 10.0, 50)
-    y = np.linspace(0.1, 10.0, 50)
-    X, Y = np.meshgrid(x, y)
-    Z = np.exp(-((X - constants["Strong Force Multiplier"])**2 + (Y - constants["Electromagnetic Force Multiplier"])**2) / 4)
-    fig = go.Figure(data=[go.Surface(z=Z, x=X, y=Y, colorscale='Viridis')])
-    fig.update_layout(scene=dict(xaxis_title='X', yaxis_title='Y', zaxis_title='Z'))
-    st.plotly_chart(fig, use_container_width=True)
-
-    st.markdown("### AI Analysis → Scientific Interpretation")
-    st.markdown("This 3D scatter shows isotope stability probabilities influenced by nuclear forces, critical for long-term element persistence.")
