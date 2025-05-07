@@ -1,3 +1,4 @@
+
 import streamlit as st
 import numpy as np
 import plotly.graph_objs as go
@@ -35,6 +36,32 @@ tabs = st.tabs([
     "Element Abundance", "Radiation Risk", "Star Lifespan", "2D Dark Matter Simulation", "3D Atomic Stability"
 ])
 
+
+
+# ======================================
+# Universal 3D Graph Optimizer Function
+# ======================================
+
+def optimize_3d_layout(fig, x_title, y_title, z_title):
+    fig.update_layout(
+        scene=dict(
+            xaxis_title=x_title,
+            yaxis_title=y_title,
+            zaxis_title=z_title,
+            xaxis=dict(titlefont=dict(size=12), tickfont=dict(size=10)),
+            yaxis=dict(titlefont=dict(size=12), tickfont=dict(size=10)),
+            zaxis=dict(titlefont=dict(size=12), tickfont=dict(size=10))
+        ),
+        margin=dict(l=20, r=20, b=20, t=40)
+    )
+    return fig
+
+
+# ======================================
+# Scientific Graphs (Optimized and Patched)
+# ======================================
+
+
 # Periodic Table Stability Probability (3D Scatter)
 with tabs[0]:
     st.subheader("Periodic Table Stability Probability (Advanced 3D Scatter)")
@@ -47,7 +74,8 @@ with tabs[0]:
                                            mode='markers', marker=dict(size=5, color=stability_probability.flatten(),
                                            colorscale='Viridis', colorbar=dict(title='Stability')))])
         fig.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='EM Force Multiplier', zaxis_title='Stability Probability'))
-        st.plotly_chart(fig, use_container_width=True)
+        fig = optimize_3d_layout(fig, fig.layout.scene.xaxis.title.text, fig.layout.scene.yaxis.title.text, fig.layout.scene.zaxis.title.text)
+st.plotly_chart(fig, use_container_width=True)
 
 # Island of Instability (3D Surface)
 with tabs[1]:
@@ -59,7 +87,8 @@ with tabs[1]:
         instability = np.abs(np.sin((strong_grid - constants["Strong Force Multiplier"]) * 5)) * (atomic_grid / 120)
         fig = go.Figure(data=[go.Surface(z=instability, x=strong_grid, y=atomic_grid, colorscale='Inferno', colorbar=dict(title='Instability'))])
         fig.update_layout(scene=dict(xaxis_title='Strong Force Multiplier', yaxis_title='Atomic Number', zaxis_title='Instability Level'))
-        st.plotly_chart(fig, use_container_width=True)
+        fig = optimize_3d_layout(fig, fig.layout.scene.xaxis.title.text, fig.layout.scene.yaxis.title.text, fig.layout.scene.zaxis.title.text)
+st.plotly_chart(fig, use_container_width=True)
 
 # Star Formation Potential (3D Surface)
 with tabs[2]:
@@ -71,7 +100,8 @@ with tabs[2]:
         star_potential = np.exp(-((gravity_grid - constants["Gravitational Constant Multiplier"])**2 + (dark_grid - constants["Dark Energy Multiplier"])**2) / 4)
         fig = go.Figure(data=[go.Surface(z=star_potential, x=gravity_grid, y=dark_grid, colorscale='Viridis', colorbar=dict(title='Potential'))])
         fig.update_layout(scene=dict(xaxis_title='Gravity Multiplier', yaxis_title='Dark Energy Multiplier', zaxis_title='Star Formation Potential'))
-        st.plotly_chart(fig, use_container_width=True)
+        fig = optimize_3d_layout(fig, fig.layout.scene.xaxis.title.text, fig.layout.scene.yaxis.title.text, fig.layout.scene.zaxis.title.text)
+st.plotly_chart(fig, use_container_width=True)
 
 # Life Probability (Heatmap)
 with tabs[3]:
@@ -83,7 +113,10 @@ with tabs[3]:
         life_prob = np.exp(-((strong_grid - constants["Strong Force Multiplier"])**2 + (em_grid - constants["Electromagnetic Force Multiplier"])**2) / 3)
         fig = go.Figure(data=go.Heatmap(z=life_prob, x=strong_force_values, y=em_force_values, colorscale='Viridis', colorbar=dict(title='Life Probability')))
         fig.update_layout(xaxis_title="Strong Force Multiplier", yaxis_title="EM Force Multiplier")
-        st.plotly_chart(fig, use_container_width=True)
+        fig = optimize_3d_layout(fig, fig.layout.scene.xaxis.title.text, fig.layout.scene.yaxis.title.text, fig.layout.scene.zaxis.title.text)
+st.plotly_chart(fig, use_container_width=True)
+
+
 
 # Quantum Bonding (3D Surface)
 with tabs[4]:
@@ -95,7 +128,8 @@ with tabs[4]:
         bonding_prob = np.exp(-((strong_grid - constants["Strong Force Multiplier"])**2 + (em_grid - constants["Electromagnetic Force Multiplier"])**2) / 2)
         fig = go.Figure(data=[go.Surface(z=bonding_prob, x=strong_grid, y=em_grid, colorscale='Viridis', colorbar=dict(title='Bonding Probability'))])
         fig.update_layout(scene=dict(xaxis_title='Strong Force Multiplier', yaxis_title='EM Force Multiplier', zaxis_title='Bonding Probability'))
-        st.plotly_chart(fig, use_container_width=True)
+        fig = optimize_3d_layout(fig, fig.layout.scene.xaxis.title.text, fig.layout.scene.yaxis.title.text, fig.layout.scene.zaxis.title.text)
+st.plotly_chart(fig, use_container_width=True)
 
 # Universe Probability
 with tabs[5]:
@@ -170,5 +204,6 @@ with tabs[10]:
         fig = go.Figure(data=[go.Scatter3d(x=Z_vals, y=Isotope_vals, z=Stability_vals, mode='markers',
                                            marker=dict(size=5, color=Stability_vals, colorscale='Plasma', colorbar=dict(title='Stability')))])
         fig.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='Isotope Number', zaxis_title='Stability Probability'))
-        st.plotly_chart(fig, use_container_width=True)
+        fig = optimize_3d_layout(fig, fig.layout.scene.xaxis.title.text, fig.layout.scene.yaxis.title.text, fig.layout.scene.zaxis.title.text)
+st.plotly_chart(fig, use_container_width=True)
 
