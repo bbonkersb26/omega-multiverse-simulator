@@ -84,7 +84,7 @@ def optimize_3d_layout(fig, x_title, y_title, z_title):
 with tabs[0]:
     st.subheader("Periodic Table Stability Probability (Advanced 3D Scatter)")
     with st.spinner("Generating Periodic Table Graph..."
-fig = optimize_3d_layout(fig, "Atomic Number", "Stability", "Probability")"):
+fig = optimize_3d_layout(fig, "Atomic Number", "Stability", "Probability"):
             atomic_numbers = np.arange(1, 121)
             em_force_values = np.linspace(0.1, 10.0, 50)
             atomic_grid, em_grid = np.meshgrid(atomic_numbers, em_force_values)
@@ -141,7 +141,7 @@ with tabs[3]:
 with tabs[4]:
     st.subheader("Quantum Bonding Probability (Advanced 3D Surface)")
     with st.spinner("Generating Quantum Bonding Graph..."
-fig = optimize_3d_layout(fig, "Strong Force Multiplier", "EM Force Multiplier", "Bonding Probability")"):
+fig = optimize_3d_layout(fig, "Strong Force Multiplier", "EM Force Multiplier", "Bonding Probability"):
             strong_force_values = np.linspace(0.1, 10.0, 50)
             em_force_values = np.linspace(0.1, 10.0, 50)
             strong_grid, em_grid = np.meshgrid(strong_force_values, em_force_values)
@@ -207,7 +207,7 @@ with tabs[9]:
 with tabs[10]:
     st.subheader("3D Atomic Stability Probability per Isotope")
     with st.spinner("Generating Atomic Stability 3D Graph..."
-fig = optimize_3d_layout(fig, "Atomic Number", "Isotope Number", "Stability Probability")"):
+fig = optimize_3d_layout(fig, "Atomic Number", "Isotope Number", "Stability Probability"):
             atomic_numbers = np.arange(1, 121)
             isotopes_per_element = 20
             np.random.seed(42)
