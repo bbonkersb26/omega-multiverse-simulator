@@ -1,3 +1,4 @@
+
 import streamlit as st
 import numpy as np
 import plotly.graph_objs as go
@@ -41,50 +42,6 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11 = st.tabs([
     "2D Dark Matter Simulation",
     "3D Atomic Stability"
 ])
-
-# Periodic Table Stability Probability (3D Scatter)
-with tab1:
-    st.subheader("Periodic Table Stability Probability (Advanced 3D Scatter)")
-    atomic_numbers = np.arange(1, 121)
-    em_force_values = np.linspace(0.1, 10.0, 50)
-    atomic_grid, em_grid = np.meshgrid(atomic_numbers, em_force_values)
-    stability_probability = np.exp(-np.abs(atomic_grid - 30) / 20) * np.exp(-np.abs(em_grid - constants["Electromagnetic Force Multiplier"]))
-    atomic_flat = atomic_grid.flatten()
-    em_flat = em_grid.flatten()
-    stability_flat = stability_probability.flatten()
-
-    fig = go.Figure(data=[go.Scatter3d(
-        x=atomic_flat,
-        y=em_flat,
-        z=stability_flat,
-        mode='markers',
-        marker=dict(size=5, color=stability_flat, colorscale='Viridis', colorbar=dict(title='Stability Probability')),
-    )])
-    fig.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='EM Force Multiplier', zaxis_title='Stability Probability'))
-    st.plotly_chart(fig, use_container_width=True)
-
-# Island of Instability (3D Surface)
-with tab2:
-    st.subheader("Island of Instability (Advanced 3D Surface)")
-    strong_force_values = np.linspace(0.1, 10.0, 50)
-    atomic_number_values = np.linspace(50, 120, 50)
-    strong_grid, atomic_grid = np.meshgrid(strong_force_values, atomic_number_values)
-    instability = np.abs(np.sin((strong_grid - constants["Strong Force Multiplier"]) * 5)) * (atomic_grid / 120)
-    fig = go.Figure(data=[go.Surface(z=instability, x=strong_grid, y=atomic_grid, colorscale='Inferno', colorbar=dict(title='Instability Level'))])
-    fig.update_layout(scene=dict(xaxis_title='Strong Force Multiplier', yaxis_title='Atomic Number', zaxis_title='Instability Level'))
-    st.plotly_chart(fig, use_container_width=True)
-
-# Star Formation Potential (3D Surface)
-with tab3:
-    st.subheader("Star Formation Potential (Advanced 3D Surface)")
-    gravity_values = np.linspace(0.1, 10.0, 50)
-    dark_energy_values = np.linspace(0.1, 10.0, 50)
-    gravity_grid, dark_grid = np.meshgrid(gravity_values, dark_energy_values)
-    star_potential = np.exp(-((gravity_grid - constants["Gravitational Constant Multiplier"])**2 + (dark_grid - constants["Dark Energy Multiplier"])**2) / 4)
-    fig = go.Figure(data=[go.Surface(z=star_potential, x=gravity_grid, y=dark_grid, colorscale='Viridis', colorbar=dict(title='Star Formation Potential'))])
-    fig.update_layout(scene=dict(xaxis_title='Gravity Multiplier', yaxis_title='Dark Energy Multiplier', zaxis_title='Star Formation Potential'))
-    st.plotly_chart(fig, use_container_width=True)
-
 # Life Probability (Heatmap)
 with tab4:
     st.subheader("Life Probability (Advanced Heatmap Version)")
@@ -183,4 +140,43 @@ with tab11:
     fig3d.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='Isotope Number', zaxis_title='Stability Probability'))
     st.plotly_chart(fig3d, use_container_width=True)
 
+# Omega Multiverse Simulator PRO — ULTRA Version (2025)
 
+The Omega Multiverse Simulator models possible universes by allowing users to adjust fundamental physical constants
+and observe their effects on star formation, life probability, periodic table stability, quantum bonding, dark matter, and more.
+
+## Features
+
+- 3D Graphical Universe Exploration
+- Periodic Table Stability (3D Scatter)
+- Island of Instability (3D Surface)
+- Star Formation Potential (3D Surface)
+- Life Probability Map (Heatmap)
+- Quantum Bonding (3D Surface)
+- Universe Probability Calculator
+- Element Abundance
+- Radiation Risk Analysis
+- Star Lifespan Estimator
+- Dark Matter Plasma Simulation (2D Cloud-Compatible)
+- Atomic Stability Probability per Isotope (3D Scatter)
+
+## Usage
+
+- Adjust universal constants using the sidebar sliders.
+- Explore dynamic graphs across all simulation dimensions.
+- Fully compatible with Streamlit Cloud.
+
+## Installation
+
+Clone the repo and run:
+
+```
+pip install -r requirements.txt
+streamlit run OmegaMultiverseSimulator2025_ULTRA_Part1.py
+```
+
+*(Make sure all 3 parts are present in the same folder for now)*
+
+## Notes
+
+This version uses Plotly and Matplotlib only (Cloud Compatible) and removes all PyVista or OpenGL dependencies.
