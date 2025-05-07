@@ -107,6 +107,50 @@ with tabs[0]:
     fig.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='EM Force Multiplier', zaxis_title='Stability Probability'))
     st.plotly_chart(fig, use_container_width=True)
 
+    with st.expander("AI Analysis"):
+        st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Dark matter clumping patterns shape galaxy and structure formation. This simulated map visualizes a random distribution, serving as a proxy for cosmic web formation tendencies in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Gravity affects star pressure and fuel consumption rates. High gravity shortens stellar lives, while low gravity prolongs them. This graph forecasts how long stars would live in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Electromagnetic force intensity affects radiation interaction with matter. Increased EM force raises the likelihood of destructive high-energy radiation, impacting biological survivability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("The relative abundance of elements depends on force magnitudes, which influence nucleosynthesis in stars. This chart predicts shifts in elemental makeup which may favor simple or complex chemistry.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Overall universe stability reflects how all constants deviate from our own. Extreme deviations may produce universes unable to support matter, stars, or life. This metric predicts general viability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Quantum bonding probabilities are influenced by nuclear and electromagnetic forces. Altering these can affect the stability of molecules, potentially preventing or enhancing chemical complexity and life-permitting environments.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Life-supporting chemistry relies on a careful balance of forces. Strong and electromagnetic force multipliers determine molecular stability and reaction pathways. This heatmap predicts how likely life-friendly conditions are under the selected constants.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Star formation depends critically on the balance between gravitational attraction and dark energy repulsion. This plot shows how different force multipliers affect star birth rates. Low gravity or high dark energy suppresses star formation, while optimal values encourage stellar nurseries.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This graph highlights the sensitivity of heavy element nuclei to the strong nuclear force multiplier. Small changes in this force can destabilize or stabilize heavy isotopes, impacting the formation of superheavy elements and the size of the island of stability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This simulation visualizes how element stability varies across the periodic table as the electromagnetic force multiplier changes. Higher EM force favors tighter atomic binding, stabilizing lighter elements, while reducing stability of heavier atoms. At current settings, element stability may shift favorably or unfavorably for complex chemistry.")
+    
+
 st.markdown("**AI Analysis:**")
 st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
             "Higher or lower values represent how isotope stability depends on nuclear forces. "
@@ -184,6 +228,50 @@ with tabs[1]:
     fig.update_layout(scene=dict(xaxis_title='Strong Force Multiplier', yaxis_title='Atomic Number', zaxis_title='Instability Level'))
     st.plotly_chart(fig, use_container_width=True)
 
+    with st.expander("AI Analysis"):
+        st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Dark matter clumping patterns shape galaxy and structure formation. This simulated map visualizes a random distribution, serving as a proxy for cosmic web formation tendencies in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Gravity affects star pressure and fuel consumption rates. High gravity shortens stellar lives, while low gravity prolongs them. This graph forecasts how long stars would live in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Electromagnetic force intensity affects radiation interaction with matter. Increased EM force raises the likelihood of destructive high-energy radiation, impacting biological survivability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("The relative abundance of elements depends on force magnitudes, which influence nucleosynthesis in stars. This chart predicts shifts in elemental makeup which may favor simple or complex chemistry.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Overall universe stability reflects how all constants deviate from our own. Extreme deviations may produce universes unable to support matter, stars, or life. This metric predicts general viability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Quantum bonding probabilities are influenced by nuclear and electromagnetic forces. Altering these can affect the stability of molecules, potentially preventing or enhancing chemical complexity and life-permitting environments.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Life-supporting chemistry relies on a careful balance of forces. Strong and electromagnetic force multipliers determine molecular stability and reaction pathways. This heatmap predicts how likely life-friendly conditions are under the selected constants.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Star formation depends critically on the balance between gravitational attraction and dark energy repulsion. This plot shows how different force multipliers affect star birth rates. Low gravity or high dark energy suppresses star formation, while optimal values encourage stellar nurseries.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This graph highlights the sensitivity of heavy element nuclei to the strong nuclear force multiplier. Small changes in this force can destabilize or stabilize heavy isotopes, impacting the formation of superheavy elements and the size of the island of stability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This simulation visualizes how element stability varies across the periodic table as the electromagnetic force multiplier changes. Higher EM force favors tighter atomic binding, stabilizing lighter elements, while reducing stability of heavier atoms. At current settings, element stability may shift favorably or unfavorably for complex chemistry.")
+    
+
 st.markdown("**AI Analysis:**")
 st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
             "Higher or lower values represent how isotope stability depends on nuclear forces. "
@@ -259,6 +347,50 @@ with tabs[2]:
     fig = go.Figure(data=[go.Surface(z=star_potential, x=gravity_grid, y=dark_grid, colorscale='Viridis', colorbar=dict(title='Potential'))])
     fig.update_layout(scene=dict(xaxis_title='Gravity Multiplier', yaxis_title='Dark Energy Multiplier', zaxis_title='Star Formation Potential'))
     st.plotly_chart(fig, use_container_width=True)
+
+    with st.expander("AI Analysis"):
+        st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Dark matter clumping patterns shape galaxy and structure formation. This simulated map visualizes a random distribution, serving as a proxy for cosmic web formation tendencies in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Gravity affects star pressure and fuel consumption rates. High gravity shortens stellar lives, while low gravity prolongs them. This graph forecasts how long stars would live in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Electromagnetic force intensity affects radiation interaction with matter. Increased EM force raises the likelihood of destructive high-energy radiation, impacting biological survivability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("The relative abundance of elements depends on force magnitudes, which influence nucleosynthesis in stars. This chart predicts shifts in elemental makeup which may favor simple or complex chemistry.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Overall universe stability reflects how all constants deviate from our own. Extreme deviations may produce universes unable to support matter, stars, or life. This metric predicts general viability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Quantum bonding probabilities are influenced by nuclear and electromagnetic forces. Altering these can affect the stability of molecules, potentially preventing or enhancing chemical complexity and life-permitting environments.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Life-supporting chemistry relies on a careful balance of forces. Strong and electromagnetic force multipliers determine molecular stability and reaction pathways. This heatmap predicts how likely life-friendly conditions are under the selected constants.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Star formation depends critically on the balance between gravitational attraction and dark energy repulsion. This plot shows how different force multipliers affect star birth rates. Low gravity or high dark energy suppresses star formation, while optimal values encourage stellar nurseries.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This graph highlights the sensitivity of heavy element nuclei to the strong nuclear force multiplier. Small changes in this force can destabilize or stabilize heavy isotopes, impacting the formation of superheavy elements and the size of the island of stability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This simulation visualizes how element stability varies across the periodic table as the electromagnetic force multiplier changes. Higher EM force favors tighter atomic binding, stabilizing lighter elements, while reducing stability of heavier atoms. At current settings, element stability may shift favorably or unfavorably for complex chemistry.")
+    
 
 st.markdown("**AI Analysis:**")
 st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
@@ -336,6 +468,50 @@ with tabs[3]:
     fig.update_layout(xaxis_title="Strong Force Multiplier", yaxis_title="EM Force Multiplier")
     st.plotly_chart(fig, use_container_width=True)
 
+    with st.expander("AI Analysis"):
+        st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Dark matter clumping patterns shape galaxy and structure formation. This simulated map visualizes a random distribution, serving as a proxy for cosmic web formation tendencies in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Gravity affects star pressure and fuel consumption rates. High gravity shortens stellar lives, while low gravity prolongs them. This graph forecasts how long stars would live in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Electromagnetic force intensity affects radiation interaction with matter. Increased EM force raises the likelihood of destructive high-energy radiation, impacting biological survivability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("The relative abundance of elements depends on force magnitudes, which influence nucleosynthesis in stars. This chart predicts shifts in elemental makeup which may favor simple or complex chemistry.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Overall universe stability reflects how all constants deviate from our own. Extreme deviations may produce universes unable to support matter, stars, or life. This metric predicts general viability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Quantum bonding probabilities are influenced by nuclear and electromagnetic forces. Altering these can affect the stability of molecules, potentially preventing or enhancing chemical complexity and life-permitting environments.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Life-supporting chemistry relies on a careful balance of forces. Strong and electromagnetic force multipliers determine molecular stability and reaction pathways. This heatmap predicts how likely life-friendly conditions are under the selected constants.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Star formation depends critically on the balance between gravitational attraction and dark energy repulsion. This plot shows how different force multipliers affect star birth rates. Low gravity or high dark energy suppresses star formation, while optimal values encourage stellar nurseries.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This graph highlights the sensitivity of heavy element nuclei to the strong nuclear force multiplier. Small changes in this force can destabilize or stabilize heavy isotopes, impacting the formation of superheavy elements and the size of the island of stability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This simulation visualizes how element stability varies across the periodic table as the electromagnetic force multiplier changes. Higher EM force favors tighter atomic binding, stabilizing lighter elements, while reducing stability of heavier atoms. At current settings, element stability may shift favorably or unfavorably for complex chemistry.")
+    
+
 st.markdown("**AI Analysis:**")
 st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
             "Higher or lower values represent how isotope stability depends on nuclear forces. "
@@ -412,6 +588,50 @@ with tabs[4]:
     fig.update_layout(scene=dict(xaxis_title='Strong Force Multiplier', yaxis_title='EM Force Multiplier', zaxis_title='Bonding Probability'))
     st.plotly_chart(fig, use_container_width=True)
 
+    with st.expander("AI Analysis"):
+        st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Dark matter clumping patterns shape galaxy and structure formation. This simulated map visualizes a random distribution, serving as a proxy for cosmic web formation tendencies in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Gravity affects star pressure and fuel consumption rates. High gravity shortens stellar lives, while low gravity prolongs them. This graph forecasts how long stars would live in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Electromagnetic force intensity affects radiation interaction with matter. Increased EM force raises the likelihood of destructive high-energy radiation, impacting biological survivability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("The relative abundance of elements depends on force magnitudes, which influence nucleosynthesis in stars. This chart predicts shifts in elemental makeup which may favor simple or complex chemistry.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Overall universe stability reflects how all constants deviate from our own. Extreme deviations may produce universes unable to support matter, stars, or life. This metric predicts general viability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Quantum bonding probabilities are influenced by nuclear and electromagnetic forces. Altering these can affect the stability of molecules, potentially preventing or enhancing chemical complexity and life-permitting environments.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Life-supporting chemistry relies on a careful balance of forces. Strong and electromagnetic force multipliers determine molecular stability and reaction pathways. This heatmap predicts how likely life-friendly conditions are under the selected constants.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Star formation depends critically on the balance between gravitational attraction and dark energy repulsion. This plot shows how different force multipliers affect star birth rates. Low gravity or high dark energy suppresses star formation, while optimal values encourage stellar nurseries.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This graph highlights the sensitivity of heavy element nuclei to the strong nuclear force multiplier. Small changes in this force can destabilize or stabilize heavy isotopes, impacting the formation of superheavy elements and the size of the island of stability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This simulation visualizes how element stability varies across the periodic table as the electromagnetic force multiplier changes. Higher EM force favors tighter atomic binding, stabilizing lighter elements, while reducing stability of heavier atoms. At current settings, element stability may shift favorably or unfavorably for complex chemistry.")
+    
+
 st.markdown("**AI Analysis:**")
 st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
             "Higher or lower values represent how isotope stability depends on nuclear forces. "
@@ -487,6 +707,50 @@ with tabs[5]:
     ax.set_ylabel('Probability')
     ax.set_title('Universe Probability vs Deviation')
     st.pyplot(fig)
+
+    with st.expander("AI Analysis"):
+        st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Dark matter clumping patterns shape galaxy and structure formation. This simulated map visualizes a random distribution, serving as a proxy for cosmic web formation tendencies in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Gravity affects star pressure and fuel consumption rates. High gravity shortens stellar lives, while low gravity prolongs them. This graph forecasts how long stars would live in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Electromagnetic force intensity affects radiation interaction with matter. Increased EM force raises the likelihood of destructive high-energy radiation, impacting biological survivability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("The relative abundance of elements depends on force magnitudes, which influence nucleosynthesis in stars. This chart predicts shifts in elemental makeup which may favor simple or complex chemistry.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Overall universe stability reflects how all constants deviate from our own. Extreme deviations may produce universes unable to support matter, stars, or life. This metric predicts general viability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Quantum bonding probabilities are influenced by nuclear and electromagnetic forces. Altering these can affect the stability of molecules, potentially preventing or enhancing chemical complexity and life-permitting environments.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Life-supporting chemistry relies on a careful balance of forces. Strong and electromagnetic force multipliers determine molecular stability and reaction pathways. This heatmap predicts how likely life-friendly conditions are under the selected constants.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Star formation depends critically on the balance between gravitational attraction and dark energy repulsion. This plot shows how different force multipliers affect star birth rates. Low gravity or high dark energy suppresses star formation, while optimal values encourage stellar nurseries.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This graph highlights the sensitivity of heavy element nuclei to the strong nuclear force multiplier. Small changes in this force can destabilize or stabilize heavy isotopes, impacting the formation of superheavy elements and the size of the island of stability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This simulation visualizes how element stability varies across the periodic table as the electromagnetic force multiplier changes. Higher EM force favors tighter atomic binding, stabilizing lighter elements, while reducing stability of heavier atoms. At current settings, element stability may shift favorably or unfavorably for complex chemistry.")
+    
 
 st.markdown("**AI Analysis:**")
 st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
@@ -567,6 +831,50 @@ with tabs[6]:
     ax.set_title('Element Abundance based on Fundamental Forces')
     st.pyplot(fig)
 
+    with st.expander("AI Analysis"):
+        st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Dark matter clumping patterns shape galaxy and structure formation. This simulated map visualizes a random distribution, serving as a proxy for cosmic web formation tendencies in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Gravity affects star pressure and fuel consumption rates. High gravity shortens stellar lives, while low gravity prolongs them. This graph forecasts how long stars would live in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Electromagnetic force intensity affects radiation interaction with matter. Increased EM force raises the likelihood of destructive high-energy radiation, impacting biological survivability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("The relative abundance of elements depends on force magnitudes, which influence nucleosynthesis in stars. This chart predicts shifts in elemental makeup which may favor simple or complex chemistry.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Overall universe stability reflects how all constants deviate from our own. Extreme deviations may produce universes unable to support matter, stars, or life. This metric predicts general viability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Quantum bonding probabilities are influenced by nuclear and electromagnetic forces. Altering these can affect the stability of molecules, potentially preventing or enhancing chemical complexity and life-permitting environments.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Life-supporting chemistry relies on a careful balance of forces. Strong and electromagnetic force multipliers determine molecular stability and reaction pathways. This heatmap predicts how likely life-friendly conditions are under the selected constants.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Star formation depends critically on the balance between gravitational attraction and dark energy repulsion. This plot shows how different force multipliers affect star birth rates. Low gravity or high dark energy suppresses star formation, while optimal values encourage stellar nurseries.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This graph highlights the sensitivity of heavy element nuclei to the strong nuclear force multiplier. Small changes in this force can destabilize or stabilize heavy isotopes, impacting the formation of superheavy elements and the size of the island of stability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This simulation visualizes how element stability varies across the periodic table as the electromagnetic force multiplier changes. Higher EM force favors tighter atomic binding, stabilizing lighter elements, while reducing stability of heavier atoms. At current settings, element stability may shift favorably or unfavorably for complex chemistry.")
+    
+
 st.markdown("**AI Analysis:**")
 st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
             "Higher or lower values represent how isotope stability depends on nuclear forces. "
@@ -642,6 +950,50 @@ with tabs[7]:
     ax.axvline(constants["Electromagnetic Force Multiplier"], color='r', linestyle='--', label="Current EM Force")
     ax.legend()
     st.pyplot(fig)
+
+    with st.expander("AI Analysis"):
+        st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Dark matter clumping patterns shape galaxy and structure formation. This simulated map visualizes a random distribution, serving as a proxy for cosmic web formation tendencies in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Gravity affects star pressure and fuel consumption rates. High gravity shortens stellar lives, while low gravity prolongs them. This graph forecasts how long stars would live in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Electromagnetic force intensity affects radiation interaction with matter. Increased EM force raises the likelihood of destructive high-energy radiation, impacting biological survivability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("The relative abundance of elements depends on force magnitudes, which influence nucleosynthesis in stars. This chart predicts shifts in elemental makeup which may favor simple or complex chemistry.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Overall universe stability reflects how all constants deviate from our own. Extreme deviations may produce universes unable to support matter, stars, or life. This metric predicts general viability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Quantum bonding probabilities are influenced by nuclear and electromagnetic forces. Altering these can affect the stability of molecules, potentially preventing or enhancing chemical complexity and life-permitting environments.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Life-supporting chemistry relies on a careful balance of forces. Strong and electromagnetic force multipliers determine molecular stability and reaction pathways. This heatmap predicts how likely life-friendly conditions are under the selected constants.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Star formation depends critically on the balance between gravitational attraction and dark energy repulsion. This plot shows how different force multipliers affect star birth rates. Low gravity or high dark energy suppresses star formation, while optimal values encourage stellar nurseries.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This graph highlights the sensitivity of heavy element nuclei to the strong nuclear force multiplier. Small changes in this force can destabilize or stabilize heavy isotopes, impacting the formation of superheavy elements and the size of the island of stability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This simulation visualizes how element stability varies across the periodic table as the electromagnetic force multiplier changes. Higher EM force favors tighter atomic binding, stabilizing lighter elements, while reducing stability of heavier atoms. At current settings, element stability may shift favorably or unfavorably for complex chemistry.")
+    
 
 st.markdown("**AI Analysis:**")
 st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
@@ -719,6 +1071,50 @@ with tabs[8]:
     ax.legend()
     st.pyplot(fig)
 
+    with st.expander("AI Analysis"):
+        st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Dark matter clumping patterns shape galaxy and structure formation. This simulated map visualizes a random distribution, serving as a proxy for cosmic web formation tendencies in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Gravity affects star pressure and fuel consumption rates. High gravity shortens stellar lives, while low gravity prolongs them. This graph forecasts how long stars would live in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Electromagnetic force intensity affects radiation interaction with matter. Increased EM force raises the likelihood of destructive high-energy radiation, impacting biological survivability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("The relative abundance of elements depends on force magnitudes, which influence nucleosynthesis in stars. This chart predicts shifts in elemental makeup which may favor simple or complex chemistry.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Overall universe stability reflects how all constants deviate from our own. Extreme deviations may produce universes unable to support matter, stars, or life. This metric predicts general viability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Quantum bonding probabilities are influenced by nuclear and electromagnetic forces. Altering these can affect the stability of molecules, potentially preventing or enhancing chemical complexity and life-permitting environments.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Life-supporting chemistry relies on a careful balance of forces. Strong and electromagnetic force multipliers determine molecular stability and reaction pathways. This heatmap predicts how likely life-friendly conditions are under the selected constants.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Star formation depends critically on the balance between gravitational attraction and dark energy repulsion. This plot shows how different force multipliers affect star birth rates. Low gravity or high dark energy suppresses star formation, while optimal values encourage stellar nurseries.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This graph highlights the sensitivity of heavy element nuclei to the strong nuclear force multiplier. Small changes in this force can destabilize or stabilize heavy isotopes, impacting the formation of superheavy elements and the size of the island of stability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This simulation visualizes how element stability varies across the periodic table as the electromagnetic force multiplier changes. Higher EM force favors tighter atomic binding, stabilizing lighter elements, while reducing stability of heavier atoms. At current settings, element stability may shift favorably or unfavorably for complex chemistry.")
+    
+
 st.markdown("**AI Analysis:**")
 st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
             "Higher or lower values represent how isotope stability depends on nuclear forces. "
@@ -794,6 +1190,50 @@ with tabs[9]:
     fig.colorbar(c, ax=ax)
     ax.set_title("Simulated 2D Dark Matter Plasma Density")
     st.pyplot(fig)
+
+    with st.expander("AI Analysis"):
+        st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Dark matter clumping patterns shape galaxy and structure formation. This simulated map visualizes a random distribution, serving as a proxy for cosmic web formation tendencies in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Gravity affects star pressure and fuel consumption rates. High gravity shortens stellar lives, while low gravity prolongs them. This graph forecasts how long stars would live in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Electromagnetic force intensity affects radiation interaction with matter. Increased EM force raises the likelihood of destructive high-energy radiation, impacting biological survivability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("The relative abundance of elements depends on force magnitudes, which influence nucleosynthesis in stars. This chart predicts shifts in elemental makeup which may favor simple or complex chemistry.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Overall universe stability reflects how all constants deviate from our own. Extreme deviations may produce universes unable to support matter, stars, or life. This metric predicts general viability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Quantum bonding probabilities are influenced by nuclear and electromagnetic forces. Altering these can affect the stability of molecules, potentially preventing or enhancing chemical complexity and life-permitting environments.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Life-supporting chemistry relies on a careful balance of forces. Strong and electromagnetic force multipliers determine molecular stability and reaction pathways. This heatmap predicts how likely life-friendly conditions are under the selected constants.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Star formation depends critically on the balance between gravitational attraction and dark energy repulsion. This plot shows how different force multipliers affect star birth rates. Low gravity or high dark energy suppresses star formation, while optimal values encourage stellar nurseries.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This graph highlights the sensitivity of heavy element nuclei to the strong nuclear force multiplier. Small changes in this force can destabilize or stabilize heavy isotopes, impacting the formation of superheavy elements and the size of the island of stability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This simulation visualizes how element stability varies across the periodic table as the electromagnetic force multiplier changes. Higher EM force favors tighter atomic binding, stabilizing lighter elements, while reducing stability of heavier atoms. At current settings, element stability may shift favorably or unfavorably for complex chemistry.")
+    
 
 st.markdown("**AI Analysis:**")
 st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
@@ -881,6 +1321,50 @@ with tabs[10]:
                                        marker=dict(size=5, color=Stability_vals, colorscale='Plasma', colorbar=dict(title='Stability')))])
     fig.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='Isotope Number', zaxis_title='Stability Probability'))
     st.plotly_chart(fig, use_container_width=True)
+
+    with st.expander("AI Analysis"):
+        st.markdown("This 3D scatter shows isotope stability probabilities across atomic numbers, influenced by nuclear force multipliers. More stable isotopes allow richer chemistry and longer-lived elements.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Dark matter clumping patterns shape galaxy and structure formation. This simulated map visualizes a random distribution, serving as a proxy for cosmic web formation tendencies in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Gravity affects star pressure and fuel consumption rates. High gravity shortens stellar lives, while low gravity prolongs them. This graph forecasts how long stars would live in this universe.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Electromagnetic force intensity affects radiation interaction with matter. Increased EM force raises the likelihood of destructive high-energy radiation, impacting biological survivability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("The relative abundance of elements depends on force magnitudes, which influence nucleosynthesis in stars. This chart predicts shifts in elemental makeup which may favor simple or complex chemistry.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Overall universe stability reflects how all constants deviate from our own. Extreme deviations may produce universes unable to support matter, stars, or life. This metric predicts general viability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Quantum bonding probabilities are influenced by nuclear and electromagnetic forces. Altering these can affect the stability of molecules, potentially preventing or enhancing chemical complexity and life-permitting environments.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Life-supporting chemistry relies on a careful balance of forces. Strong and electromagnetic force multipliers determine molecular stability and reaction pathways. This heatmap predicts how likely life-friendly conditions are under the selected constants.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("Star formation depends critically on the balance between gravitational attraction and dark energy repulsion. This plot shows how different force multipliers affect star birth rates. Low gravity or high dark energy suppresses star formation, while optimal values encourage stellar nurseries.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This graph highlights the sensitivity of heavy element nuclei to the strong nuclear force multiplier. Small changes in this force can destabilize or stabilize heavy isotopes, impacting the formation of superheavy elements and the size of the island of stability.")
+    
+
+    with st.expander("AI Analysis"):
+        st.markdown("This simulation visualizes how element stability varies across the periodic table as the electromagnetic force multiplier changes. Higher EM force favors tighter atomic binding, stabilizing lighter elements, while reducing stability of heavier atoms. At current settings, element stability may shift favorably or unfavorably for complex chemistry.")
+    
 
 st.markdown("**AI Analysis:**")
 st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
