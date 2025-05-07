@@ -11,16 +11,59 @@ st.title("Multiverse Physics Simulation")
 st.sidebar.header("Adjust Physical Constants")
 
 
+
+
+
 def slider_with_percent(label, min_value, max_value, value, step):
     col1, col2 = st.sidebar.columns([3, 1])
-    slider_val = col1.slider(label, min_value, max_value, value, step)
-    precise_val = col2.text_input(f"{label} precise", str(slider_val))
+
+    # Text input first for user-defined value
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed", key=label)
+
+    # Validate user input
     try:
-        slider_val = float(precise_val)
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
     except:
-        pass
+        precise_val = value
+
+    # Apply button to sync value
+    apply_key = f"{label}_apply"
+    if st.sidebar.button("Apply", key=apply_key):
+        slider_val = precise_val
+    else:
+        slider_val = value
+
+    # Always render slider
+    slider_val = col1.slider(label, min_value, max_value, slider_val, step)
+
     percent_change = (slider_val - 1.0) * 100
-    st.sidebar.markdown(f"<span style='font-size:12px;'>Change from baseline: {percent_change:+.1f}%</span>", unsafe_allow_html=True)
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
+
+    return slider_val
+
+    with col2:
+        st.markdown("<span style='font-size:11px;'>User Input</span>", unsafe_allow_html=True)
+        precise_val_input = st.text_input("", str(value), label_visibility="collapsed")
+
+    try:
+        precise_val = float(precise_val_input)
+        if precise_val < min_value:
+            precise_val = min_value
+        elif precise_val > max_value:
+            precise_val = max_value
+    except:
+        precise_val = value
+
+    slider_val = col1.slider(label, min_value, max_value, precise_val, step)
+
+    percent_change = (slider_val - 1.0) * 100
+    st.sidebar.markdown(f"<span style='font-size:12px;'>{label} Change: {percent_change:+.1f}% from baseline</span>", unsafe_allow_html=True)
     return slider_val
 
 constants = {
@@ -64,6 +107,72 @@ with tabs[0]:
     fig.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='EM Force Multiplier', zaxis_title='Stability Probability'))
     st.plotly_chart(fig, use_container_width=True)
 
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
+            "Higher or lower values represent how isotope stability depends on nuclear forces. "
+            "Current universe settings suggest **heavier or lighter isotopes may become favored**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Random Dark Matter Density** and the selected universal parameters. "
+            "Higher or lower values represent how density fluctuations affect structure formation. "
+            "Current universe settings suggest **current simulation shows random cosmic web densities**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how stellar burning rate changes with gravity. "
+            "Current universe settings suggest **stars may live shorter or longer**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **EM Force Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how EM force affects radiation interaction. "
+            "Current universe settings suggest **radiation danger may rise or fall**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Forces** and the selected universal parameters. "
+            "Higher or lower values represent how abundance shifts based on force magnitudes. "
+            "Current universe settings suggest **certain elements may dominate or diminish**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Deviation from Standard Model** and the selected universal parameters. "
+            "Higher or lower values represent how overall universe stability changes. "
+            "Current universe settings suggest **universe viability is tied to deviation from constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how quantum bonding strength affects chemical possibilities. "
+            "Current universe settings suggest **chemical bonding may become easier or harder**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how bonding and element formation affect life probability. "
+            "Current universe settings suggest **life potential may be higher or lower under current constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity and Dark Energy Multipliers** and the selected universal parameters. "
+            "Higher or lower values represent how gravitational collapse interacts with cosmic expansion. "
+            "Current universe settings suggest **star formation likelihood may increase or decrease**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong Force and Atomic Number** and the selected universal parameters. "
+            "Higher or lower values represent how instability regions shift depending on strong force intensity. "
+            "Current universe settings suggest **island of instability may become broader or narrower**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number and EM Force** and the selected universal parameters. "
+            "Higher or lower values represent how element stability varies with atomic number and EM force multiplier. "
+            "Current universe settings suggest **element stability may shift towards lighter or heavier elements depending on EM force multiplier**.")
+
+
 
 with tabs[1]:
     st.subheader("Island of Instability (Advanced 3D Surface)")
@@ -75,6 +184,72 @@ with tabs[1]:
     fig.update_layout(scene=dict(xaxis_title='Strong Force Multiplier', yaxis_title='Atomic Number', zaxis_title='Instability Level'))
     st.plotly_chart(fig, use_container_width=True)
 
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
+            "Higher or lower values represent how isotope stability depends on nuclear forces. "
+            "Current universe settings suggest **heavier or lighter isotopes may become favored**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Random Dark Matter Density** and the selected universal parameters. "
+            "Higher or lower values represent how density fluctuations affect structure formation. "
+            "Current universe settings suggest **current simulation shows random cosmic web densities**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how stellar burning rate changes with gravity. "
+            "Current universe settings suggest **stars may live shorter or longer**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **EM Force Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how EM force affects radiation interaction. "
+            "Current universe settings suggest **radiation danger may rise or fall**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Forces** and the selected universal parameters. "
+            "Higher or lower values represent how abundance shifts based on force magnitudes. "
+            "Current universe settings suggest **certain elements may dominate or diminish**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Deviation from Standard Model** and the selected universal parameters. "
+            "Higher or lower values represent how overall universe stability changes. "
+            "Current universe settings suggest **universe viability is tied to deviation from constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how quantum bonding strength affects chemical possibilities. "
+            "Current universe settings suggest **chemical bonding may become easier or harder**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how bonding and element formation affect life probability. "
+            "Current universe settings suggest **life potential may be higher or lower under current constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity and Dark Energy Multipliers** and the selected universal parameters. "
+            "Higher or lower values represent how gravitational collapse interacts with cosmic expansion. "
+            "Current universe settings suggest **star formation likelihood may increase or decrease**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong Force and Atomic Number** and the selected universal parameters. "
+            "Higher or lower values represent how instability regions shift depending on strong force intensity. "
+            "Current universe settings suggest **island of instability may become broader or narrower**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number and EM Force** and the selected universal parameters. "
+            "Higher or lower values represent how element stability varies with atomic number and EM force multiplier. "
+            "Current universe settings suggest **element stability may shift towards lighter or heavier elements depending on EM force multiplier**.")
+
+
 with tabs[2]:
     st.subheader("Star Formation Potential (Advanced 3D Surface)")
     gravity_values = np.linspace(0.1, 10.0, 50)
@@ -84,6 +259,72 @@ with tabs[2]:
     fig = go.Figure(data=[go.Surface(z=star_potential, x=gravity_grid, y=dark_grid, colorscale='Viridis', colorbar=dict(title='Potential'))])
     fig.update_layout(scene=dict(xaxis_title='Gravity Multiplier', yaxis_title='Dark Energy Multiplier', zaxis_title='Star Formation Potential'))
     st.plotly_chart(fig, use_container_width=True)
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
+            "Higher or lower values represent how isotope stability depends on nuclear forces. "
+            "Current universe settings suggest **heavier or lighter isotopes may become favored**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Random Dark Matter Density** and the selected universal parameters. "
+            "Higher or lower values represent how density fluctuations affect structure formation. "
+            "Current universe settings suggest **current simulation shows random cosmic web densities**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how stellar burning rate changes with gravity. "
+            "Current universe settings suggest **stars may live shorter or longer**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **EM Force Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how EM force affects radiation interaction. "
+            "Current universe settings suggest **radiation danger may rise or fall**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Forces** and the selected universal parameters. "
+            "Higher or lower values represent how abundance shifts based on force magnitudes. "
+            "Current universe settings suggest **certain elements may dominate or diminish**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Deviation from Standard Model** and the selected universal parameters. "
+            "Higher or lower values represent how overall universe stability changes. "
+            "Current universe settings suggest **universe viability is tied to deviation from constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how quantum bonding strength affects chemical possibilities. "
+            "Current universe settings suggest **chemical bonding may become easier or harder**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how bonding and element formation affect life probability. "
+            "Current universe settings suggest **life potential may be higher or lower under current constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity and Dark Energy Multipliers** and the selected universal parameters. "
+            "Higher or lower values represent how gravitational collapse interacts with cosmic expansion. "
+            "Current universe settings suggest **star formation likelihood may increase or decrease**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong Force and Atomic Number** and the selected universal parameters. "
+            "Higher or lower values represent how instability regions shift depending on strong force intensity. "
+            "Current universe settings suggest **island of instability may become broader or narrower**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number and EM Force** and the selected universal parameters. "
+            "Higher or lower values represent how element stability varies with atomic number and EM force multiplier. "
+            "Current universe settings suggest **element stability may shift towards lighter or heavier elements depending on EM force multiplier**.")
+
 
 with tabs[3]:
     st.subheader("Life Probability Map (Heatmap)")
@@ -95,6 +336,72 @@ with tabs[3]:
     fig.update_layout(xaxis_title="Strong Force Multiplier", yaxis_title="EM Force Multiplier")
     st.plotly_chart(fig, use_container_width=True)
 
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
+            "Higher or lower values represent how isotope stability depends on nuclear forces. "
+            "Current universe settings suggest **heavier or lighter isotopes may become favored**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Random Dark Matter Density** and the selected universal parameters. "
+            "Higher or lower values represent how density fluctuations affect structure formation. "
+            "Current universe settings suggest **current simulation shows random cosmic web densities**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how stellar burning rate changes with gravity. "
+            "Current universe settings suggest **stars may live shorter or longer**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **EM Force Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how EM force affects radiation interaction. "
+            "Current universe settings suggest **radiation danger may rise or fall**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Forces** and the selected universal parameters. "
+            "Higher or lower values represent how abundance shifts based on force magnitudes. "
+            "Current universe settings suggest **certain elements may dominate or diminish**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Deviation from Standard Model** and the selected universal parameters. "
+            "Higher or lower values represent how overall universe stability changes. "
+            "Current universe settings suggest **universe viability is tied to deviation from constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how quantum bonding strength affects chemical possibilities. "
+            "Current universe settings suggest **chemical bonding may become easier or harder**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how bonding and element formation affect life probability. "
+            "Current universe settings suggest **life potential may be higher or lower under current constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity and Dark Energy Multipliers** and the selected universal parameters. "
+            "Higher or lower values represent how gravitational collapse interacts with cosmic expansion. "
+            "Current universe settings suggest **star formation likelihood may increase or decrease**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong Force and Atomic Number** and the selected universal parameters. "
+            "Higher or lower values represent how instability regions shift depending on strong force intensity. "
+            "Current universe settings suggest **island of instability may become broader or narrower**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number and EM Force** and the selected universal parameters. "
+            "Higher or lower values represent how element stability varies with atomic number and EM force multiplier. "
+            "Current universe settings suggest **element stability may shift towards lighter or heavier elements depending on EM force multiplier**.")
+
+
 with tabs[4]:
     st.subheader("Quantum Bonding Probability (Advanced 3D Surface)")
     strong_force_values = np.linspace(0.1, 10.0, 50)
@@ -105,12 +412,147 @@ with tabs[4]:
     fig.update_layout(scene=dict(xaxis_title='Strong Force Multiplier', yaxis_title='EM Force Multiplier', zaxis_title='Bonding Probability'))
     st.plotly_chart(fig, use_container_width=True)
 
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
+            "Higher or lower values represent how isotope stability depends on nuclear forces. "
+            "Current universe settings suggest **heavier or lighter isotopes may become favored**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Random Dark Matter Density** and the selected universal parameters. "
+            "Higher or lower values represent how density fluctuations affect structure formation. "
+            "Current universe settings suggest **current simulation shows random cosmic web densities**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how stellar burning rate changes with gravity. "
+            "Current universe settings suggest **stars may live shorter or longer**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **EM Force Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how EM force affects radiation interaction. "
+            "Current universe settings suggest **radiation danger may rise or fall**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Forces** and the selected universal parameters. "
+            "Higher or lower values represent how abundance shifts based on force magnitudes. "
+            "Current universe settings suggest **certain elements may dominate or diminish**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Deviation from Standard Model** and the selected universal parameters. "
+            "Higher or lower values represent how overall universe stability changes. "
+            "Current universe settings suggest **universe viability is tied to deviation from constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how quantum bonding strength affects chemical possibilities. "
+            "Current universe settings suggest **chemical bonding may become easier or harder**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how bonding and element formation affect life probability. "
+            "Current universe settings suggest **life potential may be higher or lower under current constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity and Dark Energy Multipliers** and the selected universal parameters. "
+            "Higher or lower values represent how gravitational collapse interacts with cosmic expansion. "
+            "Current universe settings suggest **star formation likelihood may increase or decrease**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong Force and Atomic Number** and the selected universal parameters. "
+            "Higher or lower values represent how instability regions shift depending on strong force intensity. "
+            "Current universe settings suggest **island of instability may become broader or narrower**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number and EM Force** and the selected universal parameters. "
+            "Higher or lower values represent how element stability varies with atomic number and EM force multiplier. "
+            "Current universe settings suggest **element stability may shift towards lighter or heavier elements depending on EM force multiplier**.")
+
+
 with tabs[5]:
     st.subheader("Universe Probability")
     prob = np.exp(-deviation)
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.bar(["Universe Probability"], [prob], color='purple')
+    ax.set_xlabel('Universe Stability')
+    ax.set_ylabel('Probability')
+    ax.set_title('Universe Probability vs Deviation')
     st.pyplot(fig)
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
+            "Higher or lower values represent how isotope stability depends on nuclear forces. "
+            "Current universe settings suggest **heavier or lighter isotopes may become favored**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Random Dark Matter Density** and the selected universal parameters. "
+            "Higher or lower values represent how density fluctuations affect structure formation. "
+            "Current universe settings suggest **current simulation shows random cosmic web densities**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how stellar burning rate changes with gravity. "
+            "Current universe settings suggest **stars may live shorter or longer**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **EM Force Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how EM force affects radiation interaction. "
+            "Current universe settings suggest **radiation danger may rise or fall**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Forces** and the selected universal parameters. "
+            "Higher or lower values represent how abundance shifts based on force magnitudes. "
+            "Current universe settings suggest **certain elements may dominate or diminish**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Deviation from Standard Model** and the selected universal parameters. "
+            "Higher or lower values represent how overall universe stability changes. "
+            "Current universe settings suggest **universe viability is tied to deviation from constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how quantum bonding strength affects chemical possibilities. "
+            "Current universe settings suggest **chemical bonding may become easier or harder**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how bonding and element formation affect life probability. "
+            "Current universe settings suggest **life potential may be higher or lower under current constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity and Dark Energy Multipliers** and the selected universal parameters. "
+            "Higher or lower values represent how gravitational collapse interacts with cosmic expansion. "
+            "Current universe settings suggest **star formation likelihood may increase or decrease**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong Force and Atomic Number** and the selected universal parameters. "
+            "Higher or lower values represent how instability regions shift depending on strong force intensity. "
+            "Current universe settings suggest **island of instability may become broader or narrower**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number and EM Force** and the selected universal parameters. "
+            "Higher or lower values represent how element stability varies with atomic number and EM force multiplier. "
+            "Current universe settings suggest **element stability may shift towards lighter or heavier elements depending on EM force multiplier**.")
+
 
 with tabs[6]:
     st.subheader("Element Abundance")
@@ -125,6 +567,72 @@ with tabs[6]:
     ax.set_title('Element Abundance based on Fundamental Forces')
     st.pyplot(fig)
 
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
+            "Higher or lower values represent how isotope stability depends on nuclear forces. "
+            "Current universe settings suggest **heavier or lighter isotopes may become favored**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Random Dark Matter Density** and the selected universal parameters. "
+            "Higher or lower values represent how density fluctuations affect structure formation. "
+            "Current universe settings suggest **current simulation shows random cosmic web densities**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how stellar burning rate changes with gravity. "
+            "Current universe settings suggest **stars may live shorter or longer**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **EM Force Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how EM force affects radiation interaction. "
+            "Current universe settings suggest **radiation danger may rise or fall**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Forces** and the selected universal parameters. "
+            "Higher or lower values represent how abundance shifts based on force magnitudes. "
+            "Current universe settings suggest **certain elements may dominate or diminish**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Deviation from Standard Model** and the selected universal parameters. "
+            "Higher or lower values represent how overall universe stability changes. "
+            "Current universe settings suggest **universe viability is tied to deviation from constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how quantum bonding strength affects chemical possibilities. "
+            "Current universe settings suggest **chemical bonding may become easier or harder**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how bonding and element formation affect life probability. "
+            "Current universe settings suggest **life potential may be higher or lower under current constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity and Dark Energy Multipliers** and the selected universal parameters. "
+            "Higher or lower values represent how gravitational collapse interacts with cosmic expansion. "
+            "Current universe settings suggest **star formation likelihood may increase or decrease**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong Force and Atomic Number** and the selected universal parameters. "
+            "Higher or lower values represent how instability regions shift depending on strong force intensity. "
+            "Current universe settings suggest **island of instability may become broader or narrower**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number and EM Force** and the selected universal parameters. "
+            "Higher or lower values represent how element stability varies with atomic number and EM force multiplier. "
+            "Current universe settings suggest **element stability may shift towards lighter or heavier elements depending on EM force multiplier**.")
+
+
 with tabs[7]:
     st.subheader("Radiation Risk")
     x = np.linspace(0.1, 10.0, 500)
@@ -134,6 +642,72 @@ with tabs[7]:
     ax.axvline(constants["Electromagnetic Force Multiplier"], color='r', linestyle='--', label="Current EM Force")
     ax.legend()
     st.pyplot(fig)
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
+            "Higher or lower values represent how isotope stability depends on nuclear forces. "
+            "Current universe settings suggest **heavier or lighter isotopes may become favored**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Random Dark Matter Density** and the selected universal parameters. "
+            "Higher or lower values represent how density fluctuations affect structure formation. "
+            "Current universe settings suggest **current simulation shows random cosmic web densities**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how stellar burning rate changes with gravity. "
+            "Current universe settings suggest **stars may live shorter or longer**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **EM Force Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how EM force affects radiation interaction. "
+            "Current universe settings suggest **radiation danger may rise or fall**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Forces** and the selected universal parameters. "
+            "Higher or lower values represent how abundance shifts based on force magnitudes. "
+            "Current universe settings suggest **certain elements may dominate or diminish**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Deviation from Standard Model** and the selected universal parameters. "
+            "Higher or lower values represent how overall universe stability changes. "
+            "Current universe settings suggest **universe viability is tied to deviation from constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how quantum bonding strength affects chemical possibilities. "
+            "Current universe settings suggest **chemical bonding may become easier or harder**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how bonding and element formation affect life probability. "
+            "Current universe settings suggest **life potential may be higher or lower under current constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity and Dark Energy Multipliers** and the selected universal parameters. "
+            "Higher or lower values represent how gravitational collapse interacts with cosmic expansion. "
+            "Current universe settings suggest **star formation likelihood may increase or decrease**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong Force and Atomic Number** and the selected universal parameters. "
+            "Higher or lower values represent how instability regions shift depending on strong force intensity. "
+            "Current universe settings suggest **island of instability may become broader or narrower**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number and EM Force** and the selected universal parameters. "
+            "Higher or lower values represent how element stability varies with atomic number and EM force multiplier. "
+            "Current universe settings suggest **element stability may shift towards lighter or heavier elements depending on EM force multiplier**.")
+
 
 with tabs[8]:
     st.subheader("Star Lifespan vs Gravity Multiplier")
@@ -145,6 +719,72 @@ with tabs[8]:
     ax.legend()
     st.pyplot(fig)
 
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
+            "Higher or lower values represent how isotope stability depends on nuclear forces. "
+            "Current universe settings suggest **heavier or lighter isotopes may become favored**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Random Dark Matter Density** and the selected universal parameters. "
+            "Higher or lower values represent how density fluctuations affect structure formation. "
+            "Current universe settings suggest **current simulation shows random cosmic web densities**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how stellar burning rate changes with gravity. "
+            "Current universe settings suggest **stars may live shorter or longer**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **EM Force Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how EM force affects radiation interaction. "
+            "Current universe settings suggest **radiation danger may rise or fall**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Forces** and the selected universal parameters. "
+            "Higher or lower values represent how abundance shifts based on force magnitudes. "
+            "Current universe settings suggest **certain elements may dominate or diminish**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Deviation from Standard Model** and the selected universal parameters. "
+            "Higher or lower values represent how overall universe stability changes. "
+            "Current universe settings suggest **universe viability is tied to deviation from constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how quantum bonding strength affects chemical possibilities. "
+            "Current universe settings suggest **chemical bonding may become easier or harder**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how bonding and element formation affect life probability. "
+            "Current universe settings suggest **life potential may be higher or lower under current constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity and Dark Energy Multipliers** and the selected universal parameters. "
+            "Higher or lower values represent how gravitational collapse interacts with cosmic expansion. "
+            "Current universe settings suggest **star formation likelihood may increase or decrease**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong Force and Atomic Number** and the selected universal parameters. "
+            "Higher or lower values represent how instability regions shift depending on strong force intensity. "
+            "Current universe settings suggest **island of instability may become broader or narrower**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number and EM Force** and the selected universal parameters. "
+            "Higher or lower values represent how element stability varies with atomic number and EM force multiplier. "
+            "Current universe settings suggest **element stability may shift towards lighter or heavier elements depending on EM force multiplier**.")
+
+
 
 with tabs[9]:
     st.subheader("2D Dark Matter Simulation")
@@ -154,6 +794,72 @@ with tabs[9]:
     fig.colorbar(c, ax=ax)
     ax.set_title("Simulated 2D Dark Matter Plasma Density")
     st.pyplot(fig)
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
+            "Higher or lower values represent how isotope stability depends on nuclear forces. "
+            "Current universe settings suggest **heavier or lighter isotopes may become favored**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Random Dark Matter Density** and the selected universal parameters. "
+            "Higher or lower values represent how density fluctuations affect structure formation. "
+            "Current universe settings suggest **current simulation shows random cosmic web densities**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how stellar burning rate changes with gravity. "
+            "Current universe settings suggest **stars may live shorter or longer**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **EM Force Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how EM force affects radiation interaction. "
+            "Current universe settings suggest **radiation danger may rise or fall**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Forces** and the selected universal parameters. "
+            "Higher or lower values represent how abundance shifts based on force magnitudes. "
+            "Current universe settings suggest **certain elements may dominate or diminish**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Deviation from Standard Model** and the selected universal parameters. "
+            "Higher or lower values represent how overall universe stability changes. "
+            "Current universe settings suggest **universe viability is tied to deviation from constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how quantum bonding strength affects chemical possibilities. "
+            "Current universe settings suggest **chemical bonding may become easier or harder**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how bonding and element formation affect life probability. "
+            "Current universe settings suggest **life potential may be higher or lower under current constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity and Dark Energy Multipliers** and the selected universal parameters. "
+            "Higher or lower values represent how gravitational collapse interacts with cosmic expansion. "
+            "Current universe settings suggest **star formation likelihood may increase or decrease**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong Force and Atomic Number** and the selected universal parameters. "
+            "Higher or lower values represent how instability regions shift depending on strong force intensity. "
+            "Current universe settings suggest **island of instability may become broader or narrower**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number and EM Force** and the selected universal parameters. "
+            "Higher or lower values represent how element stability varies with atomic number and EM force multiplier. "
+            "Current universe settings suggest **element stability may shift towards lighter or heavier elements depending on EM force multiplier**.")
+
 
 with tabs[10]:
     st.subheader("3D Atomic Stability Probability per Isotope")
@@ -175,3 +881,69 @@ with tabs[10]:
                                        marker=dict(size=5, color=Stability_vals, colorscale='Plasma', colorbar=dict(title='Stability')))])
     fig.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='Isotope Number', zaxis_title='Stability Probability'))
     st.plotly_chart(fig, use_container_width=True)
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number, Isotope Number, Stability** and the selected universal parameters. "
+            "Higher or lower values represent how isotope stability depends on nuclear forces. "
+            "Current universe settings suggest **heavier or lighter isotopes may become favored**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Random Dark Matter Density** and the selected universal parameters. "
+            "Higher or lower values represent how density fluctuations affect structure formation. "
+            "Current universe settings suggest **current simulation shows random cosmic web densities**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how stellar burning rate changes with gravity. "
+            "Current universe settings suggest **stars may live shorter or longer**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **EM Force Multiplier** and the selected universal parameters. "
+            "Higher or lower values represent how EM force affects radiation interaction. "
+            "Current universe settings suggest **radiation danger may rise or fall**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Forces** and the selected universal parameters. "
+            "Higher or lower values represent how abundance shifts based on force magnitudes. "
+            "Current universe settings suggest **certain elements may dominate or diminish**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Deviation from Standard Model** and the selected universal parameters. "
+            "Higher or lower values represent how overall universe stability changes. "
+            "Current universe settings suggest **universe viability is tied to deviation from constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how quantum bonding strength affects chemical possibilities. "
+            "Current universe settings suggest **chemical bonding may become easier or harder**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong and EM Forces** and the selected universal parameters. "
+            "Higher or lower values represent how bonding and element formation affect life probability. "
+            "Current universe settings suggest **life potential may be higher or lower under current constants**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Gravity and Dark Energy Multipliers** and the selected universal parameters. "
+            "Higher or lower values represent how gravitational collapse interacts with cosmic expansion. "
+            "Current universe settings suggest **star formation likelihood may increase or decrease**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Strong Force and Atomic Number** and the selected universal parameters. "
+            "Higher or lower values represent how instability regions shift depending on strong force intensity. "
+            "Current universe settings suggest **island of instability may become broader or narrower**.")
+
+
+st.markdown("**AI Analysis:**")
+st.markdown("This graph reflects the relationship between **Atomic Number and EM Force** and the selected universal parameters. "
+            "Higher or lower values represent how element stability varies with atomic number and EM force multiplier. "
+            "Current universe settings suggest **element stability may shift towards lighter or heavier elements depending on EM force multiplier**.")
+
