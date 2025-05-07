@@ -432,7 +432,7 @@ with tabs[10]:
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("This version uses the Semi-Empirical Mass Formula to calculate binding energies and isotope stability. Isotopes with high binding energy per nucleon are more stable. As atomic number increases, stability generally decreases due to increased Coulomb repulsion.")
     # === Universe Life Probability Over Time (Metallicity + Forces Combined) ===
-with st.expander("Universe Life Probability Over Time (NEW MODULE)"):
+with tabs[11]:
     st.subheader("Universe Life Probability Over Cosmic Time")
 
     # Use star formation metallicity from previous calculation
