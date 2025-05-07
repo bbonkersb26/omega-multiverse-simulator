@@ -187,46 +187,56 @@ with tabs[8]:
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("Stars burn fuel more quickly in universes with stronger gravity. This plot visualizes how stellar lifespans shorten as gravity increases, impacting planet formation and time available for life.")
 
-# === 2D Dark Matter Simulation ===
-# === 3D Dark Matter Tendril + Galaxy Simulation ===
+# === 3D Dark Matter Tendril Simulation (Physics Linked Version) ===
 with tabs[9]:
-    st.subheader("3D Dark Matter Tendril + Galaxy Cluster Simulation")
+    st.subheader("3D Dark Matter Tendril Simulation (Linked to Physics Constants)")
 
-    size = 50  # Grid size
-    scale = 10  # Spatial scale
-    num_clusters = 5  # Number of dark matter clusters
+    # LINK TO PHYSICAL CONSTANTS (from user sliders)
+    gravity_multiplier = constants["Gravitational Constant Multiplier"]
+    dark_energy_multiplier = constants["Dark Energy Multiplier"]
 
-    # Generate 3D grid
-    x = np.linspace(-scale, scale, size)
-    y = np.linspace(-scale, scale, size)
-    z = np.linspace(-scale, scale, size)
+    size = 50
+    scale = 10
+    num_clusters = 5
+
+    # Gravity effect (higher gravity = tighter clusters)
+    gravity_effect = gravity_multiplier
+    cluster_spread = 4.0 / gravity_effect
+
+    # Dark energy effect (higher dark energy = more stretched / more void space)
+    dark_energy_effect = dark_energy_multiplier
+    space_stretch = 1.0 / dark_energy_effect
+
+    # Create 3D grid
+    x = np.linspace(-scale * space_stretch, scale * space_stretch, size)
+    y = np.linspace(-scale * space_stretch, scale * space_stretch, size)
+    z = np.linspace(-scale * space_stretch, scale * space_stretch, size)
     X, Y, Z = np.meshgrid(x, y, z)
 
-    # Initialize dark matter density
-    density = np.zeros_like(X)
-
     # Generate random cluster centers
+    density = np.zeros_like(X)
     np.random.seed(42)
     cluster_centers = np.random.uniform(-scale, scale, (num_clusters, 3))
 
     # Generate tendril-like Gaussian blobs
     for cx, cy, cz in cluster_centers:
         dist = np.sqrt((X - cx)**2 + (Y - cy)**2 + (Z - cz)**2)
-        blob = np.exp(-(dist**2) / 4)
+        blob = np.exp(-(dist**2) / cluster_spread)
         density += blob
 
     # Normalize density
     density /= np.max(density)
 
-    # Filter significant density points
+    # Extract significant points
     threshold = 0.2
     points = np.where(density > threshold)
+
     x_points = X[points]
     y_points = Y[points]
     z_points = Z[points]
     density_points = density[points]
 
-    # Plot 3D dark matter density
+    # Plot dark matter tendrils
     fig = go.Figure(data=[go.Scatter3d(
         x=x_points,
         y=y_points,
@@ -236,13 +246,13 @@ with tabs[9]:
             size=3,
             color=density_points,
             colorscale='Inferno',
-            opacity=0.7,
+            opacity=0.75,
             colorbar=dict(title='Dark Matter Density')
         )
     )])
 
     fig.update_layout(
-        title="Simulated 3D Dark Matter Tendrils and Galaxy Clusters",
+        title="3D Dark Matter Tendril Simulation (Linked to Gravity and Dark Energy)",
         scene=dict(
             xaxis_title='X Position',
             yaxis_title='Y Position',
@@ -253,6 +263,10 @@ with tabs[9]:
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("### AI Analysis → Scientific Summary")
+    st.markdown("This simulation links dark matter tendrils and cluster formation directly to physical constants:")
+    st.markdown("- **Higher Gravity Multiplier** compresses clusters and tightens tendrils.")
+    st.markdown("- **Higher Dark Energy Multiplier** stretches cosmic web, expanding voids and diffusing structures.")
+    st.plotly_chart(fig, use_container_width=True)
     st.markdown("This advanced 3D visualization simulates dark matter distributions with tendrils and clusters, emulating gravitational wells where galaxies may form and evolve. The clusters represent denser dark matter nodes, while filaments suggest cosmic web structures that bind galaxies together in the multiverse.")
     
 # === 3D Atomic Stability Probability ===
