@@ -1,3 +1,4 @@
+
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
@@ -137,24 +138,20 @@ with tab10:
     ax.legend()
     st.pyplot(fig)
 
+
 with tab11:
-    st.subheader("3D Dark Matter Plasma Web")
+    st.subheader("Dark Matter Plasma Web (Projected)")
 
     grid_size = 50
-    density = np.random.normal(0, 1, (grid_size, grid_size, grid_size))
+    density = np.random.normal(0, 1, (grid_size, grid_size))
 
-    grid = pv.UniformGrid()
-    grid.dimensions = np.array(density.shape) + 1
-    grid.origin = (0, 0, 0)
-    grid.spacing = (1, 1, 1)
-    grid.cell_arrays["density"] = density.flatten(order="F")
+    fig, ax = plt.subplots(figsize=(8, 6))
+    c = ax.imshow(density, cmap='plasma', interpolation='nearest')
+    ax.set_title("Dark Matter Plasma Density Projection")
+    plt.colorbar(c, ax=ax, label='Density')
 
-    plotter = pv.Plotter(off_screen=True)
-    plotter.add_volume(grid, cmap="plasma", opacity="sigmoid")
-    screenshot_path = "darkmatter.png"
-    plotter.screenshot(screenshot_path)
+    st.pyplot(fig)
 
-    st.image(screenshot_path, caption="Dark Matter Plasma Simulation")
 
 with tab12:
     st.subheader("3D Atomic Stability Probability per Isotope (Dynamic Universe Constants)")
