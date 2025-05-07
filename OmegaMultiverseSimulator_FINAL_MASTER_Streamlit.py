@@ -83,7 +83,7 @@ fig.update_layout(
 # Periodic Table Stability Probability (3D Scatter)
 with tabs[0]:
     st.subheader("Periodic Table Stability Probability (Advanced 3D Scatter)")
-    with st.spinner("..."):"):Generating Periodic Table Graph..."
+    with st.spinner("..."):Generating Periodic Table Graph..."
 fig = optimize_3d_layout(fig, "Atomic Number", "Stability", "Probability")
 atomic_numbers = np.arange(1, 121)
     em_force_values = np.linspace(0.1, 10.0, 50)
@@ -100,7 +100,7 @@ st.plotly_chart(fig, use_container_width=True)
 # Island of Instability (3D Surface)
 with tabs[1]:
     st.subheader("Island of Instability (Advanced 3D Surface)")
-    with st.spinner("..."):"):Generating Instability Graph......")::
+    with st.spinner("..."):Generating Instability Graph......")::
     strong_force_values = np.linspace(0.1, 10.0, 50)
     atomic_number_values = np.linspace(50, 120, 50)
     strong_grid, atomic_grid = np.meshgrid(strong_force_values, atomic_number_values)
@@ -114,7 +114,7 @@ st.plotly_chart(fig, use_container_width=True)
 # Star Formation Potential (3D Surface)
 with tabs[2]:
     st.subheader("Star Formation Potential (Advanced 3D Surface)")
-    with st.spinner("..."):"):Generating Star Formation Graph......")::
+    with st.spinner("..."):Generating Star Formation Graph......")::
 gravity_values = np.linspace(0.1, 10.0, 50)
     dark_energy_values = np.linspace(0.1, 10.0, 50)
     gravity_grid, dark_grid = np.meshgrid(gravity_values, dark_energy_values)
@@ -128,7 +128,7 @@ st.plotly_chart(fig, use_container_width=True)
 # Life Probability (Heatmap)
 with tabs[3]:
     st.subheader("Life Probability Map (Heatmap)")
-    with st.spinner("..."):"):Generating Life Probability Map......")::
+    with st.spinner("..."):Generating Life Probability Map......")::
     strong_force_values = np.linspace(0.1, 10.0, 50)
     em_force_values = np.linspace(0.1, 10.0, 50)
     strong_grid, em_grid = np.meshgrid(strong_force_values, em_force_values)
@@ -144,7 +144,7 @@ st.plotly_chart(fig, use_container_width=True)
 # Quantum Bonding (3D Surface)
 with tabs[4]:
     st.subheader("Quantum Bonding Probability (Advanced 3D Surface)")
-    with st.spinner("..."):"):Generating Quantum Bonding Graph..."
+    with st.spinner("..."):Generating Quantum Bonding Graph..."
 fig = optimize_3d_layout(fig, "Strong Force Multiplier", "EM Force Multiplier", "Bonding Probability")
     strong_force_values = np.linspace(0.1, 10.0, 50)
     em_force_values = np.linspace(0.1, 10.0, 50)
@@ -200,7 +200,7 @@ fig, ax = plt.subplots(figsize=(10, 8))
 # 2D Dark Matter Simulation
 with tabs[9]:
     st.subheader("2D Dark Matter Simulation")
-    with st.spinner("..."):"):Generating Dark Matter Map......")::
+    with st.spinner("..."):Generating Dark Matter Map......")::
 density_2d = np.random.normal(0, 1, (100, 100))
 fig, ax = plt.subplots(figsize=(10, 8))
     c = ax.imshow(density_2d, cmap="plasma", interpolation="nearest", origin="lower")
@@ -211,7 +211,7 @@ fig.colorbar(c, ax=ax)
 # 3D Atomic Stability Probability
 with tabs[10]:
     st.subheader("3D Atomic Stability Probability per Isotope")
-    with st.spinner("..."):"):Generating Atomic Stability 3D Graph..."
+    with st.spinner("..."):Generating Atomic Stability 3D Graph..."
 fig = optimize_3d_layout(fig, "Atomic Number", "Isotope Number", "Stability Probability")
 atomic_numbers = np.arange(1, 121)
     isotopes_per_element = 20
