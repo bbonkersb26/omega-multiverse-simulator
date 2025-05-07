@@ -1947,4 +1947,3 @@ st.markdown("**AI Analysis:**")
 st.markdown("This graph reflects the relationship between **Atomic Number and EM Force** and the selected universal parameters. "
             "Higher or lower values represent how element stability varies with atomic number and EM force multiplier. "
             "Current universe settings suggest **element stability may shift towards lighter or heavier elements depending on EM force multiplier**.")
-
