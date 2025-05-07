@@ -1,4 +1,3 @@
-
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
@@ -103,6 +102,8 @@ with tab7:
     fig, ax = plt.subplots()
     ax.bar(forces, abundance, color=['blue', 'magenta', 'yellow'])
     st.pyplot(fig)
+
+
 
 with tab8:
     st.subheader("Radiation Risk")
