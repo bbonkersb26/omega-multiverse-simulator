@@ -89,7 +89,7 @@ with tabs[3]:
 
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("This heatmap shows where combinations of strong and electromagnetic forces create habitable conditions. Deviating too far in either direction reduces life probability.")
-    with tabs[4]:
+with tabs[4]:
     st.subheader("Quantum Bonding Probability (Advanced 3D Surface)")
     strong_force_values = np.linspace(0.1, 10.0, 50)
     em_force_values = np.linspace(0.1, 10.0, 50)
