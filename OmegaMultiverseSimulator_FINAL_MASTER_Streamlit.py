@@ -1,7 +1,7 @@
-
 import streamlit as st
 import numpy as np
 import plotly.graph_objs as go
+import matplotlib.pyplot as plt
 
 st.set_page_config(layout="wide")
 st.title("Omega Multiverse Simulator PRO — ULTRA VERSION (Scientific + Advanced Visuals)")
@@ -182,3 +182,44 @@ with tab11:
                                          marker=dict(size=5, color=Stability_vals, colorscale='Plasma', colorbar=dict(title='Stability')))])
     fig3d.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='Isotope Number', zaxis_title='Stability Probability'))
     st.plotly_chart(fig3d, use_container_width=True)
+
+# Omega Multiverse Simulator PRO — ULTRA Version (2025)
+
+The Omega Multiverse Simulator models possible universes by allowing users to adjust fundamental physical constants
+and observe their effects on star formation, life probability, periodic table stability, quantum bonding, dark matter, and more.
+
+## Features
+
+- 3D Graphical Universe Exploration
+- Periodic Table Stability (3D Scatter)
+- Island of Instability (3D Surface)
+- Star Formation Potential (3D Surface)
+- Life Probability Map (Heatmap)
+- Quantum Bonding (3D Surface)
+- Universe Probability Calculator
+- Element Abundance
+- Radiation Risk Analysis
+- Star Lifespan Estimator
+- Dark Matter Plasma Simulation (2D Cloud-Compatible)
+- Atomic Stability Probability per Isotope (3D Scatter)
+
+## Usage
+
+- Adjust universal constants using the sidebar sliders.
+- Explore dynamic graphs across all simulation dimensions.
+- Fully compatible with Streamlit Cloud.
+
+## Installation
+
+Clone the repo and run:
+
+```
+pip install -r requirements.txt
+streamlit run OmegaMultiverseSimulator2025_ULTRA_Part1.py
+```
+
+*(Make sure all 3 parts are present in the same folder for now)*
+
+## Notes
+
+This version uses Plotly and Matplotlib only (Cloud Compatible) and removes all PyVista or OpenGL dependencies.
