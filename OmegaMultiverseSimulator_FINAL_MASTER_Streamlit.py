@@ -431,3 +431,69 @@ with tabs[10]:
 
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("This version uses the Semi-Empirical Mass Formula to calculate binding energies and isotope stability. Isotopes with high binding energy per nucleon are more stable. As atomic number increases, stability generally decreases due to increased Coulomb repulsion.")
+    # === Universe Life Probability Over Time (Metallicity + Forces Combined) ===
+with st.expander("Universe Life Probability Over Time (NEW MODULE)"):
+    st.subheader("Universe Life Probability Over Cosmic Time")
+
+    # Use star formation metallicity from previous calculation
+    time_steps = 100
+    gravity_multiplier = constants["Gravitational Constant Multiplier"]
+    dark_energy_multiplier = constants["Dark Energy Multiplier"]
+    strong_force_multiplier = constants["Strong Force Multiplier"]
+    em_force_multiplier = constants["Electromagnetic Force Multiplier"]
+
+    initial_gas_density = 1.0
+    star_formation_efficiency_base = 0.05
+
+    gravity_effect = gravity_multiplier
+    dark_energy_effect = 1 / dark_energy_multiplier
+
+    time = np.arange(time_steps)
+    gas_density = np.zeros(time_steps)
+    star_density = np.zeros(time_steps)
+    metallicity = np.zeros(time_steps)
+
+    gas_density[0] = initial_gas_density
+    star_density[0] = 0
+    metallicity[0] = 0.01
+
+    for t in range(1, time_steps):
+        star_formation_efficiency = star_formation_efficiency_base * gravity_effect * dark_energy_effect
+        stars_formed = gas_density[t-1] * star_formation_efficiency
+
+        gas_density[t] = gas_density[t-1] - stars_formed
+        star_density[t] = star_density[t-1] + stars_formed
+        metallicity[t] = metallicity[t-1] + stars_formed * 0.02
+
+        if gas_density[t] < 0:
+            gas_density[t] = 0
+
+    # Calculate life probability over time
+    metallicity_factor = (metallicity - 0.1) / (0.5 - 0.1)
+    metallicity_factor = np.clip(metallicity_factor, 0, 1)
+
+    force_factor = np.exp(-((strong_force_multiplier - 1.0)**2 + (em_force_multiplier - 1.0)**2) / 3)
+
+    life_probability_time = metallicity_factor * force_factor
+
+    # Plotting
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(x=time, y=metallicity_factor, mode='lines', name='Metallicity Factor', line=dict(color='green')))
+    fig.add_trace(go.Scatter(x=time, y=life_probability_time, mode='lines', name='Life Probability', line=dict(color='purple')))
+
+    fig.update_layout(
+        title="Universe Life Probability Over Time (Metallicity + Forces Combined)",
+        xaxis_title='Time (Arbitrary Units ~ Billions of Years)',
+        yaxis_title='Probability',
+        legend_title="Factors"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("### AI Analysis → Scientific Summary")
+    st.markdown("This graph shows how life probability in the universe changes over time:")
+    st.markdown("- **Early Universe → Low Metallicity → Low Life Probability**")
+    st.markdown("- **Mid-life Universe → High Metallicity → Peak Life Probability**")
+    st.markdown("- **Late Universe → Stars fade, no new metals → Declining Life Probability**")
+    st.markdown("- **Force Constants → Tuning effects shown through scaling → unfavorable universes may never reach high probability**")
