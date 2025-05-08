@@ -94,7 +94,7 @@ with tabs[0]:
     )])
 
     fig.update_layout(
-        title="Periodic Table Stability Probability (Scientific Model → Strong, EM, Weak Force Dependent)",
+        title="Periodic Table Stability Probability",
         scene=dict(
             xaxis_title='Atomic Number',
             yaxis_title='EM Force Multiplier',
