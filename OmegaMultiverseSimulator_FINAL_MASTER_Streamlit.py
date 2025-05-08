@@ -112,23 +112,16 @@ with tabs[0]:
     st.markdown("- **Magic Numbers** → Nuclei near magic proton/neutron numbers (2, 8, 20, 28, 50, 82, 126) are exceptionally stable.")
     st.markdown("- **Atomic Size** → Stability naturally decreases for very large nuclei beyond iron peak.")
     st.markdown("- **EM Force** → Higher electromagnetic force increases proton repulsion, reducing stability.")
-# === Island of Instability (Scientific Proton/Neutron Ratio Model) ===
+# === Island of Instability (Scientific Proton/Neutron Ratio Shift Model) ===
 with tabs[1]:
-    st.subheader("Island of Instability (Proton/Neutron Ratio + Strong Force Linked)")
+    st.subheader("Island of Instability (Proton/Neutron Ratio + Strong Force Shift Model)")
 
     # Atomic numbers (heavy elements)
     atomic_number_values = np.linspace(50, 120, 50)
     strong_force_values = np.linspace(0.1, 10.0, 50)
     atomic_grid, strong_grid = np.meshgrid(atomic_number_values, strong_force_values)
 
-    # Define optimal neutron number based on simple approximation
-    def optimal_neutron_number(Z):
-        if Z < 20:
-            return Z
-        else:
-            return int(Z * 1.5)
-
-    # Calculate instability (deviation from optimal N/Z ratio + strong force stabilization)
+    # Calculate instability (shifted N/Z ratio model)
     instability = np.zeros_like(atomic_grid, dtype=float)
 
     for i in range(atomic_grid.shape[0]):
@@ -136,26 +129,33 @@ with tabs[1]:
             Z = atomic_grid[i, j]
             strong_force = strong_grid[i, j]
 
-            # Optimal neutron number
-            N_opt = optimal_neutron_number(Z)
+            # Optimal neutron number approximation
+            if Z < 20:
+                N_opt = Z
+            else:
+                N_opt = int(Z * 1.5)
+
             A_opt = N_opt + Z
 
-            # Current neutron/proton ratio instability
+            # Current N/Z ratio
             current_NZ_ratio = A_opt / Z
-            ideal_NZ_ratio = 1.5  # target for heavy nuclei
 
+            # Shift ideal N/Z ratio based on strong force
+            ideal_NZ_ratio = 1.5 - (strong_force - 1) * 0.2
+
+            # Physical limit (can't be below ~1.1)
+            if ideal_NZ_ratio < 1.1:
+                ideal_NZ_ratio = 1.1
+
+            # Instability calculation
             ratio_instability = np.abs(current_NZ_ratio - ideal_NZ_ratio) / 0.5
 
-            # Strong force bonus → higher strong force stabilizes heavy nuclei
-            strong_force_bonus = np.exp(-np.abs(strong_force - 1))
+            instability[i, j] = ratio_instability
 
-            # Final instability score
-            instability[i, j] = ratio_instability * (1 / strong_force_bonus)
-
-    # Normalize instability
+    # Normalize
     instability = np.clip(instability, 0, 1)
 
-    # Plot
+    # Plotting
     fig = go.Figure(data=[go.Surface(
         z=instability,
         x=strong_grid,
@@ -165,7 +165,7 @@ with tabs[1]:
     )])
 
     fig.update_layout(
-        title="Island of Instability (Proton/Neutron Ratio + Strong Force Model)",
+        title="Island of Instability (Scientific Proton/Neutron Ratio Shift Model)",
         scene=dict(
             xaxis_title='Strong Force Multiplier',
             yaxis_title='Atomic Number',
@@ -176,10 +176,10 @@ with tabs[1]:
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("### AI Analysis → Scientific Summary")
-    st.markdown("This graph models nuclear instability based on proton/neutron ratios and strong force tuning:")
-    st.markdown("- **Optimal N/Z Ratio → Heavy nuclei require ~1.5 neutron/proton ratio for stability.**")
-    st.markdown("- **Deviation from optimal ratio increases instability → forms 'island of instability'.**")
-    st.markdown("- **Strong Force Multiplier → Higher strong force stabilizes heavy nuclei → shifts island boundaries.**")
+    st.markdown("This advanced model simulates nuclear instability using shifted proton/neutron ratio theory:")
+    st.markdown("- **Higher Strong Force shifts island → more heavy nuclei become stable.**")
+    st.markdown("- **Lower Strong Force shifts island → heavy elements become unstable earlier.**")
+    st.markdown("- **Proton/Neutron ratio deviation from shifted ideal values defines instability level.**")
 # === Star Formation and Evolution (Scientific Physics Model) ===
 with tabs[2]:
     st.subheader("Star Formation and Evolution (Linked to Gravity and Dark Energy)")
