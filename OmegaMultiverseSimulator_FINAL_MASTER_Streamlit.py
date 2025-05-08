@@ -4,8 +4,8 @@ import numpy as np
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 
-st.set_page_config(page_title="Multiverse Physics Simulation", layout="wide")
-st.title("Multiverse Physics Simulation")
+st.set_page_config(page_title="Multiverse Simulation", layout="wide")
+st.title("Multiverse Simulation")
 
 st.sidebar.header("Adjust Physical Constants")
 
@@ -52,7 +52,7 @@ tabs = st.tabs([
 # --- Continue Tabs (starting from tab1) ---
 # === Periodic Table Stability (Scientific Model → Strong Force, EM Force, Weak Force Dependent) ===
 with tabs[0]:
-    st.subheader("Periodic Table Stability Probability (Scientific Model → Strong, EM, Weak Force Dependent)")
+    st.subheader("Periodic Table Stability Probability")
 
     atomic_numbers = np.arange(1, 121)
 
@@ -154,8 +154,8 @@ with tabs[1]:
     st.markdown("- The result is a dynamic, accurate, and responsive simulation of nuclear instability across universes.")
 # === Star Formation Potential (Fully Scientific Model → Gravity + Dark Energy + EM + Strong + Weak) ===
 with tabs[2]:
-    st.subheader("Star Formation Potential (Fully Scientific Model)")
-
+    st.subheader("Star Formation Potential")
+    
     # Slider values → Physical constants
     gravity_slider = constants["Gravitational Constant Multiplier"]
     dark_energy_slider = constants["Dark Energy Multiplier"]
@@ -282,7 +282,7 @@ with tabs[3]:
     st.markdown("The model shows that universes with optimal physical constants and sufficient cosmic evolution (star death → metals) are the most likely to support life.")
 # Quantum Bonding (3D Surface)
 with tabs[4]:
-    st.subheader("Quantum Bonding Probability (Advanced 3D Surface)")
+    st.subheader("Quantum Bonding Probability")
     strong_force_values = np.linspace(0.1, 10.0, 50)
     em_force_values = np.linspace(0.1, 10.0, 50)
     strong_grid, em_grid = np.meshgrid(strong_force_values, em_force_values)
@@ -297,7 +297,7 @@ with tabs[4]:
 # ------------------------
 # === Universe Probability ===
 with tabs[5]:
-    st.subheader("Universe Probability")
+    st.subheader("Universe Emergence Probability")
     prob = np.exp(-deviation)
     fig, ax = plt.subplots()
     ax.bar(["Universe Probability"], [prob], color='purple')
@@ -310,7 +310,7 @@ with tabs[5]:
 
 # === Element Abundance ===
 with tabs[6]:
-    st.subheader("Element Abundance")
+    st.subheader("Element Abundance Probabilities")
     forces = ["Strong", "EM", "Weak"]
     abundance = [np.exp(-abs(constants["Strong Force Multiplier"]-1)),
                  np.exp(-abs(constants["Electromagnetic Force Multiplier"]-1)),
@@ -326,7 +326,7 @@ with tabs[6]:
 
 # === Radiation Risk ===
 with tabs[7]:
-    st.subheader("Radiation Risk")
+    st.subheader("EM Radiation Risk")
     x = np.linspace(0.1, 10.0, 500)
     y = (x**2) / 100
     fig, ax = plt.subplots()
@@ -343,7 +343,7 @@ with tabs[7]:
 
 # === Star Lifespan (Scientific Mass-Luminosity-Lifespan Model) ===
 with tabs[8]:
-    st.subheader("Star Lifespan vs Gravity Multiplier (Scientific Model)")
+    st.subheader("Star Lifespan Model")
 
     # Define gravity multiplier range
     gravity_values = np.linspace(0.1, 10.0, 500)
@@ -396,7 +396,7 @@ with tabs[8]:
     st.markdown("- Universes with stronger gravity have shorter-lived stars, reducing time for planets and life to evolve.")
 # === 3D Dark Matter Tendril Simulation (Physics Linked Version) ===
 with tabs[9]:
-    st.subheader("3D Dark Matter Tendril Simulation (Linked to Physics Constants)")
+    st.subheader("Dark Matter Tendril Simulation")
 
     # LINK TO PHYSICAL CONSTANTS (user sliders)
     gravity_multiplier = constants["Gravitational Constant Multiplier"]
@@ -477,7 +477,7 @@ with tabs[9]:
 
 # === 3D Atomic Stability Probability (Scientific → Strong, EM, Weak Forces) ===
 with tabs[10]:
-    st.subheader("3D Atomic Stability Probability per Isotope (Scientific Model)")
+    st.subheader("Atomic Stability Probability per Isotope")
 
     atomic_numbers = np.arange(1, 121)
     isotopes_per_element = 20
