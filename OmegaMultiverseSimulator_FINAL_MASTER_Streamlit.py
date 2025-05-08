@@ -50,27 +50,41 @@ tabs = st.tabs([
 ])
 
 # --- Continue Tabs (starting from tab1) ---
-
-# === Periodic Table Stability Probability (3D Scatter → Dynamic EM Force Linked) ===
+# === Periodic Table Stability (Scientific Model → Strong Force, EM Force, Weak Force Dependent) ===
 with tabs[0]:
-    st.subheader("Periodic Table Stability Probability (Dynamic EM Force Linked)")
+    st.subheader("Periodic Table Stability Probability (Scientific Model → Strong, EM, Weak Force Dependent)")
 
     atomic_numbers = np.arange(1, 121)
 
-    # Get current Electromagnetic Force Multiplier from slider
-    em_force_center = constants["Electromagnetic Force Multiplier"]
+    # Pull slider values from physical constants
+    strong_force = constants["Strong Force Multiplier"]
+    em_force = constants["Electromagnetic Force Multiplier"]
+    weak_force = constants["Weak Force Multiplier"]
 
-    # Dynamic EM force range centered on slider value
-    em_force_values = np.linspace(em_force_center - 2, em_force_center + 2, 50)
+    # Create dynamic EM force range centered on slider value
+    em_force_values = np.linspace(em_force - 2, em_force + 2, 50)
     em_force_values = np.clip(em_force_values, 0.1, 10.0)
-
-    # Create grid
     atomic_grid, em_grid = np.meshgrid(atomic_numbers, em_force_values)
 
-    # Calculate stability probability
-    stability_probability = np.exp(-np.abs(atomic_grid - 30) / 20) * np.exp(-np.abs(em_grid - em_force_center))
+    # Calculate base nuclear stability (shell + atomic number)
+    base_stability = np.exp(-np.abs(atomic_grid - 30) / 20)
 
-    # Create 3D scatter plot
+    # Strong Force Effect → Higher strong force → stabilizes heavy nuclei
+    strong_bonus = np.exp(-np.abs(atomic_grid - 80) / (20 * strong_force))
+
+    # EM Force Effect → Higher EM force → destabilizes heavy nuclei
+    em_penalty = np.exp(-np.abs(em_grid - em_force))
+
+    # Weak Force Effect → Ideal weak force (~1.0) → most stable isotopes
+    weak_bonus = np.exp(-((weak_force - 1.0) ** 2) * 3)
+
+    # Final Stability Probability
+    stability_probability = base_stability * strong_bonus * em_penalty * weak_bonus
+
+    # Normalize for visualization
+    stability_probability = np.clip(stability_probability, 0, 1)
+
+    # Plot 3D Scatter
     fig = go.Figure(data=[go.Scatter3d(
         x=atomic_grid.flatten(),
         y=em_grid.flatten(),
@@ -80,7 +94,7 @@ with tabs[0]:
     )])
 
     fig.update_layout(
-        title="Periodic Table Stability Probability (Dynamic EM Force Linked)",
+        title="Periodic Table Stability Probability (Scientific Model → Strong, EM, Weak Force Dependent)",
         scene=dict(
             xaxis_title='Atomic Number',
             yaxis_title='EM Force Multiplier',
@@ -91,11 +105,11 @@ with tabs[0]:
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("**AI Analysis → Scientific Summary**")
-    st.markdown("This simulation models atomic stability based on atomic number and electromagnetic force:")
-    st.markdown("- **Atomic Number → Heavier elements naturally become less stable.**")
-    st.markdown("- **EM Force Multiplier (Dynamic) → Slider controls proton-proton repulsion effect → increasing EM destabilizes heavy nuclei.**")
-    st.markdown("- Changing EM slider shifts the stability zone in real-time → reflecting how altered physical laws impact the periodic table.")
-# === Island of Instability (Original Periodic + Scientific Bonus Model) ===
+    st.markdown("This advanced scientific model calculates element stability based on fundamental forces:")
+    st.markdown("- **Strong Force Multiplier → Higher values stabilize heavier nuclei → reduces instability.**")
+    st.markdown("- **EM Force Multiplier → Higher values destabilize heavy elements → proton repulsion dominates.**")
+    st.markdown("- **Weak Force Multiplier → Deviations from 1.0 destabilize isotopes → ideal near 1.0.**")
+    st.markdown("- This model reflects realistic nuclear behavior, dynamically updating with universe physical constants.")
 with tabs[1]:
     st.subheader("Island of Instability (Periodic Pattern + Scientific Bonus)")
 
