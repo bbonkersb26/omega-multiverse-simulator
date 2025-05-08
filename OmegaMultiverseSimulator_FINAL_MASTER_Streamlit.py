@@ -155,50 +155,52 @@ with tabs[1]:
     st.markdown("- **Periodic Pattern → Models peaks/valleys of nuclear shell closures (like magic numbers).**")
     st.markdown("- **Scientific Bonus → Strong Force near ideal (1.0) improves stability, shifting instability lower.**")
     st.markdown("- The result is a dynamic, accurate, and responsive simulation of nuclear instability across universes.")
-# === Star Formation Potential (Jeans Mass + Critical Density Scientific Model) ===
+# === Star Formation Potential (Fixed → Linked to Physical Constants Sliders) ===
 with tabs[2]:
-    st.subheader("Star Formation Potential (Jeans Mass + Critical Density Model)")
+    st.subheader("Star Formation Potential (Jeans Mass Model → Linked to Current Universe)")
 
-    # Use gravity and dark energy multipliers from sliders
-    gravity_values = np.linspace(0.1, 10.0, 50)
-    dark_energy_values = np.linspace(0.1, 10.0, 50)
-    gravity_grid, dark_grid = np.meshgrid(gravity_values, dark_energy_values)
+    # Use current universe constants (sliders)
+    gravity = constants["Gravitational Constant Multiplier"]
+    dark_energy = constants["Dark Energy Multiplier"]
 
-    # Calculate Jeans Mass (simplified model)
-    temperature = gravity_grid  # Gravity → pressure → temperature
-    density = 1 / dark_grid     # Dark energy → expansion → lower density
+    # Calculate Jeans Mass
+    temperature = gravity
+    density = 1 / dark_energy
 
     jeans_mass = (temperature ** 1.5) / (density ** 0.5)
 
     # Star Formation Potential → Inverse of Jeans Mass
     star_formation_potential = 1 / jeans_mass
-    star_formation_potential /= np.max(star_formation_potential)  # Normalize 0 to 1
 
-    # Plot
-    fig = go.Figure(data=[go.Surface(
-        z=star_formation_potential,
-        x=gravity_grid,
-        y=dark_grid,
-        colorscale='Viridis',
-        colorbar=dict(title='Star Formation Potential')
+    # Normalize to baseline universe (gravity=1, dark_energy=1)
+    baseline_jeans_mass = (1 ** 1.5) / (1 ** 0.5)
+    baseline_potential = 1 / baseline_jeans_mass
+
+    relative_potential = star_formation_potential / baseline_potential
+
+    # Clamp to reasonable range for visualization
+    relative_potential = np.clip(relative_potential, 0, 2)
+
+    # Plot → simple bar chart for current universe
+    fig = go.Figure(data=[go.Bar(
+        x=["Star Formation Potential"],
+        y=[relative_potential],
+        marker_color="blue"
     )])
 
     fig.update_layout(
-        title="Star Formation Potential (Jeans Mass + Critical Density Model)",
-        scene=dict(
-            xaxis_title='Gravity Multiplier',
-            yaxis_title='Dark Energy Multiplier',
-            zaxis_title='Star Formation Potential'
-        )
+        title="Star Formation Potential (Linked to Physical Constants)",
+        yaxis_title="Relative Star Formation Potential",
+        xaxis_title="Current Universe"
     )
 
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("### AI Analysis → Scientific Summary")
-    st.markdown("This advanced model calculates star formation potential using physics principles:")
-    st.markdown("- **Gravity → Increases gas temperature → higher pressure → lower Jeans mass → more stars.**")
-    st.markdown("- **Dark Energy → Expands universe → lowers density → raises Jeans mass → suppresses stars.**")
-    st.markdown("- Star formation potential is highest at balanced gravity and low dark energy multipliers.")
+    st.markdown("This module calculates star formation likelihood in the current universe configuration:")
+    st.markdown("- **Gravity Multiplier → Higher gravity increases gas temperature → lowers Jeans Mass → easier star formation.**")
+    st.markdown("- **Dark Energy Multiplier → Higher dark energy lowers density → raises Jeans Mass → suppresses star formation.**")
+    st.markdown("- The result reflects the balance of forces shaping stellar birth in each simulated universe.")
 # === Life Probability (Heatmap → Linked to Metallicity + Forces) ===
 with tabs[3]:
     st.subheader("Life Probability Map (Linked to Metallicity and Forces)")
