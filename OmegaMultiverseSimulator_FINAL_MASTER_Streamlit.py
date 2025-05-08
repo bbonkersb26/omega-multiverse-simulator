@@ -51,22 +51,50 @@ tabs = st.tabs([
 
 # --- Continue Tabs (starting from tab1) ---
 
-# Periodic Table Stability Probability (3D Scatter)
+# === Periodic Table Stability Probability (3D Scatter → Dynamic EM Force Linked) ===
 with tabs[0]:
-    st.subheader("Periodic Table Stability Probability (Advanced 3D Scatter)")
-    atomic_numbers = np.arange(1, 121)
-    em_force_values = np.linspace(0.1, 10.0, 50)
-    atomic_grid, em_grid = np.meshgrid(atomic_numbers, em_force_values)
-    stability_probability = np.exp(-np.abs(atomic_grid - 30) / 20) * np.exp(-np.abs(em_grid - constants["Electromagnetic Force Multiplier"]))
-    fig = go.Figure(data=[go.Scatter3d(x=atomic_grid.flatten(), y=em_grid.flatten(), z=stability_probability.flatten(),
-                                       mode='markers', marker=dict(size=5, color=stability_probability.flatten(),
-                                       colorscale='Viridis', colorbar=dict(title='Stability')))])
-    fig.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='EM Force Multiplier', zaxis_title='Stability Probability'))
-    st.plotly_chart(fig, use_container_width=True)
-    
-    st.markdown("**AI Analysis → Scientific Summary**")
-    st.markdown("This 3D scatter visualizes how atomic number and electromagnetic force affect element stability. Higher atomic numbers usually reduce stability, but fine-tuned EM force values can increase bonding possibilities.")
+    st.subheader("Periodic Table Stability Probability (Dynamic EM Force Linked)")
 
+    atomic_numbers = np.arange(1, 121)
+
+    # Get current Electromagnetic Force Multiplier from slider
+    em_force_center = constants["Electromagnetic Force Multiplier"]
+
+    # Dynamic EM force range centered on slider value
+    em_force_values = np.linspace(em_force_center - 2, em_force_center + 2, 50)
+    em_force_values = np.clip(em_force_values, 0.1, 10.0)
+
+    # Create grid
+    atomic_grid, em_grid = np.meshgrid(atomic_numbers, em_force_values)
+
+    # Calculate stability probability
+    stability_probability = np.exp(-np.abs(atomic_grid - 30) / 20) * np.exp(-np.abs(em_grid - em_force_center))
+
+    # Create 3D scatter plot
+    fig = go.Figure(data=[go.Scatter3d(
+        x=atomic_grid.flatten(),
+        y=em_grid.flatten(),
+        z=stability_probability.flatten(),
+        mode='markers',
+        marker=dict(size=5, color=stability_probability.flatten(), colorscale='Viridis', colorbar=dict(title='Stability'))
+    )])
+
+    fig.update_layout(
+        title="Periodic Table Stability Probability (Dynamic EM Force Linked)",
+        scene=dict(
+            xaxis_title='Atomic Number',
+            yaxis_title='EM Force Multiplier',
+            zaxis_title='Stability Probability'
+        )
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("**AI Analysis → Scientific Summary**")
+    st.markdown("This simulation models atomic stability based on atomic number and electromagnetic force:")
+    st.markdown("- **Atomic Number → Heavier elements naturally become less stable.**")
+    st.markdown("- **EM Force Multiplier (Dynamic) → Slider controls proton-proton repulsion effect → increasing EM destabilizes heavy nuclei.**")
+    st.markdown("- Changing EM slider shifts the stability zone in real-time → reflecting how altered physical laws impact the periodic table.")
 # === Island of Instability (Original Periodic + Scientific Bonus Model) ===
 with tabs[1]:
     st.subheader("Island of Instability (Periodic Pattern + Scientific Bonus)")
