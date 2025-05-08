@@ -356,23 +356,59 @@ with tabs[7]:
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("Higher EM force constants increase electromagnetic interactions, leading to more radiation. This graph models radiation risk scaling, important for universe habitability.")
 
-# === Star Lifespan ===
+# === Star Lifespan (Scientific Mass-Luminosity-Lifespan Model) ===
 with tabs[8]:
-    st.subheader("Star Lifespan vs Gravity Multiplier")
-    x = np.linspace(0.1, 10.0, 500)
-    y = 1 / x
-    fig, ax = plt.subplots()
-    ax.plot(x, y, color='darkgreen', linewidth=2)
-    ax.axvline(constants["Gravitational Constant Multiplier"], color='r', linestyle='--', label="Current Gravity Multiplier")
-    ax.legend()
-    ax.set_xlabel("Gravitational Constant Multiplier")
-    ax.set_ylabel("Relative Star Lifespan")
-    ax.set_title("Predicted Star Lifespans in Different Universes")
-    st.pyplot(fig)
+    st.subheader("Star Lifespan vs Gravity Multiplier (Scientific Model)")
+
+    # Define gravity multiplier range
+    gravity_values = np.linspace(0.1, 10.0, 500)
+
+    # Assume stellar mass scales linearly with gravity (simplified)
+    stellar_mass = gravity_values  # M ∝ gravity multiplier
+
+    # Luminosity → L ∝ M^3.5
+    luminosity = stellar_mass ** 3.5
+
+    # Lifetime → τ ∝ M / L → τ ∝ 1 / M^2.5
+    stellar_lifetime = 1 / (stellar_mass ** 2.5)
+
+    # Normalize lifetime for graphing
+    stellar_lifetime /= np.max(stellar_lifetime)
+
+    # Plotting
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=gravity_values,
+        y=stellar_lifetime,
+        mode='lines',
+        name='Relative Star Lifespan',
+        line=dict(color='darkgreen', width=3)
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=[constants["Gravitational Constant Multiplier"]],
+        y=[1 / (constants["Gravitational Constant Multiplier"] ** 2.5) / np.max(1 / (stellar_mass ** 2.5))],
+        mode='markers',
+        name='Current Universe Setting',
+        marker=dict(size=12, color='red', symbol='x')
+    ))
+
+    fig.update_layout(
+        title="Star Lifespan vs Gravity Multiplier (Mass-Luminosity-Lifespan Model)",
+        xaxis_title='Gravitational Constant Multiplier',
+        yaxis_title='Relative Star Lifespan',
+        legend_title="Stellar Lifetime"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("### AI Analysis → Scientific Summary")
-    st.markdown("Stars burn fuel more quickly in universes with stronger gravity. This plot visualizes how stellar lifespans shorten as gravity increases, impacting planet formation and time available for life.")
-
+    st.markdown("This model uses stellar physics to calculate star lifespan based on gravitational strength:")
+    st.markdown("- **Stellar Mass scales with gravity → Higher gravity → Higher stellar mass.**")
+    st.markdown("- **Luminosity increases with mass (L ∝ M^3.5) → more massive stars burn faster.**")
+    st.markdown("- **Stellar Lifespan → Shortens significantly as gravity increases (τ ∝ 1 / M^2.5).**")
+    st.markdown("- Universes with stronger gravity have shorter-lived stars, reducing time for planets and life to evolve.")
 # === 3D Dark Matter Tendril Simulation (Physics Linked Version) ===
 with tabs[9]:
     st.subheader("3D Dark Matter Tendril Simulation (Linked to Physics Constants)")
