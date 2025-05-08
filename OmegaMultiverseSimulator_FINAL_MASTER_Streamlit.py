@@ -112,67 +112,19 @@ with tabs[0]:
     st.markdown("- **Magic Numbers** → Nuclei near magic proton/neutron numbers (2, 8, 20, 28, 50, 82, 126) are exceptionally stable.")
     st.markdown("- **Atomic Size** → Stability naturally decreases for very large nuclei beyond iron peak.")
     st.markdown("- **EM Force** → Higher electromagnetic force increases proton repulsion, reducing stability.")
-# === Island of Instability (v3 True Shifted N/Z Stability Model) ===
+# Island of Instability (3D Surface)
 with tabs[1]:
-    st.subheader("Island of Instability (Proton/Neutron Ratio True Shift + Strong Force Linked)")
-
-    # Atomic numbers and strong force range
-    atomic_number_values = np.linspace(50, 120, 50)
+    st.subheader("Island of Instability (Advanced 3D Surface)")
     strong_force_values = np.linspace(0.1, 10.0, 50)
-    atomic_grid, strong_grid = np.meshgrid(atomic_number_values, strong_force_values)
-
-    # Calculate instability using shifted N/Z model
-    instability = np.zeros_like(atomic_grid, dtype=float)
-
-    for i in range(atomic_grid.shape[0]):
-        for j in range(atomic_grid.shape[1]):
-            Z = atomic_grid[i, j]
-            strong_force = strong_grid[i, j]
-
-            # Shift N/Z ratio with strong force
-            shifted_NZ_ratio = 1.5 - (strong_force - 1) * 0.4
-            shifted_NZ_ratio = max(1.0, shifted_NZ_ratio)  # Cap to physical limit
-
-            # Optimal neutron number with shifted ratio
-            N_opt = shifted_NZ_ratio * Z
-            A_opt = Z + N_opt
-
-            # Current N/Z ratio
-            current_NZ_ratio = A_opt / Z
-
-            # Instability = Deviation from "ideal" 1.5
-            ratio_instability = np.abs(current_NZ_ratio - 1.5) / 0.5
-
-            instability[i, j] = ratio_instability
-
-    # Normalize for visualization
-    instability = np.clip(instability, 0, 1)
-
-    # Plot
-    fig = go.Figure(data=[go.Surface(
-        z=instability,
-        x=strong_grid,
-        y=atomic_grid,
-        colorscale='Inferno',
-        colorbar=dict(title='Instability Level')
-    )])
-
-    fig.update_layout(
-        title="Island of Instability (v3 True Shifted N/Z Stability Model)",
-        scene=dict(
-            xaxis_title='Strong Force Multiplier',
-            yaxis_title='Atomic Number',
-            zaxis_title='Instability Level'
-        )
-    )
-
+    atomic_number_values = np.linspace(50, 120, 50)
+    strong_grid, atomic_grid = np.meshgrid(strong_force_values, atomic_number_values)
+    instability = np.abs(np.sin((strong_grid - constants["Strong Force Multiplier"]) * 5)) * (atomic_grid / 120)
+    fig = go.Figure(data=[go.Surface(z=instability, x=strong_grid, y=atomic_grid, colorscale='Inferno', colorbar=dict(title='Instability'))])
+    fig.update_layout(scene=dict(xaxis_title='Strong Force Multiplier', yaxis_title='Atomic Number', zaxis_title='Instability Level'))
     st.plotly_chart(fig, use_container_width=True)
-
-    st.markdown("### AI Analysis → Scientific Summary")
-    st.markdown("This version accurately models how the Island of Instability shifts with strong force:")
-    st.markdown("- **Stronger Strong Force → Lower neutron requirement → island shifts right → more heavy elements become stable.**")
-    st.markdown("- **Weaker Strong Force → Higher neutron requirement → island shifts left → heavy elements become unstable earlier.**")
-    st.markdown("- The surface now dynamically responds to universe tuning → a realistic nuclear physics simulation.")
+    
+    st.markdown("**AI Analysis → Scientific Summary**")
+    st.markdown("This surface graph explores nuclear instability regions. As the strong force multiplier shifts, peaks and valleys show zones where nuclei are more or less prone to decay or collapse.")
 # === Star Formation and Evolution (Scientific Physics Model) ===
 with tabs[2]:
     st.subheader("Star Formation and Evolution (Linked to Gravity and Dark Energy)")
