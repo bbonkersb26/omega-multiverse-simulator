@@ -51,22 +51,67 @@ tabs = st.tabs([
 
 # --- Continue Tabs (starting from tab1) ---
 
-# Periodic Table Stability Probability (3D Scatter)
+# === Periodic Table Stability Probability (Shell Model + Magic Numbers Scientific Model) ===
 with tabs[0]:
-    st.subheader("Periodic Table Stability Probability (Advanced 3D Scatter)")
+    st.subheader("Periodic Table Stability Probability (Shell Model + Magic Numbers)")
+
+    # Define magic numbers (nuclear shell model stability points)
+    magic_numbers = [2, 8, 20, 28, 50, 82, 126]
+
+    # Atomic numbers + EM force range
     atomic_numbers = np.arange(1, 121)
     em_force_values = np.linspace(0.1, 10.0, 50)
     atomic_grid, em_grid = np.meshgrid(atomic_numbers, em_force_values)
-    stability_probability = np.exp(-np.abs(atomic_grid - 30) / 20) * np.exp(-np.abs(em_grid - constants["Electromagnetic Force Multiplier"]))
-    fig = go.Figure(data=[go.Scatter3d(x=atomic_grid.flatten(), y=em_grid.flatten(), z=stability_probability.flatten(),
-                                       mode='markers', marker=dict(size=5, color=stability_probability.flatten(),
-                                       colorscale='Viridis', colorbar=dict(title='Stability')))])
-    fig.update_layout(scene=dict(xaxis_title='Atomic Number', yaxis_title='EM Force Multiplier', zaxis_title='Stability Probability'))
-    st.plotly_chart(fig, use_container_width=True)
-    
-    st.markdown("**AI Analysis → Scientific Summary**")
-    st.markdown("This 3D scatter visualizes how atomic number and electromagnetic force affect element stability. Higher atomic numbers usually reduce stability, but fine-tuned EM force values can increase bonding possibilities.")
 
+    # Function → magic number stability boost
+    def magic_number_stability_boost(Z):
+        return np.exp(-np.min(np.abs(np.array(magic_numbers) - Z)) / 10)
+
+    # Calculate stability probability
+    stability_probability = np.zeros_like(atomic_grid, dtype=float)
+
+    for i in range(atomic_grid.shape[0]):
+        for j in range(atomic_grid.shape[1]):
+            Z = atomic_grid[i, j]
+            em_force = em_grid[i, j]
+
+            # Base stability (larger nuclei are harder to bind)
+            base_stability = np.exp(-np.abs(Z - 30) / 20)
+
+            # Magic number boost
+            magic_boost = magic_number_stability_boost(Z)
+
+            # EM force penalty (higher EM force = more repulsion)
+            em_penalty = np.exp(-np.abs(em_force - 1))
+
+            # Final stability probability
+            stability_probability[i, j] = base_stability * magic_boost * em_penalty
+
+    # Plotting
+    fig = go.Figure(data=[go.Scatter3d(
+        x=atomic_grid.flatten(),
+        y=em_grid.flatten(),
+        z=stability_probability.flatten(),
+        mode='markers',
+        marker=dict(size=5, color=stability_probability.flatten(), colorscale='Viridis', colorbar=dict(title='Stability'))
+    )])
+
+    fig.update_layout(
+        title="Periodic Table Stability Probability (Shell Model + Magic Numbers)",
+        scene=dict(
+            xaxis_title='Atomic Number',
+            yaxis_title='EM Force Multiplier',
+            zaxis_title='Stability Probability'
+        )
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("### AI Analysis → Scientific Summary")
+    st.markdown("This model predicts atomic stability using nuclear shell model principles:")
+    st.markdown("- **Magic Numbers** → Nuclei near magic proton/neutron numbers (2, 8, 20, 28, 50, 82, 126) are exceptionally stable.")
+    st.markdown("- **Atomic Size** → Stability naturally decreases for very large nuclei beyond iron peak.")
+    st.markdown("- **EM Force** → Higher electromagnetic force increases proton repulsion, reducing stability.")
 # Island of Instability (3D Surface)
 with tabs[1]:
     st.subheader("Island of Instability (Advanced 3D Surface)")
