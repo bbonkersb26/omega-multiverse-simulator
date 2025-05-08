@@ -152,44 +152,53 @@ with tabs[1]:
     st.markdown("- **Periodic Pattern → Models peaks/valleys of nuclear shell closures (like magic numbers).**")
     st.markdown("- **Scientific Bonus → Strong Force near ideal (1.0) improves stability, shifting instability lower.**")
     st.markdown("- The result is a dynamic, accurate, and responsive simulation of nuclear instability across universes.")
-# === Star Formation Potential (Advanced Full Physics Model → Gravity, Dark Energy, EM, Strong, Weak) ===
+# === Star Formation Potential (Fully Scientific Model → Gravity + Dark Energy + EM + Strong + Weak) ===
 with tabs[2]:
-    st.subheader("Star Formation Potential (Full Physics Model)")
+    st.subheader("Star Formation Potential (Fully Scientific Model)")
 
-    # Define range
-    gravity_values = np.linspace(0.1, 10.0, 50)
-    dark_energy_values = np.linspace(0.1, 10.0, 50)
-    gravity_grid, dark_grid = np.meshgrid(gravity_values, dark_energy_values)
-
-    # Get sliders → physical constants
+    # Slider values → Physical constants
     gravity_slider = constants["Gravitational Constant Multiplier"]
     dark_energy_slider = constants["Dark Energy Multiplier"]
     strong_force_slider = constants["Strong Force Multiplier"]
     em_force_slider = constants["Electromagnetic Force Multiplier"]
     weak_force_slider = constants["Weak Force Multiplier"]
 
-    # 1. Gravity → Boosts star formation when high
-    gravity_factor = np.exp(-np.abs(gravity_grid - gravity_slider))
+    # Create local dynamic grid around current universe constants
+    gravity_center = gravity_slider
+    dark_energy_center = dark_energy_slider
 
-    # 2. Dark Energy → Suppresses star formation when high
-    dark_energy_factor = np.exp(-np.abs(dark_grid - dark_energy_slider) * 1.5)
+    gravity_values = np.linspace(gravity_center - 2, gravity_center + 2, 50)
+    dark_energy_values = np.linspace(dark_energy_center - 2, dark_energy_center + 2, 50)
 
-    # 3. EM Force → Higher EM force increases radiative pressure → bad for star formation
-    em_force_penalty = np.exp(-np.abs(em_force_slider - 1.0) * 2)
+    gravity_values = np.clip(gravity_values, 0.1, 10.0)
+    dark_energy_values = np.clip(dark_energy_values, 0.1, 10.0)
 
-    # 4. Strong Force → Higher strong force → better nuclear fusion → better star formation
+    gravity_grid, dark_grid = np.meshgrid(gravity_values, dark_energy_values)
+
+    # Calculate factors
+
+    # 1. Gravity → Higher gravity → easier collapse
+    gravity_factor = np.exp(-np.abs(gravity_grid - gravity_slider) * 0.5)
+
+    # 2. Dark Energy → Higher DE → harder collapse
+    dark_energy_penalty = np.exp(-np.abs(dark_grid - dark_energy_slider) * 1.5)
+
+    # 3. EM Force → Higher EM → higher radiation pressure → harder collapse
+    em_force_penalty = np.exp(-np.abs(em_force_slider - 1.0) * 2.0)
+
+    # 4. Strong Force → Higher strong → easier ignition → better formation
     strong_force_bonus = np.exp(-np.abs(strong_force_slider - 1.0) * 1.5)
 
-    # 5. Weak Force → Optimal near 1.0 → too weak or strong suppresses fusion
-    weak_force_optimal = np.exp(-((weak_force_slider - 1.0) ** 2) * 3)
+    # 5. Weak Force → Optimal near 1.0 → better fusion → too weak or strong → worse
+    weak_force_bonus = np.exp(-((weak_force_slider - 1.0) ** 2) * 3.0)
 
-    # Calculate Star Formation Potential
-    star_formation_potential = gravity_factor * dark_energy_factor * em_force_penalty * strong_force_bonus * weak_force_optimal
+    # Final Star Formation Potential
+    star_formation_potential = gravity_factor * dark_energy_penalty * em_force_penalty * strong_force_bonus * weak_force_bonus
 
     # Normalize
     star_formation_potential /= np.max(star_formation_potential)
 
-    # Plot 3D Surface
+    # Plot
     fig = go.Figure(data=[go.Surface(
         z=star_formation_potential,
         x=gravity_grid,
@@ -199,7 +208,7 @@ with tabs[2]:
     )])
 
     fig.update_layout(
-        title="Star Formation Potential (Full Physics Model → Gravity, Dark Energy, EM, Strong, Weak Force)",
+        title="Star Formation Potential (Fully Scientific → Gravity + Dark Energy + EM + Strong + Weak)",
         scene=dict(
             xaxis_title='Gravity Multiplier',
             yaxis_title='Dark Energy Multiplier',
@@ -210,12 +219,12 @@ with tabs[2]:
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("### AI Analysis → Scientific Summary")
-    st.markdown("This advanced scientific model calculates star formation likelihood using 5 major physical constants:")
-    st.markdown("- **Gravity Multiplier → Higher gravity compresses gas → easier star formation.**")
-    st.markdown("- **Dark Energy Multiplier → Higher dark energy suppresses density → harder star formation.**")
-    st.markdown("- **EM Force Multiplier → Higher EM increases radiative pressure → suppresses formation.**")
-    st.markdown("- **Strong Force Multiplier → Higher strong force makes nuclear fusion easier → boosts formation.**")
-    st.markdown("- **Weak Force Multiplier → Ideal weak force allows stable fusion cycles → deviations suppress formation.**")
+    st.markdown("This module models star formation based on five critical universal constants:")
+    st.markdown("- **Gravity → Higher gravity compresses gas → promotes collapse → better star formation.**")
+    st.markdown("- **Dark Energy → Expands space → lowers density → suppresses star formation.**")
+    st.markdown("- **EM Force → Higher EM increases radiation pressure → suppresses star formation.**")
+    st.markdown("- **Strong Force → Higher strong force makes nuclear ignition easier → promotes star formation.**")
+    st.markdown("- **Weak Force → Optimal weak force allows stable fusion → deviations suppress formation.")
 # === Life Probability (Heatmap → Linked to Metallicity + Forces) ===
 with tabs[3]:
     st.subheader("Life Probability Map (Linked to Metallicity and Forces)")
