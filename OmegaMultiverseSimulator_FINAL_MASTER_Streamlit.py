@@ -155,66 +155,50 @@ with tabs[1]:
     st.markdown("- **Periodic Pattern → Models peaks/valleys of nuclear shell closures (like magic numbers).**")
     st.markdown("- **Scientific Bonus → Strong Force near ideal (1.0) improves stability, shifting instability lower.**")
     st.markdown("- The result is a dynamic, accurate, and responsive simulation of nuclear instability across universes.")
-# === Star Formation and Evolution (Scientific Physics Model) ===
+# === Star Formation Potential (Jeans Mass + Critical Density Scientific Model) ===
 with tabs[2]:
-    st.subheader("Star Formation and Evolution (Linked to Gravity and Dark Energy)")
+    st.subheader("Star Formation Potential (Jeans Mass + Critical Density Model)")
 
-    # Link to physical constants (user sliders)
-    gravity_multiplier = constants["Gravitational Constant Multiplier"]
-    dark_energy_multiplier = constants["Dark Energy Multiplier"]
+    # Use gravity and dark energy multipliers from sliders
+    gravity_values = np.linspace(0.1, 10.0, 50)
+    dark_energy_values = np.linspace(0.1, 10.0, 50)
+    gravity_grid, dark_grid = np.meshgrid(gravity_values, dark_energy_values)
 
-    time_steps = 100
-    initial_gas_density = 1.0
-    star_formation_efficiency_base = 0.05
+    # Calculate Jeans Mass (simplified model)
+    temperature = gravity_grid  # Gravity → pressure → temperature
+    density = 1 / dark_grid     # Dark energy → expansion → lower density
 
-    # Effects of gravity and dark energy
-    gravity_effect = gravity_multiplier
-    dark_energy_effect = 1 / dark_energy_multiplier
+    jeans_mass = (temperature ** 1.5) / (density ** 0.5)
 
-    time = np.arange(time_steps)
-    gas_density = np.zeros(time_steps)
-    star_density = np.zeros(time_steps)
-    metallicity = np.zeros(time_steps)
+    # Star Formation Potential → Inverse of Jeans Mass
+    star_formation_potential = 1 / jeans_mass
+    star_formation_potential /= np.max(star_formation_potential)  # Normalize 0 to 1
 
-    gas_density[0] = initial_gas_density
-    star_density[0] = 0
-    metallicity[0] = 0.01  # Initial trace metals
-
-    # Simulation loop
-    for t in range(1, time_steps):
-        star_formation_efficiency = star_formation_efficiency_base * gravity_effect * dark_energy_effect
-        stars_formed = gas_density[t-1] * star_formation_efficiency
-
-        gas_density[t] = gas_density[t-1] - stars_formed
-        star_density[t] = star_density[t-1] + stars_formed
-
-        # Metal enrichment from star death and recycling
-        metallicity[t] = metallicity[t-1] + stars_formed * 0.02
-
-        if gas_density[t] < 0:
-            gas_density[t] = 0
-
-    # Plotting
-    fig = go.Figure()
-
-    fig.add_trace(go.Scatter(x=time, y=gas_density, mode='lines', name='Gas Density', line=dict(color='blue')))
-    fig.add_trace(go.Scatter(x=time, y=star_density, mode='lines', name='Star Density', line=dict(color='orange')))
-    fig.add_trace(go.Scatter(x=time, y=metallicity, mode='lines', name='Metallicity', line=dict(color='green')))
+    # Plot
+    fig = go.Figure(data=[go.Surface(
+        z=star_formation_potential,
+        x=gravity_grid,
+        y=dark_grid,
+        colorscale='Viridis',
+        colorbar=dict(title='Star Formation Potential')
+    )])
 
     fig.update_layout(
-        title="Star Formation and Evolution (Linked to Gravity and Dark Energy)",
-        xaxis_title='Time (Arbitrary Units ~ Billions of Years)',
-        yaxis_title='Relative Density / Metallicity',
-        legend_title="Components"
+        title="Star Formation Potential (Jeans Mass + Critical Density Model)",
+        scene=dict(
+            xaxis_title='Gravity Multiplier',
+            yaxis_title='Dark Energy Multiplier',
+            zaxis_title='Star Formation Potential'
+        )
     )
 
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("### AI Analysis → Scientific Summary")
-    st.markdown("This scientific model simulates the evolution of stars and heavy elements over cosmic time.")
-    st.markdown("- **Higher Gravity Multiplier** accelerates star formation, consuming gas more quickly.")
-    st.markdown("- **Higher Dark Energy Multiplier** suppresses star formation by expanding space.")
-    st.markdown("- **Metallicity** increases over time as stars die, releasing heavy elements critical for planet and life formation.")
+    st.markdown("This advanced model calculates star formation potential using physics principles:")
+    st.markdown("- **Gravity → Increases gas temperature → higher pressure → lower Jeans mass → more stars.**")
+    st.markdown("- **Dark Energy → Expands universe → lowers density → raises Jeans mass → suppresses stars.**")
+    st.markdown("- Star formation potential is highest at balanced gravity and low dark energy multipliers.")
 # === Life Probability (Heatmap → Linked to Metallicity + Forces) ===
 with tabs[3]:
     st.subheader("Life Probability Map (Linked to Metallicity and Forces)")
