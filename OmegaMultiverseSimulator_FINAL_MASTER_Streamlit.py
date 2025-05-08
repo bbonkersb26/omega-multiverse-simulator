@@ -137,7 +137,7 @@ with tabs[1]:
     )])
 
     fig.update_layout(
-        title="Island of Instability (Periodic + Scientific Bonus Model)",
+        title="Island of Instability",
         scene=dict(
             xaxis_title='Strong Force Multiplier',
             yaxis_title='Atomic Number',
@@ -208,7 +208,7 @@ with tabs[2]:
     )])
 
     fig.update_layout(
-        title="Star Formation Potential (Fully Scientific → Gravity + Dark Energy + EM + Strong + Weak)",
+        title="Star Formation Potential",
         scene=dict(
             xaxis_title='Gravity Multiplier',
             yaxis_title='Dark Energy Multiplier',
@@ -310,7 +310,7 @@ with tabs[5]:
 
 # === Element Abundance ===
 with tabs[6]:
-    st.subheader("Element Abundance Probabilities")
+    st.subheader("Element Abundance Probability")
     forces = ["Strong", "EM", "Weak"]
     abundance = [np.exp(-abs(constants["Strong Force Multiplier"]-1)),
                  np.exp(-abs(constants["Electromagnetic Force Multiplier"]-1)),
@@ -459,7 +459,7 @@ with tabs[9]:
     )])
 
     fig.update_layout(
-        title="3D Dark Matter Tendril Simulation (Linked to Gravity and Dark Energy)",
+        title="3D Dark Matter Tendril Simulation",
         scene=dict(
             xaxis_title='X Position',
             yaxis_title='Y Position',
