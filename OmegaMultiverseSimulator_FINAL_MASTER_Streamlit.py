@@ -74,7 +74,7 @@ if st.button("Generate AI Universe Summary"):
         user_context = "\n".join([f"{k}: {v:.2f}" for k, v in constants.items()])
         try:
             response = client.chat.completions.create(
-                model="gpt-4",
+                model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a physics and cosmology expert. Analyze universal constants and summarize what kind of universe this configuration would produce."},
                     {"role": "user", "content": f"Here are the physical constants:\n{user_context}"}
