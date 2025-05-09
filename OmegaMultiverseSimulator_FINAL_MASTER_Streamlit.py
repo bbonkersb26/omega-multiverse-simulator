@@ -24,53 +24,54 @@ def save_plot(fig, filename, is_plotly=True):
         plt.savefig(path, bbox_inches='tight', dpi=300)
         plt.close()
 
-# === PDF Generation Function ===
 def generate_pdf(constants, summary_text, output_dir="pdf_visuals"):
+    # Fix any unsupported characters
+    summary_text = summary_text.replace("–", "-").replace("→", "->").replace("•", "*")
+
     pdf = FPDF()
+    pdf.add_font("DejaVu", "", "DejaVuSans.ttf", uni=True)
     pdf.set_auto_page_break(auto=True, margin=15)
 
     # Cover Page
     pdf.add_page()
-    pdf.set_font("Arial", "B", 24)
+    pdf.set_font("DejaVu", "", 24)
     pdf.cell(0, 15, "Omega Multiverse Simulation Report", ln=True, align="C")
     pdf.ln(10)
-    pdf.set_font("Arial", size=14)
+    pdf.set_font("DejaVu", "", 14)
     date_str = datetime.datetime.now().strftime("%B %d, %Y")
     pdf.cell(0, 10, f"Date: {date_str}", ln=True, align="C")
     pdf.cell(0, 10, "Generated via GPT-3.5 AI", ln=True, align="C")
 
-    # Parameters
+    # Parameters Page
     pdf.add_page()
-    pdf.set_font("Arial", "B", 16)
+    pdf.set_font("DejaVu", "", 16)
     pdf.cell(0, 10, "Simulation Parameters", ln=True)
-    pdf.set_font("Arial", size=12)
+    pdf.set_font("DejaVu", "", 12)
     for k, v in constants.items():
         pdf.cell(0, 8, f"{k}: {v:.2f}", ln=True)
 
-    # AI Summary
+    # AI Summary Page
     pdf.add_page()
-    pdf.set_font("Arial", "B", 16)
+    pdf.set_font("DejaVu", "", 16)
     pdf.cell(0, 10, "AI Universe Summary", ln=True)
-    pdf.set_font("Arial", size=12)
-    summary_text = summary_text.replace('\u2013', '-')
+    pdf.set_font("DejaVu", "", 12)
     for line in summary_text.split('\n'):
         pdf.multi_cell(0, 8, line)
 
-    # Visuals
+    # Visuals Section
     pdf.add_page()
-    pdf.set_font("Arial", "B", 16)
+    pdf.set_font("DejaVu", "", 16)
     pdf.cell(0, 10, "Simulation Visuals", ln=True)
 
     image_files = sorted([f for f in os.listdir(output_dir) if f.endswith(".png")])
     for image_file in image_files:
         path = os.path.join(output_dir, image_file)
         pdf.add_page()
-        pdf.set_font("Arial", "B", 14)
+        pdf.set_font("DejaVu", "", 14)
         pdf.cell(0, 10, image_file.replace(".png", "").replace("_", " "), ln=True)
         pdf.image(path, w=180)
 
     pdf.output("Omega_Universe_Simulation_Report.pdf")
-
 st.sidebar.header("Adjust Physical Constants")
 
 def slider_with_input(label, min_val, max_val, default_val, step):
