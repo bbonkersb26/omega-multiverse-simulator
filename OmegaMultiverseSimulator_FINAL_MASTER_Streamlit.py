@@ -56,6 +56,8 @@ def save_plot(fig, filename, is_plotly=True):
         plt.savefig(path, bbox_inches='tight', dpi=300)
         plt.close()
     st.sidebar.header("Adjust Physical Constants")
+def sanitize_text(text):
+    return text.encode('latin-1', 'replace').decode('latin-1')
 def generate_pdf_with_tab_summaries(constants, summary_text, tab_summaries, output_dir="pdf_visuals"):
     # (Paste the entire body of your current working generate_pdf here)
     pdf = FPDF()
