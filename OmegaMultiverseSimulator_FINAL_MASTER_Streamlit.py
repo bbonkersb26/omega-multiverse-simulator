@@ -42,13 +42,27 @@ def generate_pdf(constants, summary_text, output_dir="pdf_visuals"):
     for k, v in constants.items():
         pdf.cell(0, 8, f"{k}: {v:.2f}", ln=True)
 
-    # === Section: AI Summary ===
-    pdf.ln(5)
-    pdf.set_font("Arial", "B", 16)
-    pdf.cell(0, 10, "Global AI Universe Summary", ln=True)
-    pdf.set_font("Arial", size=12)
-    for line in summary_text.split("\n"):
-        pdf.multi_cell(0, 8, line)
+    st.subheader("AI Global Universe Analysis")
+
+if st.button("Generate AI Universe Summary"):
+    with st.spinner("Generating summary using OpenAI..."):
+        user_context = "\n".join([f"{k}: {v:.2f}" for k, v in constants.items()])
+        try:
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a physics and cosmology expert. Analyze universal constants and summarize what kind of universe this configuration would produce."},
+                    {"role": "user", "content": f"Here are the physical constants:\n{user_context}"}
+                ],
+                max_tokens=300,
+                temperature=0.7
+            )
+            summary = response.choices[0].message.content
+            st.session_state['summary'] = summary  # store it safely
+            st.success("Summary generated:")
+            st.markdown(summary)
+        except Exception as e:
+            st.error(f"Error generating summary: {e}")
 
     # === Section: Visuals ===
     pdf.add_page()
