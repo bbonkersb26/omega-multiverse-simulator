@@ -421,7 +421,7 @@ abundance = [
     em_abundance * half_life_weight,
     weak_abundance * half_life_weight
 ]
-    fig, ax = plt.subplots()
+fig, ax = plt.subplots()
     ax.bar(forces, abundance, color=['blue', 'magenta', 'yellow'])
     ax.set_ylabel("Relative Abundance")
     ax.set_title("Predicted Element Abundance per Force Multiplier")
