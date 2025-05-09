@@ -70,7 +70,8 @@ def generate_pdf(constants, summary_text, output_dir="pdf_visuals"):
         pdf.cell(0, 10, image_file.replace(".png", "").replace("_", " "), ln=True)
         pdf.image(path, w=180)
 
-    pdf.output("Omega_Universe_Simulation_Report.pdf")st.sidebar.header("Adjust Physical Constants")
+    pdf.output("Omega_Universe_Simulation_Report.pdf")
+    st.sidebar.header("Adjust Physical Constants")
 
 def slider_with_input(label, min_val, max_val, default_val, step):
     col1, col2 = st.sidebar.columns([3, 1])
