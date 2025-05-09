@@ -261,22 +261,6 @@ tabs = st.tabs([
     "Quantum Branch Count Estimator",
     "Quantum Gravity Horizon Map"
 ])
-st.divider()
-if st.button("Generate Final PDF Report"):
-    with st.spinner("Compiling full scientific PDF with AI summary and visuals..."):
-        try:
-            summary_text = st.session_state.get("summary", "No AI summary generated yet.")
-            generate_pdf_with_tab_summaries(constants, summary_text, tab_summaries)
-            st.success("PDF Report generated successfully!")
-            with open("Omega_Universe_Simulation_Report.pdf", "rb") as f:
-                st.download_button(
-                    label="Download Final PDF Report",
-                    data=f,
-                    file_name="Omega_Universe_Simulation_Report.pdf",
-                    mime="application/pdf"
-                )
-        except Exception as e:
-            st.error(f"PDF generation failed: {e}")
 with tabs[0]:
     st.subheader("Periodic Table Stability Probability")
     tab_title = "Periodic Table Stability"
