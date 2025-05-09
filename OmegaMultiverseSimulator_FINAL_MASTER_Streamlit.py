@@ -580,13 +580,22 @@ with tabs[10]:
     ]).T
     stability_matrix = np.clip(stability_matrix, 0, 1)
 
-    # Prepare plotting data
+    # === FIXED: Safe index access ===
     Z_vals, Isotope_vals, Stability_vals = [], [], []
+    num_elements = stability_matrix.shape[0]
+    num_isotopes = stability_matrix.shape[1]
+
     for Z in atomic_numbers:
         for iso in range(1, isotopes_per_element + 1):
-            Z_vals.append(Z)
-            Isotope_vals.append(iso)
-            Stability_vals.append(stability_matrix[Z - 1, iso - 1])
+            z_index = Z - 1
+            iso_index = iso - 1
+
+            if z_index < num_elements and iso_index < num_isotopes:
+                Z_vals.append(Z)
+                Isotope_vals.append(iso)
+                Stability_vals.append(stability_matrix[z_index, iso_index])
+            else:
+                st.warning(f"IndexError avoided: Z={Z}, iso={iso}")
 
     # Plot
     fig = go.Figure(data=[go.Scatter3d(
@@ -613,9 +622,7 @@ with tabs[10]:
     st.markdown("- **Strong Force → Higher values stabilize heavier nuclei → promotes stability.**")
     st.markdown("- **EM Force → Higher EM force increases proton repulsion → reduces stability.**")
     st.markdown("- **Weak Force → Optimal near 1.0 → deviations increase instability through inefficient decay modes.**")
-    st.markdown("- Each isotope varies randomly per element, simulating natural isotope-dependent instability with weak force influence.")
-        # === Universe Life Probability Over Time (Metallicity + Forces Combined) ===
-with tabs[11]:
+    st.markdown("- Each isotope varies randomly per element, simulating natural isotope-dependent instability with weak force influence.")with tabs[11]:
     st.subheader("Universe Life Probability Over Cosmic Time")
 
     # Use star formation metallicity from previous calculation
