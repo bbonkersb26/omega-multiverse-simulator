@@ -78,7 +78,8 @@ tabs = st.tabs([
     "Universe Life Probability Over Time",
     "Molecular Bonding Model (Element Specific)",
     "Molecular Abundance Map",
-    "Isotope Decay & Half-Life Model"
+    "Isotope Decay & Half-Life Model",
+    "Periodic Table Expansion Potential"
 ])
 
 # --- Continue Tabs (starting from tab1) ---
@@ -931,3 +932,59 @@ with tabs[14]:
     st.markdown("- **Weak Force Multiplier** → Controls decay rates. Higher = faster decay = fewer long-lived isotopes.")
     st.markdown("- **Strong Force Multiplier** → Stabilizes heavier nuclei. Higher = longer lifespans for heavy elements.")
     st.markdown("- **Dynamic thresholding** (top 10%) enables realistic comparisons across many different universes.")
+with tabs[15]:
+    st.subheader("Periodic Table Expansion Potential")
+
+    # Pull force multipliers
+    strong_force = constants["Strong Force Multiplier"]
+    em_force = constants["Electromagnetic Force Multiplier"]
+    weak_force = constants["Weak Force Multiplier"]
+
+    # Theoretical Z limit based on balance between nuclear cohesion and EM repulsion
+    # Use a scaled sigmoid centered around Z=118
+    Z = np.linspace(1, 200, 200)
+
+    cohesion = np.exp(-np.abs(Z - 80) / (25 * strong_force))  # stabilizing
+    repulsion = 1 / (1 + np.exp(-(Z - 100) / (10 * em_force)))  # destabilizing EM effect
+    weak_instability = np.exp(-((weak_force - 1.0) ** 2) * 3)
+
+    stability_curve = cohesion * (1 - repulsion) * weak_instability
+    stability_curve = np.clip(stability_curve, 0, 1)
+
+    # Threshold: elements with stability > 0.1 are "potentially stable"
+    Z_extended = Z[stability_curve > 0.1]
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=Z,
+        y=stability_curve,
+        mode='lines',
+        name='Expansion Curve',
+        line=dict(color='royalblue')
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=[Z_extended[-1]] if len(Z_extended) > 0 else [],
+        y=[stability_curve[Z_extended.shape[0]-1]] if len(Z_extended) > 0 else [],
+        mode='markers+text',
+        text=[f"Max Z: {int(Z_extended[-1])}"] if len(Z_extended) > 0 else [],
+        textposition="top center",
+        marker=dict(size=10, color='red'),
+        name="Expansion Limit"
+    ))
+
+    fig.update_layout(
+        title="Theoretical Periodic Table Expansion Limit",
+        xaxis_title="Atomic Number (Z)",
+        yaxis_title="Stability Potential",
+        yaxis_range=[0, 1.05]
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("### AI Analysis → Scientific Summary")
+    st.markdown("- This model estimates the furthest stable atomic number (Z) a universe can support.")
+    st.markdown("- **Strong Force** increases nuclear cohesion → allows higher Z before instability.")
+    st.markdown("- **EM Force** causes proton repulsion → caps the growth of periodic table.")
+    st.markdown("- **Weak Force** impacts decay resilience of extreme elements.")
+    st.markdown("- **Max stable Z** is shown dynamically as physical constants vary.")
