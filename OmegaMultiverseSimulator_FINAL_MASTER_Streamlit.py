@@ -172,7 +172,8 @@ tabs = st.tabs([
     "Isotope Decay & Half-Life Model",
     "Periodic Table Expansion Potential",
     "Proton–Neutron Ratio Heatmap",                # already fixed earlier
-    "Nuclear Binding Energy Map"                   # <-- just add it here directly
+    "Nuclear Binding Energy Map",                   # <-- just add it here directly
+    "Multiverse Decoherence Map"
 ])
 st.divider()
 st.subheader("Export Simulation Report")
