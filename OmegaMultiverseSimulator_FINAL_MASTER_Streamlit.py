@@ -9,7 +9,15 @@ import plotly.io as pio
 from fpdf import FPDF
 import datetime
 import openai
-
+import os
+def save_tab_summary(tab_title, summary_text, folder="pdf_summaries"):
+    os.makedirs(folder, exist_ok=True)
+    filename = os.path.join(folder, f"{tab_title.replace(' ', '_')}_summary.txt")
+    with open(filename, "w") as f:
+        f.write(summary_text)
+# Ensure required folders exist
+os.makedirs("pdf_visuals", exist_ok=True)
+os.makedirs("pdf_summaries", exist_ok=True)
 # === MUST BE FIRST Streamlit command ===
 st.set_page_config(page_title="Multiverse Simulation", layout="wide")
 st.title("Multiverse Simulation")
@@ -82,23 +90,51 @@ def generate_pdf_with_tab_summaries(constants, summary_text, tab_summaries, outp
     for line in summary_text.split('\n'):
         pdf.multi_cell(0, 8, line)
 
-    # === MODULE SUMMARIES ===
-    for tab, summary in tab_summaries.items():
-        pdf.add_page()
-        pdf.set_font(font, "B", 16)
-        pdf.cell(0, 10, f"{tab} Summary", ln=True)
-        pdf.set_font(font, "", 12)
-        for line in summary.split('\n'):
-            pdf.multi_cell(0, 8, line)
+# === Tab Summaries Section ===
+pdf.add_page()
+pdf.set_font(font, "B", 16)
+pdf.cell(0, 10, "Per-Tab Scientific Summaries", ln=True)
 
-    # === VISUALS ===
+summary_dir = "pdf_summaries"
+if os.path.exists(summary_dir):
+    for filename in sorted(os.listdir(summary_dir)):
+        if filename.endswith(".txt"):
+            tab_name = filename.replace("_summary.txt", "").replace("_", " ").title()
+            pdf.set_font(font, "B", 14)
+            pdf.cell(0, 10, tab_name, ln=True)
+            pdf.set_font(font, "", 12)
+            with open(os.path.join(summary_dir, filename), "r") as f:
+                for line in f.read().splitlines():
+                    pdf.multi_cell(0, 8, line)
+            pdf.ln(5)
+    # === Visuals Section ===
+    pdf.add_page()
+    pdf.set_font(font, "B", 16)
+    pdf.cell(0, 10, "Simulation Visuals & Graph Summaries", ln=True)
+
     image_files = sorted([f for f in os.listdir(output_dir) if f.endswith(".png")])
     for image_file in image_files:
+        path = os.path.join(output_dir, image_file)
+        summary_path = os.path.join("pdf_summaries", image_file.replace(".png", "_summary.txt"))
+
         pdf.add_page()
         pdf.set_font(font, "B", 14)
         pdf.cell(0, 10, image_file.replace(".png", "").replace("_", " "), ln=True)
-        pdf.image(os.path.join(output_dir, image_file), w=180)
 
+        if os.path.exists(path):
+            pdf.image(path, w=180)
+
+        # === Add AI Summary if it exists ===
+        if os.path.exists(summary_path):
+            with open(summary_path, "r") as f:
+                summary = f.read()
+
+            pdf.ln(5)
+            pdf.set_font(font, "I", 12)
+            pdf.multi_cell(0, 8, "AI Summary:")
+            pdf.set_font(font, "", 12)
+            for line in summary.strip().split('\n'):
+                pdf.multi_cell(0, 8, line)
     pdf.output("Omega_Universe_Simulation_Report.pdf")
     st.sidebar.header("Adjust Physical Constants")
 
@@ -115,7 +151,43 @@ def slider_with_input(label, min_val, max_val, default_val, step):
     percent_change = ((slider_val - 1.0) / 1.0) * 100
     st.sidebar.caption(f"Change from baseline: {percent_change:+.2f}%")
     return slider_val
+def generate_graph_summary(graph_name, data_description, constants, output_dir="pdf_summaries"):
+    import openai
+    import os
 
+    # OpenAI API key from Streamlit secrets
+    client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+    os.makedirs(output_dir, exist_ok=True)
+
+    constants_text = "\n".join([f"{k}: {v:.2f}" for k, v in constants.items()])
+    prompt = f"""
+    You are a scientific AI assistant. Analyze the simulation graph titled '{graph_name}' based on the following inputs.
+
+    Constants:
+    {constants_text}
+
+    Description:
+    {data_description}
+
+    Generate a scientific explanation of the results, trends, and implications for this universe.
+    """
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=300,
+            temperature=0.7
+        )
+        summary = response.choices[0].message.content.strip()
+
+        with open(os.path.join(output_dir, f"{graph_name.replace(' ', '_')}_summary.txt"), "w") as f:
+            f.write(summary)
+
+        return summary
+    except Exception as e:
+        st.error(f"Summary generation failed for {graph_name}: {e}")
+        return "Summary generation failed."
 
 constants = {
     "Strong Force Multiplier": slider_with_input("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
@@ -273,6 +345,27 @@ with tabs[0]:
 
     st.plotly_chart(fig, use_container_width=True)
     save_plot(fig, "Periodic Table Stability.png", is_plotly=True)
+    if st.button(f"Generate AI Summary for {tab_title}"):
+    with st.spinner("Generating summary..."):
+        try:
+            # Replace `tab_data_context` with relevant values from graph inputs or constants
+            tab_data_context = f"Current constants:\n{[f'{k}: {v:.2f}' for k, v in constants.items()]}"
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": f"You are a physics AI generating a scientific summary for a simulation tab titled '{tab_title}'."},
+                    {"role": "user", "content": f"{tab_data_context}"}
+                ],
+                max_tokens=300
+            )
+            tab_summary = response.choices[0].message.content
+            st.success("AI summary generated.")
+            st.markdown(tab_summary)
+
+            # Save it
+            save_tab_summary(tab_title, tab_summary)
+        except Exception as e:
+            st.error(f"Summary generation failed: {e}")
     st.markdown("**AI Analysis → Scientific Summary**")
     st.markdown("This advanced scientific model calculates element stability based on fundamental forces:")
     st.markdown("- **Strong Force Multiplier → Higher values stabilize heavier nuclei → reduces instability.**")
