@@ -55,16 +55,13 @@ def save_plot(fig, filename, is_plotly=True):
     else:
         plt.savefig(path, bbox_inches='tight', dpi=300)
         plt.close()
-def generate_pdf_with_tab_summaries(constants, summary_text, tab_summaries, output_dir="pdf_visuals"):
-    from fpdf import FPDF
-    import os
-    import datetime
-
+    st.sidebar.header("Adjust Physical Constants")
+def generate_pdf(constants, summary_text, output_dir="pdf_visuals"):
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     font = "Helvetica"
 
-    # === COVER PAGE ===
+    # === Cover Page ===
     pdf.add_page()
     pdf.set_font(font, "B", 24)
     pdf.cell(0, 15, "Omega Multiverse Simulation Report", ln=True, align="C")
@@ -74,7 +71,7 @@ def generate_pdf_with_tab_summaries(constants, summary_text, tab_summaries, outp
     pdf.cell(0, 10, f"Date: {date_str}", ln=True, align="C")
     pdf.cell(0, 10, "Generated via GPT-3.5 AI", ln=True, align="C")
 
-    # === PARAMETERS PAGE ===
+    # === Parameters Page ===
     pdf.add_page()
     pdf.set_font(font, "B", 16)
     pdf.cell(0, 10, "Simulation Parameters", ln=True)
@@ -82,62 +79,47 @@ def generate_pdf_with_tab_summaries(constants, summary_text, tab_summaries, outp
     for k, v in constants.items():
         pdf.cell(0, 8, f"{k}: {v:.2f}", ln=True)
 
-    # === GLOBAL AI SUMMARY PAGE ===
+    # === Global AI Summary ===
     pdf.add_page()
     pdf.set_font(font, "B", 16)
-    pdf.cell(0, 10, "AI Universe Summary", ln=True)
+    pdf.cell(0, 10, "AI Global Universe Summary", ln=True)
     pdf.set_font(font, "", 12)
     for line in summary_text.split('\n'):
         pdf.multi_cell(0, 8, line)
 
-# === Tab Summaries Section ===
-pdf.add_page()
-pdf.set_font(font, "B", 16)
-pdf.cell(0, 10, "Per-Tab Scientific Summaries", ln=True)
-
-summary_dir = "pdf_summaries"
-if os.path.exists(summary_dir):
-    for filename in sorted(os.listdir(summary_dir)):
-        if filename.endswith(".txt"):
-            tab_name = filename.replace("_summary.txt", "").replace("_", " ").title()
-            pdf.set_font(font, "B", 14)
-            pdf.cell(0, 10, tab_name, ln=True)
-            pdf.set_font(font, "", 12)
-            with open(os.path.join(summary_dir, filename), "r") as f:
-                for line in f.read().splitlines():
-                    pdf.multi_cell(0, 8, line)
-            pdf.ln(5)
-    # === Visuals Section ===
-    pdf.add_page()
-    pdf.set_font(font, "B", 16)
-    pdf.cell(0, 10, "Simulation Visuals & Graph Summaries", ln=True)
-
+    # === Visuals with Per-Tab AI Summaries ===
     image_files = sorted([f for f in os.listdir(output_dir) if f.endswith(".png")])
     for image_file in image_files:
-        path = os.path.join(output_dir, image_file)
-        summary_path = os.path.join("pdf_summaries", image_file.replace(".png", "_summary.txt"))
+        title = image_file.replace(".png", "").replace("_", " ")
 
         pdf.add_page()
         pdf.set_font(font, "B", 14)
-        pdf.cell(0, 10, image_file.replace(".png", "").replace("_", " "), ln=True)
+        pdf.cell(0, 10, title, ln=True)
+        image_path = os.path.join(output_dir, image_file)
+        pdf.image(image_path, w=180)
 
-        if os.path.exists(path):
-            pdf.image(path, w=180)
+        try:
+            tab_prompt = f"The graph title is: {title}.\nHere are the current universal constants:\n"
+            tab_prompt += "\n".join([f"{k}: {v:.2f}" for k, v in constants.items()])
+            tab_prompt += "\n\nWrite a 1-paragraph scientific summary about this graph."
 
-        # === Add AI Summary if it exists ===
-        if os.path.exists(summary_path):
-            with open(summary_path, "r") as f:
-                summary = f.read()
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a physics researcher writing an academic simulation report."},
+                    {"role": "user", "content": tab_prompt}
+                ],
+                max_tokens=250,
+                temperature=0.6
+            )
+            tab_summary = response.choices[0].message.content
+            pdf.set_font(font, "", 11)
+            pdf.multi_cell(0, 8, tab_summary)
+        except Exception as e:
+            pdf.set_font(font, "", 11)
+            pdf.multi_cell(0, 8, f"(AI summary unavailable: {str(e)})")
 
-            pdf.ln(5)
-            pdf.set_font(font, "I", 12)
-            pdf.multi_cell(0, 8, "AI Summary:")
-            pdf.set_font(font, "", 12)
-            for line in summary.strip().split('\n'):
-                pdf.multi_cell(0, 8, line)
     pdf.output("Omega_Universe_Simulation_Report.pdf")
-    st.sidebar.header("Adjust Physical Constants")
-
 def slider_with_input(label, min_val, max_val, default_val, step):
     col1, col2 = st.sidebar.columns([3, 1])
     slider_val = col1.slider(label, min_val, max_val, default_val, step=step)
