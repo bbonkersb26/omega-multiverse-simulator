@@ -161,22 +161,18 @@ st.subheader("Export Simulation Report")
 if st.button("Generate Final PDF Report"):
     with st.spinner("Compiling full scientific PDF with AI summary and visuals..."):
         try:
-            # Ensure AI summary exists
-            if 'summary' not in locals():
-                st.warning("Please generate the AI Universe Summary first.")
-            else:
-                generate_pdf(constants, summary)
-                st.success("PDF Report generated successfully!")
-                with open("Omega_Universe_Simulation_Report.pdf", "rb") as f:
-                    st.download_button(
-                        label="Download Final PDF Report",
-                        data=f,
-                        file_name="Omega_Universe_Simulation_Report.pdf",
-                        mime="application/pdf"
-                    )
+            summary_text = st.session_state.get("summary", "No AI summary generated yet.")
+            generate_pdf(constants, summary_text)
+            st.success("PDF Report generated successfully!")
+            with open("Omega_Universe_Simulation_Report.pdf", "rb") as f:
+                st.download_button(
+                    label="Download Final PDF Report",
+                    data=f,
+                    file_name="Omega_Universe_Simulation_Report.pdf",
+                    mime="application/pdf"
+                )
         except Exception as e:
             st.error(f"PDF generation failed: {e}")
-
 tabs = st.tabs([
     "Periodic Table Stability",
     "Island of Instability",
