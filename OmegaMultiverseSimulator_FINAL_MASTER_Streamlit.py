@@ -79,7 +79,8 @@ tabs = st.tabs([
     "Molecular Bonding Model (Element Specific)",
     "Molecular Abundance Map",
     "Isotope Decay & Half-Life Model",
-    "Periodic Table Expansion Potential"
+    "Periodic Table Expansion Potential",
+    "Nuclear Energy Binding Map"
 ])
 
 # --- Continue Tabs (starting from tab1) ---
@@ -988,3 +989,62 @@ with tabs[15]:
     st.markdown("- **EM Force** causes proton repulsion → caps the growth of periodic table.")
     st.markdown("- **Weak Force** impacts decay resilience of extreme elements.")
     st.markdown("- **Max stable Z** is shown dynamically as physical constants vary.")
+# === New Tab: Nuclear Binding Energy Map ===
+tabs.append("Nuclear Binding Energy Map")
+with tabs[-1]:
+    st.subheader("Nuclear Binding Energy per Nucleon")
+
+    # Slider values
+    strong = constants["Strong Force Multiplier"]
+    em = constants["Electromagnetic Force Multiplier"]
+    weak = constants["Weak Force Multiplier"]  # will modulate symmetry term
+
+    # SEMF coefficients (baseline in MeV)
+    a_v  = 15.8  * strong        # volume term ∝ strong force
+    a_s  = 18.3                  # surface term (unchanged)
+    a_c  = 0.714 * em            # Coulomb term ∝ EM repulsion
+    a_sym= 23.2 * (1/weak)       # symmetry term ∝ 1/weak (weak stabilizes n↔p balance)
+    a_pair = 12.0                # pairing term (simplified constant)
+
+    # Atomic mass numbers
+    Z = np.arange(1, 121)
+    A = Z * 2                     # approximate N≈Z for most stable isotopes
+    N = A - Z
+
+    # SEMF binding energy per nucleus
+    BE = ( a_v*A
+           - a_s*A**(2/3)
+           - a_c*Z*(Z-1)/A**(1/3)
+           - a_sym*(A-2*Z)**2/A
+           + np.where((A%2)==0, a_pair/A**(1/2), -a_pair/A**(1/2)) )
+
+    # Per-nucleon and clip
+    BE_per_A = np.clip(BE/A, 0, None)
+
+    # Plot curve
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=Z,
+        y=BE_per_A,
+        mode='lines+markers',
+        marker=dict(size=6),
+        name="BE/A (MeV)"
+    ))
+    fig.update_layout(
+        title="Binding Energy per Nucleon vs Atomic Number",
+        xaxis_title="Atomic Number (Z)",
+        yaxis_title="Binding Energy per Nucleon (MeV)",
+        yaxis_range=[0, np.max(BE_per_A)*1.1]
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Highlight iron peak
+    Z_peak = Z[np.argmax(BE_per_A)]
+    st.markdown(f"**Peak BE/A at Z = {int(Z_peak)} → {BE_per_A.max():.2f} MeV/nucleon**")
+
+    # Scientific Recap
+    st.markdown("### AI Analysis → Scientific Summary")
+    st.markdown(f"- **Volume Term (a_v)** scales with strong force → deeper well for all nuclei.")
+    st.markdown(f"- **Coulomb Term (a_c)** scales with EM force → larger Z penalized more.")
+    st.markdown(f"- **Symmetry Term (a_sym)** inversely tied to weak force → n↔p balance stability.")
+    st.markdown("- The peak around **Fe–Ni** emerges naturally; universes with stronger strong force push the peak slightly higher in Z.")
