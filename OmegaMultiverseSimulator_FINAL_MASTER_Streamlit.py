@@ -148,6 +148,20 @@ if st.button("Generate AI Universe Summary"):
             st.markdown(summary)
         except Exception as e:
             st.error(f"Error generating summary: {e}")
+if st.button("Generate Scientific PDF Report"):
+    with st.spinner("Compiling PDF..."):
+        try:
+            generate_pdf(constants, summary)
+            st.success("PDF generated successfully!")
+            with open("Omega_Universe_Simulation_Report.pdf", "rb") as file:
+                st.download_button(
+                    label="Download Scientific Report PDF",
+                    data=file,
+                    file_name="Omega_Universe_Simulation_Report.pdf",
+                    mime="application/pdf"
+                )
+        except Exception as e:
+            st.error(f"PDF generation failed: {e}")
 tabs = st.tabs([
     "Periodic Table Stability",
     "Island of Instability",
