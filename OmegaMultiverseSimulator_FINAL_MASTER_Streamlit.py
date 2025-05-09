@@ -166,7 +166,8 @@ if st.button("Download Full PDF Report"):
                     mime="application/pdf"
                 )
         except Exception as e:
-            st.error(f"PDF generation failed: {e}")tabs = st.tabs([
+            st.error(f"PDF generation failed: {e}")
+tabs = st.tabs([
     "Periodic Table Stability",
     "Island of Instability",
     "Star Formation Potential",
