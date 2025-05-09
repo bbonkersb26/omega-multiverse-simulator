@@ -6,3 +6,4 @@ pyvista
 scipy
 streamlit[all]
 openai>=1.0.0
+fpdf
