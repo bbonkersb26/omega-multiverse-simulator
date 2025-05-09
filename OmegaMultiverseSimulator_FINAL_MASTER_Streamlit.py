@@ -61,7 +61,8 @@ tabs = st.tabs([
     "Atomic Stability",
     "Universe Life Probability Over Time",
     "Molecular Bonding Model (Element Specific)",
-    "Molecular Abundance Map"
+    "Molecular Abundance Map",
+    "Isotope Decay & Half-Life Model"
 ])
 
 # --- Continue Tabs (starting from tab1) ---
@@ -845,3 +846,64 @@ with tabs[13]:
     st.markdown("- **Metallic Bonds** benefit from high pressure and low EM noise.")
     st.markdown("- **Heavy Element Compounds** are only stable if nuclear strong force is strong enough and weak force doesn’t cause fast decay.")
     st.markdown("- This model suggests which types of chemistry would dominate in this universe’s physical regime.")
+# === tabs[14]: Isotope Decay & Half-Life Model ===
+with tabs[14]:
+    st.subheader("Isotope Decay & Half-Life Model")
+
+    # Constants
+    weak_force = constants["Weak Force Multiplier"]
+    strong_force = constants["Strong Force Multiplier"]
+
+    atomic_numbers = np.arange(1, 121)
+    isotope_range = np.arange(1, 21)
+
+    Z_grid, iso_grid = np.meshgrid(atomic_numbers, isotope_range, indexing='ij')
+
+    # === Decay rate model ===
+    # Weak force controls decay speed (faster = shorter half-life)
+    # Strong force helps bind nucleus = longer half-life
+
+    base_half_life = np.exp(-np.abs(Z_grid - 50) / 20)  # Mid-Z elements last longer
+    weak_decay_penalty = np.exp(-((weak_force - 1.0) ** 2) * 3)
+    strong_bonus = np.exp(-np.abs(Z_grid - 80) / (25 * strong_force))
+
+    # Final decay rate: Higher = longer half-life (normalized)
+    half_life_matrix = base_half_life * weak_decay_penalty * strong_bonus
+    half_life_matrix = np.clip(half_life_matrix, 0, 1)
+
+    # Prepare 3D plotting
+    fig = go.Figure(data=[go.Surface(
+        z=half_life_matrix,
+        x=atomic_numbers,
+        y=isotope_range,
+        colorscale='Cividis',
+        colorbar=dict(title='Relative Half-Life')
+    )])
+
+    fig.update_layout(
+        title="Isotope Half-Life Map (Decay vs Z and Isotope Index)",
+        scene=dict(
+            xaxis_title='Atomic Number',
+            yaxis_title='Isotope Number',
+            zaxis_title='Relative Half-Life'
+        )
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    # === Histogram: Life-viable Isotopes ===
+    life_viable_isotopes = (half_life_matrix > 0.5).sum(axis=1)
+
+    fig2, ax = plt.subplots()
+    ax.bar(atomic_numbers, life_viable_isotopes, color='darkorange')
+    ax.set_title("Count of Life-Compatible Isotopes per Element")
+    ax.set_xlabel("Atomic Number")
+    ax.set_ylabel("# of Isotopes with Long Half-Life")
+    st.pyplot(fig2)
+
+    # === Explanation ===
+    st.markdown("### AI Analysis → Scientific Nuclear Summary")
+    st.markdown("- **Weak Force** governs decay rate. Universes with high weak force have short-lived isotopes.")
+    st.markdown("- **Strong Force** stabilizes the nucleus. Higher strong force preserves heavier isotopes.")
+    st.markdown("- **This simulation** shows which atomic numbers retain stable isotopes long enough for planetary and chemical evolution.")
+    st.markdown("- **Histogram**: Elements with many long-lived isotopes are more likely to participate in prebiotic or planetary chemistry.")
