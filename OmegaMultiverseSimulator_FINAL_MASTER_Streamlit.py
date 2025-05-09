@@ -150,7 +150,7 @@ if st.button("Generate AI Universe Summary"):
             st.markdown(summary)
         except Exception as e:
             st.error(f"Error generating summary: {e}")
-st.button("Download Full PDF Report"):
+if st.button("Download Full PDF Report"):
     with st.spinner("Compiling PDF..."):
         try:
             generate_pdf(constants, summary)
@@ -187,7 +187,7 @@ tabs = st.tabs([
 st.divider()
 st.subheader("Export Simulation Report")
 
-if st.button("Generate Scientific PDF Report")
+if st.button("Generate Scientific PDF Report"):
     with st.spinner("Compiling PDF..."):
         try:
             summary_text = st.session_state.get("summary", "No AI summary generated yet.")
