@@ -135,8 +135,8 @@ client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 # === Global Universe Synopsis ===
 st.divider()
-# === AI Global Universe Summary Button (Restore) ===
 st.subheader("AI Global Universe Analysis")
+
 if st.button("Generate AI Universe Summary"):
     with st.spinner("Generating summary using OpenAI..."):
         user_context = "\n".join([f"{k}: {v:.2f}" for k, v in constants.items()])
@@ -147,10 +147,11 @@ if st.button("Generate AI Universe Summary"):
                     {"role": "system", "content": "You are a physics and cosmology expert. Analyze universal constants and summarize what kind of universe this configuration would produce."},
                     {"role": "user", "content": f"Here are the physical constants:\n{user_context}"}
                 ],
-                max_tokens=300,
+                max_tokens=500,
                 temperature=0.7
             )
             summary = response.choices[0].message.content
+            st.session_state["summary"] = summary  # Persist the summary
             st.success("Summary generated:")
             st.markdown(summary)
         except Exception as e:
