@@ -174,7 +174,7 @@ def generate_graph_summary(graph_name, data_description, constants, output_dir="
         # === FINAL PDF GENERATION BUTTON BLOCK ===
 st.subheader("Export Simulation Report")
 
-if st.button("Generate Final PDF Report"):
+if st.button("Generate Final PDF Report1"):
     with st.spinner("Compiling full scientific PDF with AI summary and visuals..."):
         try:
             summary_text = st.session_state.get("summary", "No AI summary generated yet.")
