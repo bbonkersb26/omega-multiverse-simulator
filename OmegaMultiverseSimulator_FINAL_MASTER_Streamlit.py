@@ -989,7 +989,7 @@ with tabs[15]:
     st.markdown("- **Weak Force** impacts decay resilience of extreme elements.")
     st.markdown("- **Max stable Z** is shown dynamically as physical constants vary.")
 # === New Tab: Nuclear Binding Energy Map ===
-tabs.append("Nuclear Binding Energy Map")
+#tabs.append("Nuclear Binding Energy Map")
 with tabs[-1]:
     st.subheader("Nuclear Binding Energy per Nucleon")
 
