@@ -1346,7 +1346,7 @@ with tabs[17]:
     st.markdown("- Decoherence increases with greater deviation in constants and over time due to **entanglement entropy decay**.")
     st.markdown("- **High coherence regions** imply entangled universes that are still in quantum superposition.")
     st.markdown("- **Entropy decay curve** ensures even close universes decohere over time.")
-with tabs[17]:
+with tabs[18]:
     st.subheader("Quantum Branch Count Estimator")
 
     # Constants from sliders
