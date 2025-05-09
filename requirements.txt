@@ -5,4 +5,4 @@ plotly
 pyvista
 scipy
 streamlit[all]
-openai
+openai>=1.0.0
