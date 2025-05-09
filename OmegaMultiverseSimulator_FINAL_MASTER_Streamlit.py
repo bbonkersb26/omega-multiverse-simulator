@@ -622,7 +622,8 @@ with tabs[10]:
     st.markdown("- **Strong Force → Higher values stabilize heavier nuclei → promotes stability.**")
     st.markdown("- **EM Force → Higher EM force increases proton repulsion → reduces stability.**")
     st.markdown("- **Weak Force → Optimal near 1.0 → deviations increase instability through inefficient decay modes.**")
-    st.markdown("- Each isotope varies randomly per element, simulating natural isotope-dependent instability with weak force influence.")with tabs[11]:
+    st.markdown("- Each isotope varies randomly per element, simulating natural isotope-dependent instability with weak force influence.")
+with tabs[11]:
     st.subheader("Universe Life Probability Over Cosmic Time")
 
     # Use star formation metallicity from previous calculation
