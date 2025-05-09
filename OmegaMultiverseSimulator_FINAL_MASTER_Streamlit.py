@@ -191,7 +191,8 @@ tabs = st.tabs([
     "Periodic Table Expansion Potential",
     "Proton–Neutron Ratio Heatmap",                # already fixed earlier
     "Nuclear Binding Energy Map",                   # <-- just add it here directly
-    "Multiverse Decoherence Map"
+    "Multiverse Decoherence Map",
+    "Quantum Branch Count Estimator"
 ])
 st.divider()
 st.subheader("Export Simulation Report")
@@ -1227,3 +1228,170 @@ with tabs[16]:
     st.markdown("- **Heavier elements require a neutron surplus** to remain stable — modeled via a dynamic optimal ratio.")
     st.markdown("- **Strong force** enhances high-Z nuclei stability.")
     st.markdown("- **Weak force** governs beta decay thresholds — deviations reduce isotope persistence.")
+with tabs[17]:
+    st.subheader("Multiverse Decoherence Map (Quantum Divergence Over Time)")
+
+    # Extract slider values
+    strong = constants["Strong Force Multiplier"]
+    em = constants["Electromagnetic Force Multiplier"]
+    weak = constants["Weak Force Multiplier"]
+    gravity = constants["Gravitational Constant Multiplier"]
+    dark = constants["Dark Energy Multiplier"]
+
+    # Setup ranges
+    strong_vals = np.linspace(0.1, 10.0, 30)
+    em_vals = np.linspace(0.1, 10.0, 30)
+    time_vals = np.linspace(0, 100, 30)  # Arbitrary time units ~ quantum evolution scale
+
+    S_grid, EM_grid, T_grid = np.meshgrid(strong_vals, em_vals, time_vals, indexing='ij')
+
+    # Core decoherence penalty from deviation
+    deviation_penalty = (
+        (S_grid - strong) ** 2 +
+        (EM_grid - em) ** 2 +
+        (weak - 1.0) ** 2 +
+        (gravity - 1.0) ** 2 +
+        (dark - 1.0) ** 2
+    )
+
+    # Entanglement entropy decay over time
+    entropy_loss = np.exp(-T_grid / 30.0)  # Coherence decays exponentially with time
+
+    # Decoherence probability = closeness in parameter space * time coherence
+    decoherence_score = np.exp(-deviation_penalty / 5.0) * entropy_loss
+
+    # Extract a 2D slice for fixed time = mid-range
+    mid_index = len(time_vals) // 2
+    decoherence_slice = decoherence_score[:, :, mid_index]
+
+    # === 2D Mid-Time Heatmap ===
+    fig2d = go.Figure(data=go.Heatmap(
+        z=decoherence_slice,
+        x=strong_vals,
+        y=em_vals,
+        colorscale='Magma',
+        colorbar=dict(title="Quantum Coherence"),
+        zmin=0, zmax=1
+    ))
+    fig2d.update_layout(
+        title="Mid-Time Quantum Decoherence Map",
+        xaxis_title="Strong Force Multiplier",
+        yaxis_title="EM Force Multiplier"
+    )
+    st.plotly_chart(fig2d, use_container_width=True)
+    save_plot(fig2d, "Multiverse Decoherence Map 2D.png", is_plotly=True)
+
+    # === 3D Decoherence Surface at Mid-Time ===
+    fig3d = go.Figure(data=[go.Surface(
+        z=decoherence_slice,
+        x=strong_vals,
+        y=em_vals,
+        colorscale='Magma',
+        colorbar=dict(title="Coherence"),
+        cmin=0, cmax=1
+    )])
+    fig3d.update_layout(
+        title="3D Decoherence Surface (Mid-Time)",
+        scene=dict(
+            xaxis_title="Strong Force Multiplier",
+            yaxis_title="EM Force Multiplier",
+            zaxis_title="Quantum Coherence"
+        )
+    )
+    st.plotly_chart(fig3d, use_container_width=True)
+    save_plot(fig3d, "Multiverse Decoherence Map 3D.png", is_plotly=True)
+    st.subheader("Quantum Tunneling Crossover Probability")
+
+    # Force proximity space
+    s_vals = np.linspace(0.1, 10.0, 50)
+    em_vals = np.linspace(0.1, 10.0, 50)
+    S_grid, EM_grid = np.meshgrid(s_vals, em_vals)
+
+    # Localized potential landscape → lower deviation = higher tunneling
+    delta_S = (S_grid - strong) ** 2
+    delta_EM = (EM_grid - em) ** 2
+    quantum_distance = np.sqrt(delta_S + delta_EM + (weak - 1.0)**2 + (gravity - 1.0)**2 + (dark - 1.0)**2)
+
+    # Decoherence entropy decay → lower entropy = less tunneling
+    entropy_barrier = np.exp((quantum_distance) * 1.5)
+    tunneling_prob = np.exp(-entropy_barrier)
+
+    # Normalize
+    tunneling_prob = np.clip(tunneling_prob, 0, 1)
+
+    # Plot
+    fig = go.Figure(data=go.Heatmap(
+        z=tunneling_prob,
+        x=s_vals,
+        y=em_vals,
+        colorscale='Viridis',
+        colorbar=dict(title="Tunneling Probability")
+    ))
+    fig.update_layout(
+        title="Quantum Tunneling Crossover Probability Between Universes",
+        xaxis_title="Strong Force Multiplier",
+        yaxis_title="EM Force Multiplier"
+    )
+    st.plotly_chart(fig, use_container_width=True)
+    save_plot(fig, "Quantum Tunneling Probability.png", is_plotly=True)
+
+    # Scientific notes
+    st.markdown("### AI Analysis → Quantum Tunneling Between Universe Branches")
+    st.markdown("- **Crossover tunneling** represents probability of a universe transitioning into a nearby branch through quantum fluctuations.")
+    st.markdown("- **Low force deviation** and **low decoherence entropy** make tunneling more likely.")
+    st.markdown("- This map predicts multiverse interactions — regions of high overlap between quantum realities.")
+    # === Scientific Explanation ===
+    st.markdown("### AI Analysis → Quantum Decoherence & Entanglement Entropy Summary")
+    st.markdown("- **Everettian interpretation** suggests universes split over time based on quantum history divergence.")
+    st.markdown("- Decoherence increases with greater deviation in constants and over time due to **entanglement entropy decay**.")
+    st.markdown("- **High coherence regions** imply entangled universes that are still in quantum superposition.")
+    st.markdown("- **Entropy decay curve** ensures even close universes decohere over time.")
+with tabs[17]:
+    st.subheader("Quantum Branch Count Estimator")
+
+    # Constants from sliders
+    strong = constants["Strong Force Multiplier"]
+    em = constants["Electromagnetic Force Multiplier"]
+    weak = constants["Weak Force Multiplier"]
+    gravity = constants["Gravitational Constant Multiplier"]
+    dark = constants["Dark Energy Multiplier"]
+
+    # Time evolution (arbitrary units ~ Planck ticks)
+    time_steps = 100
+    time = np.arange(time_steps)
+
+    # Decoherence rate function (depends on energy scales)
+    base_decoherence_rate = 0.02
+    decoherence_scale = (strong * em * gravity) / (dark * weak + 1e-3)
+    decoherence_rate = base_decoherence_rate * decoherence_scale
+
+    # Exponential branch growth model
+    branch_counts = np.exp(decoherence_rate * time)
+
+    # Clip to avoid overflow
+    branch_counts = np.clip(branch_counts, 1, 1e20)
+
+    # Plot
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=time,
+        y=branch_counts,
+        mode='lines',
+        line=dict(color='cyan', width=3),
+        name='Branch Count'
+    ))
+    fig.update_layout(
+        title="Quantum Branch Count Over Time",
+        xaxis_title="Time (Arbitrary Units)",
+        yaxis_title="Estimated Everettian Branches",
+        yaxis_type="log"
+    )
+    st.plotly_chart(fig, use_container_width=True)
+    save_plot(fig, "Quantum Branch Count Over Time.png", is_plotly=True)
+
+    # AI Interpretation
+    st.markdown("### AI Analysis → Many-Worlds Branch Evolution")
+    st.markdown("- **This model estimates the number of parallel branches created via quantum decoherence.**")
+    st.markdown("- **Higher energy densities (strong, EM, gravity)** cause faster decoherence → more branches.")
+    st.markdown("- **Weak force and dark energy slow decoherence**, reducing branch complexity.")
+    st.markdown("- **Result is exponential branching**, reflecting Everett’s interpretation of quantum measurement.")
