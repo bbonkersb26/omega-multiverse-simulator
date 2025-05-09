@@ -134,7 +134,7 @@ import openai
 client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 # === Global Universe Synopsis ===
-st.divider()
+
 st.subheader("AI Global Universe Analysis")
 
 if st.button("Generate AI Universe Summary"):
