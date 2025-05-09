@@ -146,14 +146,17 @@ if st.button("Generate AI Universe Summary"):
                 temperature=0.7
             )
             summary = response.choices[0].message.content
+            st.session_state["summary"] = summary  # Store summary in session state
             st.success("Summary generated:")
             st.markdown(summary)
         except Exception as e:
             st.error(f"Error generating summary: {e}")
+
 if st.button("Download Full PDF Report"):
     with st.spinner("Compiling PDF..."):
         try:
-            generate_pdf(constants, summary)
+            summary_text = st.session_state.get("summary", "No AI summary was generated yet.")
+            generate_pdf(constants, summary_text)
             st.success("PDF generated successfully!")
             with open("Omega_Universe_Simulation_Report.pdf", "rb") as file:
                 st.download_button(
@@ -163,8 +166,7 @@ if st.button("Download Full PDF Report"):
                     mime="application/pdf"
                 )
         except Exception as e:
-            st.error(f"PDF generation failed: {e}")
-tabs = st.tabs([
+            st.error(f"PDF generation failed: {e}")tabs = st.tabs([
     "Periodic Table Stability",
     "Island of Instability",
     "Star Formation Potential",
