@@ -56,7 +56,8 @@ def save_plot(fig, filename, is_plotly=True):
         plt.savefig(path, bbox_inches='tight', dpi=300)
         plt.close()
     st.sidebar.header("Adjust Physical Constants")
-def generate_pdf(constants, summary_text, output_dir="pdf_visuals"):
+def generate_pdf_with_tab_summaries(constants, summary_text, tab_summaries, output_dir="pdf_visuals"):
+    # (Paste the entire body of your current working generate_pdf here)
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     font = "Helvetica"
@@ -170,6 +171,25 @@ def generate_graph_summary(graph_name, data_description, constants, output_dir="
     except Exception as e:
         st.error(f"Summary generation failed for {graph_name}: {e}")
         return "Summary generation failed."
+        # === FINAL PDF GENERATION BUTTON BLOCK ===
+st.subheader("Export Simulation Report")
+
+if st.button("Generate Final PDF Report"):
+    with st.spinner("Compiling full scientific PDF with AI summary and visuals..."):
+        try:
+            summary_text = st.session_state.get("summary", "No AI summary generated yet.")
+            generate_pdf_with_tab_summaries(constants, summary_text, tab_summaries)
+            st.success("PDF Report generated successfully!")
+
+            with open("Omega_Universe_Simulation_Report.pdf", "rb") as f:
+                st.download_button(
+                    label="Download Final PDF Report",
+                    data=f,
+                    file_name="Omega_Universe_Simulation_Report.pdf",
+                    mime="application/pdf"
+                )
+        except Exception as e:
+            st.error(f"PDF generation failed: {e}")
 
 constants = {
     "Strong Force Multiplier": slider_with_input("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
