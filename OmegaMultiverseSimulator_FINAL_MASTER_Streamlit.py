@@ -52,6 +52,7 @@ def generate_pdf(constants, summary_text, output_dir="pdf_visuals"):
     pdf.set_font("Arial", "B", 16)
     pdf.cell(0, 10, "AI Universe Summary", ln=True)
     pdf.set_font("Arial", size=12)
+    summary_text = summary_text.replace('\u2013', '-')
     for line in summary_text.split('\n'):
         pdf.multi_cell(0, 8, line)
 
