@@ -1049,3 +1049,55 @@ with tabs[-1]:
     st.markdown(f"- **Coulomb Term (a_c)** scales with EM force → larger Z penalized more.")
     st.markdown(f"- **Symmetry Term (a_sym)** inversely tied to weak force → n↔p balance stability.")
     st.markdown("- The peak around **Fe–Ni** emerges naturally; universes with stronger strong force push the peak slightly higher in Z.")
+with tabs[16]:
+    st.subheader("Proton–Neutron Ratio Heatmap")
+
+    # Constants
+    strong_force = constants["Strong Force Multiplier"]
+    weak_force = constants["Weak Force Multiplier"]
+
+    # Define atomic and neutron numbers
+    atomic_numbers = np.arange(1, 121)
+    neutron_numbers = np.arange(1, 181)  # Allow for neutron-rich isotopes
+
+    Z_grid, N_grid = np.meshgrid(atomic_numbers, neutron_numbers, indexing='ij')
+
+    # Proton-Neutron balance model
+    optimal_ratio = 1 + (Z_grid / 100)  # Heavier elements need more neutrons
+    actual_ratio = N_grid / Z_grid
+
+    # Deviation penalty
+    ratio_penalty = np.exp(-((actual_ratio - optimal_ratio)**2) * 10)
+
+    # Strong force stabilizes high-Z elements
+    strong_bonus = np.exp(-np.abs(Z_grid - 80) / (25 * strong_force))
+
+    # Weak force moderates beta decay zones
+    weak_bonus = np.exp(-((weak_force - 1.0)**2) * 3)
+
+    # Final viability
+    pn_viability = ratio_penalty * strong_bonus * weak_bonus
+    pn_viability = np.clip(pn_viability, 0, 1)
+
+    # Plot
+    fig = go.Figure(data=[go.Heatmap(
+        z=pn_viability.T,
+        x=atomic_numbers,
+        y=neutron_numbers,
+        colorscale='Plasma',
+        colorbar=dict(title='Viability Score')
+    )])
+
+    fig.update_layout(
+        title="Proton–Neutron Stability Heatmap",
+        xaxis_title="Proton Number (Z)",
+        yaxis_title="Neutron Number (N)"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("### AI Analysis → Scientific Summary")
+    st.markdown("- This map models isotope viability based on **proton-to-neutron ratios** adjusted by force constants.")
+    st.markdown("- **Heavier elements require a neutron surplus** to remain stable — modeled via a dynamic optimal ratio.")
+    st.markdown("- **Strong force** enhances high-Z nuclei stability.")
+    st.markdown("- **Weak force** governs beta decay thresholds — deviations reduce isotope persistence.")
