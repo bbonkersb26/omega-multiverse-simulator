@@ -881,48 +881,44 @@ with tabs[13]:
 with tabs[14]:
     st.subheader("Isotope Decay & Half-Life Model")
 
-    # Constants
+    # Pull updated constants directly
     weak_force = constants["Weak Force Multiplier"]
     strong_force = constants["Strong Force Multiplier"]
 
+    # Define atomic number and isotope ranges
     atomic_numbers = np.arange(1, 121)
     isotope_range = np.arange(1, 21)
-
     Z_grid, iso_grid = np.meshgrid(atomic_numbers, isotope_range, indexing='ij')
 
-    # === Decay rate model ===
+    # Compute half-life matrix (updated every run)
     base_half_life = np.exp(-np.abs(Z_grid - 50) / 20)
     weak_decay_penalty = np.exp(-((weak_force - 1.0) ** 2) * 3)
     strong_bonus = np.exp(-np.abs(Z_grid - 80) / (25 * strong_force))
 
     half_life_matrix = base_half_life * weak_decay_penalty * strong_bonus
     half_life_matrix = np.clip(half_life_matrix, 0, 1)
+    half_life_matrix /= half_life_matrix.max()  # Normalize
 
-    # Normalize (so highest value = 1 for cross-universe comparability)
-    half_life_matrix /= half_life_matrix.max()
-
-    # === 3D Surface Plot ===
-    fig = go.Figure(data=[go.Surface(
+    # === 3D Surface Plot of Half-Lives ===
+    fig1 = go.Figure(data=[go.Surface(
         z=half_life_matrix,
         x=atomic_numbers,
         y=isotope_range,
         colorscale='Cividis',
         colorbar=dict(title='Normalized Half-Life')
     )])
-
-    fig.update_layout(
-        title="Isotope Half-Life Map (Decay vs Z and Isotope Index)",
+    fig1.update_layout(
+        title="Isotope Half-Life Map (Z vs Isotope Number)",
         scene=dict(
-            xaxis_title='Atomic Number',
+            xaxis_title='Atomic Number (Z)',
             yaxis_title='Isotope Number',
             zaxis_title='Relative Half-Life'
         )
     )
+    st.plotly_chart(fig1, use_container_width=True)
 
-    st.plotly_chart(fig, use_container_width=True)
-
-    # === Adaptive Histogram of Stable Isotopes ===
-    threshold = 0.1  # Top 10% of values in this universe
+    # === Life-Compatible Isotope Bar Plot ===
+    threshold = 0.1  # Define long-lived isotopes as top 10% within current universe
     life_viable_isotopes = (half_life_matrix > threshold).sum(axis=1)
 
     fig2, ax = plt.subplots()
@@ -932,9 +928,8 @@ with tabs[14]:
     ax.set_ylabel("# of Isotopes with Long Half-Life")
     st.pyplot(fig2)
 
-    # === Summary ===
+    # === AI Summary ===
     st.markdown("### AI Analysis → Scientific Nuclear Summary")
-    st.markdown("- **Weak Force** governs decay rate. Higher values cause short-lived isotopes.")
-    st.markdown("- **Strong Force** helps stabilize heavier nuclei, improving longevity.")
-    st.markdown("- **Top 10% logic** ensures that even unstable universes reveal which elements are most decay-resistant.")
-    st.markdown("- This method is more universal and realistic when comparing different multiverse physics models.")
+    st.markdown("- **Weak Force Multiplier** → Controls decay rates. Higher = faster decay = fewer long-lived isotopes.")
+    st.markdown("- **Strong Force Multiplier** → Stabilizes heavier nuclei. Higher = longer lifespans for heavy elements.")
+    st.markdown("- **Dynamic thresholding** (top 10%) enables realistic comparisons across many different universes.")
