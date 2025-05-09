@@ -46,7 +46,23 @@ else:
     st.error("High deviation. Unstable universe likely.")
 
 st.divider()
+# === Precompute Half-Life Matrix for Cross-Module Use ===
+atomic_numbers = np.arange(1, 121)
+isotope_range = np.arange(1, 21)
+Z_grid, iso_grid = np.meshgrid(atomic_numbers, isotope_range, indexing='ij')
 
+weak_force = constants["Weak Force Multiplier"]
+strong_force = constants["Strong Force Multiplier"]
+
+base_half_life = np.exp(-np.abs(Z_grid - 50) / 20)
+weak_decay_penalty = np.exp(-((weak_force - 1.0) ** 2) * 3)
+strong_bonus = np.exp(-np.abs(Z_grid - 80) / (25 * strong_force))
+
+half_life_matrix = base_half_life * weak_decay_penalty * strong_bonus
+half_life_matrix = np.clip(half_life_matrix, 0, 1)
+
+# Mean half-life per element (used later)
+mean_half_life_per_element = half_life_matrix.mean(axis=1)
 tabs = st.tabs([
     "Periodic Table Stability",
     "Island of Instability",
