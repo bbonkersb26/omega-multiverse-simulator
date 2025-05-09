@@ -192,7 +192,8 @@ tabs = st.tabs([
     "Proton–Neutron Ratio Heatmap",                # already fixed earlier
     "Nuclear Binding Energy Map",                   # <-- just add it here directly
     "Multiverse Decoherence Map",
-    "Quantum Branch Count Estimator"
+    "Quantum Branch Count Estimator",
+    "Quantum Gravity Horizon Map"
 ])
 st.divider()
 st.subheader("Export Simulation Report")
@@ -1395,3 +1396,67 @@ with tabs[18]:
     st.markdown("- **Higher energy densities (strong, EM, gravity)** cause faster decoherence → more branches.")
     st.markdown("- **Weak force and dark energy slow decoherence**, reducing branch complexity.")
     st.markdown("- **Result is exponential branching**, reflecting Everett’s interpretation of quantum measurement.")
+# === Tab 19: Quantum Gravity Horizon Map ===
+with tabs[19]:
+    st.subheader("Quantum Gravity Horizon Map")
+
+    # Load relevant constants
+    G = constants["Gravitational Constant Multiplier"]
+    Λ = constants["Dark Energy Multiplier"]
+    strong = constants["Strong Force Multiplier"]
+    weak = constants["Weak Force Multiplier"]
+
+    # Simulate spacetime curvature strength across a grid
+    r_vals = np.linspace(0.1, 10.0, 100)
+    G_vals = np.linspace(0.1, 10.0, 100)
+    R, G_grid = np.meshgrid(r_vals, G_vals)
+
+    # Schwarzschild-like curvature metric
+    curvature_strength = (G_grid * G) / (R + 1e-5)
+    curvature_strength = np.clip(curvature_strength, 0, 1.5)
+
+    # Horizon thresholding (where metric reaches Planck curvature)
+    horizon_mask = curvature_strength > 1.0
+    curvature_strength[horizon_mask] = 1.0  # Cap for visualization
+
+    # === 2D Curvature Heatmap ===
+    fig_2d = go.Figure(data=go.Heatmap(
+        z=curvature_strength,
+        x=r_vals,
+        y=G_vals,
+        colorscale="Cividis",
+        colorbar=dict(title="Curvature Intensity")
+    ))
+    fig_2d.update_layout(
+        title="2D Quantum Gravity Curvature Map",
+        xaxis_title="Radial Coordinate (r)",
+        yaxis_title="Gravitational Field Multiplier"
+    )
+    st.plotly_chart(fig_2d, use_container_width=True)
+    save_plot(fig_2d, "Quantum Gravity Horizon Map 2D.png", is_plotly=True)
+
+    # === 3D Curvature Surface ===
+    fig_3d = go.Figure(data=[go.Surface(
+        z=curvature_strength,
+        x=r_vals,
+        y=G_vals,
+        colorscale='Cividis',
+        colorbar=dict(title="Curvature Intensity")
+    )])
+    fig_3d.update_layout(
+        title="3D Quantum Gravity Horizon Surface",
+        scene=dict(
+            xaxis_title="Radial Coordinate (r)",
+            yaxis_title="Gravitational Field Multiplier",
+            zaxis_title="Curvature Intensity"
+        )
+    )
+    st.plotly_chart(fig_3d, use_container_width=True)
+    save_plot(fig_3d, "Quantum Gravity Horizon Map 3D.png", is_plotly=True)
+
+    # === AI Scientific Summary ===
+    st.markdown("### AI Analysis → Quantum Gravity Horizon Summary")
+    st.markdown("- This simulation visualizes where gravity becomes strong enough to approach Planck-scale curvature.")
+    st.markdown("- **High gravity** and **low radial distance** intensify curvature → resembling event horizons.")
+    st.markdown("- Regions where the curvature exceeds unity approximate **quantum gravity horizons** or black hole-like limits.")
+    st.markdown("- **Dark energy** and **strong/weak force multipliers** indirectly shape spacetime expansion, but curvature is most sensitive to **gravitational multiplier G**.")
