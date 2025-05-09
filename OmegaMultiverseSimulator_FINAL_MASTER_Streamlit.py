@@ -410,9 +410,9 @@ with tabs[6]:
     st.subheader("Element Abundance Probability")
     forces = ["Strong", "EM", "Weak"]
     abundance = [np.exp(-abs(constants["Strong Force Multiplier"]-1)),
-                 np.exp(-abs(constants["Electromagnetic Force Multiplier"]-1)),
-                 np.exp(-abs(constants["Weak Force Multiplier"]-1))]
-    fig, ax = plt.subplots()
+             np.exp(-abs(constants["Electromagnetic Force Multiplier"]-1)),
+             np.exp(-abs(constants["Weak Force Multiplier"]-1))]
+            fig, ax = plt.subplots()
     ax.bar(forces, abundance, color=['blue', 'magenta', 'yellow'])
     ax.set_ylabel("Relative Abundance")
     ax.set_title("Predicted Element Abundance per Force Multiplier")
