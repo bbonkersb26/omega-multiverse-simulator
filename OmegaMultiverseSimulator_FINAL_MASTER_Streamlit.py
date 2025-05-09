@@ -345,7 +345,7 @@ with tabs[0]:
 
     st.plotly_chart(fig, use_container_width=True)
     save_plot(fig, "Periodic Table Stability.png", is_plotly=True)
-    if st.button(f"Generate AI Summary for {tab_title}"):
+if st.button(f"Generate AI Summary for {tab_title}"):
     with st.spinner("Generating summary..."):
         try:
             # Replace `tab_data_context` with relevant values from graph inputs or constants
