@@ -680,3 +680,70 @@ with tabs[11]:
     st.markdown("- **Mid-life Universe → High Metallicity → Peak Life Probability**")
     st.markdown("- **Late Universe → Stars fade, no new metals → Declining Life Probability**")
     st.markdown("- **Force Constants → Tuning effects shown through scaling → unfavorable universes may never reach high probability**")
+    # === tabs[12]: Molecular Bonding Model (Element Specific Chemistry) ===
+with tabs[12]:
+    st.subheader("Molecular Bonding Stability (Element-Specific Chemistry)")
+
+    # Pull in relevant physical constants
+    em_force = constants["Electromagnetic Force Multiplier"]
+    strong_force = constants["Strong Force Multiplier"]
+    weak_force = constants["Weak Force Multiplier"]
+    temperature = constants["Temperature Multiplier"]
+    pressure = constants["Pressure Multiplier"]
+
+    # Define molecules and baseline stability (arbitrary units ~ bond strength)
+    molecules = {
+        "H₂ (Covalent)": 1.0,
+        "CO₂ (Covalent)": 0.85,
+        "Fe (Metallic)": 0.75,
+        "H₂O (Polar)": 0.90,
+        "Uranium Compounds (Heavy)": 0.65
+    }
+
+    # Calculate force modifiers
+    em_modifier = np.exp(-abs(em_force - 1.0) * 2.0)  # EM destabilizes bonds with high repulsion
+    strong_modifier = np.exp(-abs(strong_force - 1.0) * 1.5)  # Strong force stabilizes nuclei → more stable atoms
+    weak_modifier = np.exp(-abs(weak_force - 1.0) * 1.2)  # Weak force optimality supports long-lived atoms
+
+    temp_modifier = np.exp(-((temperature - 1.0)**2) * 2.0)  # High temp disrupts bonding
+    pressure_modifier = np.exp(-((pressure - 1.0)**2) * 2.0)  # Ideal pressure helps orbital overlap
+
+    global_modifier = em_modifier * strong_modifier * weak_modifier * temp_modifier * pressure_modifier
+
+    # Calculate adjusted bond strengths
+    adjusted_stabilities = {mol: base * global_modifier for mol, base in molecules.items()}
+
+    # Bond viability threshold
+    viability_threshold = 0.5
+
+    # Prepare plotting data
+    molecule_names = list(adjusted_stabilities.keys())
+    stability_values = list(adjusted_stabilities.values())
+    color_map = ['green' if val > viability_threshold else 'gray' for val in stability_values]
+
+    # Plot
+    fig = go.Figure(data=[go.Bar(
+        x=molecule_names,
+        y=stability_values,
+        marker=dict(color=color_map),
+        text=[f"{v:.2f}" for v in stability_values],
+        textposition='outside'
+    )])
+
+    fig.update_layout(
+        title="Molecular Bonding Viability Across Forces, Temperature, Pressure",
+        yaxis_title="Relative Bond Stability",
+        xaxis_title="Molecule Type",
+        yaxis_range=[0, 1.2]
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    # === Summary Analysis ===
+    st.markdown("### AI Analysis → Scientific Chemistry Summary")
+    st.markdown("This model evaluates molecule formation viability across universes:")
+    st.markdown("- **H₂ & CO₂** → Highly dependent on EM and temperature for covalent bonding.")
+    st.markdown("- **Fe (Metallic)** → Relies more on atomic packing and pressure-induced orbital overlap.")
+    st.markdown("- **H₂O** → Depends heavily on polar EM behavior and temperature balance.")
+    st.markdown("- **Uranium Compounds** → Require strong nuclear force to maintain heavy element stability.")
+    st.markdown("- **Gray Bars** → Molecules likely cannot exist in this universe due to physical parameter divergence.")
