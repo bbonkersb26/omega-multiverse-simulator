@@ -187,7 +187,7 @@ tabs = st.tabs([
 st.divider()
 st.subheader("Export Simulation Report")
 
-if st.button("Generate Scientific PDF Report"):
+if st.button("Generate Scientific PDF Report")
     with st.spinner("Compiling PDF..."):
         try:
             summary_text = st.session_state.get("summary", "No AI summary generated yet.")
