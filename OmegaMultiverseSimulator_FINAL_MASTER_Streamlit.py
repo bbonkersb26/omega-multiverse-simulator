@@ -61,8 +61,6 @@ strong_bonus = np.exp(-np.abs(Z_grid - 80) / (25 * strong_force))
 half_life_matrix = base_half_life * weak_decay_penalty * strong_bonus
 half_life_matrix = np.clip(half_life_matrix, 0, 1)
 
-# Mean half-life per element (used later)
-mean_half_life_per_element = half_life_matrix.mean(axis=1)
 tabs = st.tabs([
     "Periodic Table Stability",
     "Island of Instability",
@@ -80,8 +78,8 @@ tabs = st.tabs([
     "Molecular Abundance Map",
     "Isotope Decay & Half-Life Model",
     "Periodic Table Expansion Potential",
-    "Nuclear Energy Binding Map",
-    "Proton–Neutron Ratio Heatmap"
+    "Proton–Neutron Ratio Heatmap",                # already fixed earlier
+    "Nuclear Binding Energy Map"                   # <-- just add it here directly
 ])
 
 # --- Continue Tabs (starting from tab1) ---
