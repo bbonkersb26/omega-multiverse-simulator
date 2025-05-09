@@ -60,7 +60,33 @@ strong_bonus = np.exp(-np.abs(Z_grid - 80) / (25 * strong_force))
 
 half_life_matrix = base_half_life * weak_decay_penalty * strong_bonus
 half_life_matrix = np.clip(half_life_matrix, 0, 1)
+import openai
 
+# Initialize OpenAI client (make sure your API key is in .streamlit/secrets.toml under [openai])
+client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+
+# === Global Universe Synopsis ===
+st.divider()
+st.subheader("AI Global Universe Analysis")
+
+if st.button("Generate AI Universe Summary"):
+    with st.spinner("Generating summary using OpenAI..."):
+        user_context = "\n".join([f"{k}: {v:.2f}" for k, v in constants.items()])
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are a physics and cosmology expert. Analyze universal constants and summarize what kind of universe this configuration would produce."},
+                    {"role": "user", "content": f"Here are the physical constants:\n{user_context}"}
+                ],
+                max_tokens=300,
+                temperature=0.7
+            )
+            summary = response.choices[0].message.content
+            st.success("Summary generated:")
+            st.markdown(summary)
+        except Exception as e:
+            st.error(f"Error generating summary: {e}")
 tabs = st.tabs([
     "Periodic Table Stability",
     "Island of Instability",
@@ -1099,35 +1125,3 @@ with tabs[16]:
     st.markdown("- **Heavier elements require a neutron surplus** to remain stable — modeled via a dynamic optimal ratio.")
     st.markdown("- **Strong force** enhances high-Z nuclei stability.")
     st.markdown("- **Weak force** governs beta decay thresholds — deviations reduce isotope persistence.")
-import openai
-
-# === Set up client using secrets ===
-client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-
-# === Global Universe AI Summary ===
-with st.expander("AI Global Universe Analysis", expanded=True):
-    st.header("AI Global Universe Analysis")
-
-    if st.button("Generate AI Universe Summary"):
-        with st.spinner("Analyzing universe with GPT-3.5..."):
-            # Prepare context based on your constants
-            summary_prompt = (
-                "You are a theoretical physicist AI analyzing a simulated universe with the following parameters:\n"
-                + "\n".join([f"- {k}: {v:.2f}x standard" for k, v in constants.items()])
-                + "\n\nProvide a scientific summary about this universe’s stability, periodic table limits, element bonding, life probability, and cosmic structure. Use technical language."
-            )
-
-            try:
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {"role": "system", "content": "You are a theoretical physicist AI."},
-                        {"role": "user", "content": summary_prompt}
-                    ]
-                )
-                ai_output = response.choices[0].message.content
-                st.success("Summary generated successfully!")
-                st.markdown(ai_output)
-
-            except Exception as e:
-                st.error(f"Error: {e}")
