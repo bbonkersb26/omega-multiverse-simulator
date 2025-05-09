@@ -133,41 +133,27 @@ client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 st.divider()
 st.subheader("AI Global Universe Analysis")
 
-if st.button("Generate AI Universe Summary"):
-    with st.spinner("Generating summary using OpenAI..."):
-        user_context = "\n".join([f"{k}: {v:.2f}" for k, v in constants.items()])
-        try:
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are a physics and cosmology expert. Analyze universal constants and summarize what kind of universe this configuration would produce."},
-                    {"role": "user", "content": f"Here are the physical constants:\n{user_context}"}
-                ],
-                max_tokens=300,
-                temperature=0.7
-            )
-            summary = response.choices[0].message.content
-            st.session_state["summary"] = summary  # Store summary in session state
-            st.success("Summary generated:")
-            st.markdown(summary)
-        except Exception as e:
-            st.error(f"Error generating summary: {e}")
+st.subheader("Export Simulation Report")
 
-if st.button("Download Full PDF Report"):
-    with st.spinner("Compiling PDF..."):
+if st.button("Generate Final PDF Report"):
+    with st.spinner("Compiling full scientific PDF with AI summary and visuals..."):
         try:
-            summary_text = st.session_state.get("summary", "No AI summary was generated yet.")
-            generate_pdf(constants, summary_text)
-            st.success("PDF generated successfully!")
-            with open("Omega_Universe_Simulation_Report.pdf", "rb") as file:
-                st.download_button(
-                    label="Download Scientific Report PDF",
-                    data=file,
-                    file_name="Omega_Universe_Simulation_Report.pdf",
-                    mime="application/pdf"
-                )
+            # Ensure AI summary exists
+            if 'summary' not in locals():
+                st.warning("Please generate the AI Universe Summary first.")
+            else:
+                generate_pdf(constants, summary)
+                st.success("PDF Report generated successfully!")
+                with open("Omega_Universe_Simulation_Report.pdf", "rb") as f:
+                    st.download_button(
+                        label="Download Final PDF Report",
+                        data=f,
+                        file_name="Omega_Universe_Simulation_Report.pdf",
+                        mime="application/pdf"
+                    )
         except Exception as e:
             st.error(f"PDF generation failed: {e}")
+
 tabs = st.tabs([
     "Periodic Table Stability",
     "Island of Instability",
