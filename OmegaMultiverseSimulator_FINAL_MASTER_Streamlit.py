@@ -277,7 +277,7 @@ if st.button("Generate Final PDF Report"):
             st.error(f"PDF generation failed: {e}")
 with tabs[0]:
     st.subheader("Periodic Table Stability Probability")
-
+    tab_title = "Periodic Table Stability"
     atomic_numbers = np.arange(1, 121)
 
     # Pull slider values from physical constants
