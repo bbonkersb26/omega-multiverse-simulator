@@ -409,27 +409,33 @@ with tabs[5]:
 with tabs[6]:
     st.subheader("Element Abundance Probability")
     forces = ["Strong", "EM", "Weak"]
-    # Original force-dependent abundance
-strong_abundance = np.exp(-abs(constants["Strong Force Multiplier"] - 1))
-em_abundance = np.exp(-abs(constants["Electromagnetic Force Multiplier"] - 1))
-weak_abundance = np.exp(-abs(constants["Weak Force Multiplier"] - 1))
 
-# Modify by half-life survival score
-half_life_weight = np.mean(mean_half_life_per_element)  # average stability
-abundance = [
-    strong_abundance * half_life_weight,
-    em_abundance * half_life_weight,
-    weak_abundance * half_life_weight
-]
-fig, ax = plt.subplots()
+    # Original force-dependent abundance
+    strong_abundance = np.exp(-abs(constants["Strong Force Multiplier"] - 1))
+    em_abundance = np.exp(-abs(constants["Electromagnetic Force Multiplier"] - 1))
+    weak_abundance = np.exp(-abs(constants["Weak Force Multiplier"] - 1))
+
+    # Modify by half-life survival score
+    half_life_weight = np.mean(mean_half_life_per_element)  # average stability
+    abundance = [
+        strong_abundance * half_life_weight,
+        em_abundance * half_life_weight,
+        weak_abundance * half_life_weight
+    ]
+
+    # Plotting
+    fig, ax = plt.subplots()
     ax.bar(forces, abundance, color=['blue', 'magenta', 'yellow'])
     ax.set_ylabel("Relative Abundance")
     ax.set_title("Predicted Element Abundance per Force Multiplier")
     st.pyplot(fig)
 
+    # Summary
     st.markdown("### AI Analysis → Scientific Summary")
-    st.markdown("This graph estimates the abundance of elements in universes where the fundamental force strengths differ. Strong and weak forces alter nuclear formation rates while EM changes impact overall element formation efficiency.")
-
+    st.markdown("This graph estimates the abundance of elements in universes where the fundamental force strengths differ.")
+    st.markdown("- **Strong and weak forces** alter nuclear formation rates.")
+    st.markdown("- **EM changes** impact proton repulsion and molecular formation.")
+    st.markdown("- **Half-life weight** reduces abundance in unstable universes.")
 # === Radiation Risk ===
 with tabs[7]:
     st.subheader("EM Radiation Risk")
