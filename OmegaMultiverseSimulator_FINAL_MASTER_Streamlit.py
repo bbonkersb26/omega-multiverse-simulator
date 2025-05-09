@@ -187,13 +187,11 @@ tabs = st.tabs([
 st.divider()
 st.subheader("Export Simulation Report")
 
-if st.button("Generate PDF Report"):
-    with st.spinner("Assembling PDF with all visuals and summary..."):
-        generate_pdf(constants, summary)
-        st.success("PDF Report generated successfully!")
-        with open("Multiverse_Report.pdf", "rb") as f:
-            st.download_button("Download PDF Report", f, file_name="Multiverse_Report.pdf")
-# --- Continue Tabs (starting from tab1) ---
+if st.button("Generate Scientific PDF Report"):
+    with st.spinner("Compiling PDF..."):
+        try:
+            summary_text = st.session_state.get("summary", "No AI summary generated yet.")
+            generate_pdf(constants, summary_text)# --- Continue Tabs (starting from tab1) ---
 # === Periodic Table Stability (Scientific Model → Strong Force, EM Force, Weak Force Dependent) ===
 with tabs[0]:
     st.subheader("Periodic Table Stability Probability")
