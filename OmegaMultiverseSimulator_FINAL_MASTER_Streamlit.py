@@ -48,9 +48,20 @@ else:
 st.divider()
 
 tabs = st.tabs([
-    "Periodic Table Stability", "Island of Instability", "Star Formation Potential", 
-    "Life Probability (Heatmap)", "Quantum Bonding", "Universe Emergence Probability",
-    "Element Abundance Probability", "EM Radiation Risk", "Star Lifespan Model", "Dark Matter Simulation", "Atomic Stability", "Universe Life Probability Over Time"
+    "Periodic Table Stability",
+    "Island of Instability",
+    "Star Formation Potential",
+    "Life Probability (Heatmap)",
+    "Quantum Bonding",
+    "Universe Emergence Probability",
+    "Element Abundance Probability",
+    "EM Radiation Risk",
+    "Star Lifespan Model",
+    "Dark Matter Simulation",
+    "Atomic Stability",
+    "Universe Life Probability Over Time",
+    "Molecular Bonding Model (Element Specific)",
+    "Molecular Abundance Map"
 ])
 
 # --- Continue Tabs (starting from tab1) ---
