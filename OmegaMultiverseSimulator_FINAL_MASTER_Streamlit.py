@@ -204,6 +204,7 @@ if st.button("Generate Scientific PDF Report"):
                 )
         except Exception as e:
             st.error(f"PDF generation failed: {e}")# === Periodic Table Stability (Scientific Model → Strong Force, EM Force, Weak Force Dependent) ===
+            
 with tabs[0]:
     st.subheader("Periodic Table Stability Probability")
 
