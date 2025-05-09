@@ -191,8 +191,17 @@ if st.button("Generate Scientific PDF Report"):
     with st.spinner("Compiling PDF..."):
         try:
             summary_text = st.session_state.get("summary", "No AI summary generated yet.")
-            generate_pdf(constants, summary_text)# --- Continue Tabs (starting from tab1) ---
-# === Periodic Table Stability (Scientific Model → Strong Force, EM Force, Weak Force Dependent) ===
+            generate_pdf(constants, summary_text)
+            st.success("PDF generated successfully!")
+            with open("Omega_Universe_Simulation_Report.pdf", "rb") as file:
+                st.download_button(
+                    label="Download Scientific Report PDF",
+                    data=file,
+                    file_name="Omega_Universe_Simulation_Report.pdf",
+                    mime="application/pdf"
+                )
+        except Exception as e:
+            st.error(f"PDF generation failed: {e}")# === Periodic Table Stability (Scientific Model → Strong Force, EM Force, Weak Force Dependent) ===
 with tabs[0]:
     st.subheader("Periodic Table Stability Probability")
 
