@@ -47,7 +47,8 @@ def generate_pdf(constants, summary_text, output_dir="pdf_visuals"):
     pdf.cell(0, 10, "Simulation Parameters", ln=True)
     pdf.set_font(font, "", 12)
     for k, v in constants.items():
-        pdf.cell(0, 8, f"{k}: {v:.2f}", ln=True)
+        line = f"{k}: {v:.2f}"
+        pdf.cell(0, 8, line.encode('latin-1', 'replace').decode('latin-1'), ln=True)
 
     # === AI Summary Page ===
     pdf.add_page()
@@ -55,7 +56,8 @@ def generate_pdf(constants, summary_text, output_dir="pdf_visuals"):
     pdf.cell(0, 10, "AI Universe Summary", ln=True)
     pdf.set_font(font, "", 12)
     for line in summary_text.split('\n'):
-        pdf.multi_cell(0, 8, line)
+        safe_line = line.encode('latin-1', 'replace').decode('latin-1')
+        pdf.multi_cell(0, 8, safe_line)
 
     # === Visuals Section ===
     pdf.add_page()
@@ -67,10 +69,12 @@ def generate_pdf(constants, summary_text, output_dir="pdf_visuals"):
         path = os.path.join(output_dir, image_file)
         pdf.add_page()
         pdf.set_font(font, "B", 14)
-        pdf.cell(0, 10, image_file.replace(".png", "").replace("_", " "), ln=True)
+        title = image_file.replace(".png", "").replace("_", " ")
+        title_safe = title.encode('latin-1', 'replace').decode('latin-1')
+        pdf.cell(0, 10, title_safe, ln=True)
         pdf.image(path, w=180)
 
-    pdf.output("Omega_Universe_Simulation_Report.pdf")
+    pdf.output("Omega_Universe_Simulation_Report.pdf")    
     st.sidebar.header("Adjust Physical Constants")
 
 def slider_with_input(label, min_val, max_val, default_val, step):
