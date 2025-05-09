@@ -23,14 +23,18 @@ def slider_with_input(label, min_val, max_val, default_val, step):
     st.sidebar.caption(f"Change from baseline: {percent_change:+.2f}%")
     return slider_val
 
+
 constants = {
     "Strong Force Multiplier": slider_with_input("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
     "Electromagnetic Force Multiplier": slider_with_input("EM Force Multiplier", 0.1, 10.0, 1.0, 0.01),
     "Weak Force Multiplier": slider_with_input("Weak Force Multiplier", 0.1, 10.0, 1.0, 0.01),
     "Gravitational Constant Multiplier": slider_with_input("Gravitational Multiplier", 0.1, 10.0, 1.0, 0.01),
     "Dark Energy Multiplier": slider_with_input("Dark Energy Multiplier", 0.1, 10.0, 1.0, 0.01),
+    
+    # === NEW ENHANCEMENTS for Chemical Modeling ===
+    "Temperature Multiplier": slider_with_input("Temperature Multiplier", 0.1, 10.0, 1.0, 0.01),
+    "Pressure Multiplier": slider_with_input("Pressure Multiplier", 0.1, 10.0, 1.0, 0.01),
 }
-
 deviation = sum(abs(v - 1.0) for v in constants.values())
 st.header("Universe Stability Summary")
 st.write(f"Deviation from Standard Model: **{deviation:.2f}**")
@@ -280,20 +284,85 @@ with tabs[3]:
     st.markdown("- **Forces Compatibility** → Molecular and atomic stability zones based on nuclear and EM forces.")
     st.markdown("- **Metallicity Influence** → Low metallicity suppresses life chances (no planet formation), while medium to high metallicity supports life emergence.")
     st.markdown("The model shows that universes with optimal physical constants and sufficient cosmic evolution (star death → metals) are the most likely to support life.")
-# Quantum Bonding (3D Surface)
+
+# === Quantum Bonding Probability (Enhanced with Temperature and Pressure) ===
 with tabs[4]:
     st.subheader("Quantum Bonding Probability")
+
+    # Add new sliders to constants
+    if "Temperature Multiplier" not in constants:
+        constants["Temperature Multiplier"] = slider_with_input("Temperature Multiplier", 0.1, 10.0, 1.0, 0.01)
+    if "Pressure Multiplier" not in constants:
+        constants["Pressure Multiplier"] = slider_with_input("Pressure Multiplier", 0.1, 10.0, 1.0, 0.01)
+
+    # Load force constants
+    strong_force = constants["Strong Force Multiplier"]
+    em_force = constants["Electromagnetic Force Multiplier"]
+    temperature = constants["Temperature Multiplier"]
+    pressure = constants["Pressure Multiplier"]
+
+    # Create grid for strong & EM force combinations
     strong_force_values = np.linspace(0.1, 10.0, 50)
     em_force_values = np.linspace(0.1, 10.0, 50)
     strong_grid, em_grid = np.meshgrid(strong_force_values, em_force_values)
-    bonding_prob = np.exp(-((strong_grid - constants["Strong Force Multiplier"])**2 + (em_grid - constants["Electromagnetic Force Multiplier"])**2) / 2)
-    fig = go.Figure(data=[go.Surface(z=bonding_prob, x=strong_grid, y=em_grid, colorscale='Viridis', colorbar=dict(title='Bonding Probability'))])
-    fig.update_layout(scene=dict(xaxis_title='Strong Force Multiplier', yaxis_title='EM Force Multiplier', zaxis_title='Bonding Probability'))
-    st.plotly_chart(fig, use_container_width=True)
-    
-    st.markdown("**AI Analysis → Scientific Summary**")
-    st.markdown("Chemical bonding relies on the interplay of nuclear forces. This graph shows optimal force regions where atoms can form molecules efficiently, which is essential for chemistry and life.")
 
+    # Base bonding probability (force interaction proximity to user setting)
+    bonding_prob = np.exp(-((strong_grid - strong_force)**2 + (em_grid - em_force)**2) / 2)
+
+    # Temperature & pressure modifiers → ideal at 1.0
+    temp_effect = np.exp(-((temperature - 1.0)**2) * 2.0)
+    pressure_effect = np.exp(-((pressure - 1.0)**2) * 2.0)
+
+    # Apply physical modifiers globally
+    bonding_prob *= temp_effect * pressure_effect
+
+    # === 3D Surface Plot (Preserved Original) ===
+    fig_3d = go.Figure(data=[go.Surface(
+        z=bonding_prob,
+        x=strong_force_values,
+        y=em_force_values,
+        colorscale='Viridis',
+        colorbar=dict(title='Bonding Probability')
+    )])
+
+    fig_3d.update_layout(
+        title="3D Quantum Bonding Probability (Forces + Temp/Pressure)",
+        scene=dict(
+            xaxis_title='Strong Force Multiplier',
+            yaxis_title='EM Force Multiplier',
+            zaxis_title='Bonding Probability'
+        )
+    )
+
+    st.plotly_chart(fig_3d, use_container_width=True)
+
+    # === 2D Contour Plot (New Addition) ===
+    fig_2d = go.Figure(data=go.Contour(
+        z=bonding_prob,
+        x=strong_force_values,
+        y=em_force_values,
+        colorscale='Viridis',
+        contours_coloring='heatmap',
+        colorbar=dict(title='Bonding Probability'),
+        line_smoothing=1.2
+    ))
+
+    fig_2d.update_layout(
+        title="2D Bonding Zone Map (Temperature & Pressure Adjusted)",
+        xaxis_title='Strong Force Multiplier',
+        yaxis_title='EM Force Multiplier'
+    )
+
+    st.plotly_chart(fig_2d, use_container_width=True)
+
+    # === Scientific Explanation ===
+    st.markdown("### AI Analysis → Scientific Summary")
+    st.markdown("This upgraded bonding model includes:")
+    st.markdown("- **Strong and EM Force Interplay** → Nucleus-electron interactions define potential for chemical bonding.")
+    st.markdown("- **Temperature Multiplier** → High temperatures may prevent stable bonding due to high kinetic energy.")
+    st.markdown("- **Pressure Multiplier** → Optimal pressure enables orbital overlap and electron cloud compression.")
+    st.markdown("- **3D Surface** shows quantum bonding efficiency across force space.")
+    st.markdown("- **2D Contour** reveals high-probability bonding zones for molecule formation across universes.")
 # ------------------------
 # === Universe Probability ===
 with tabs[5]:
