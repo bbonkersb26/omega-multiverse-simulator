@@ -80,7 +80,8 @@ tabs = st.tabs([
     "Molecular Abundance Map",
     "Isotope Decay & Half-Life Model",
     "Periodic Table Expansion Potential",
-    "Nuclear Energy Binding Map"
+    "Nuclear Energy Binding Map",
+    "Proton–Neutron Ratio Heatmap"
 ])
 
 # --- Continue Tabs (starting from tab1) ---
