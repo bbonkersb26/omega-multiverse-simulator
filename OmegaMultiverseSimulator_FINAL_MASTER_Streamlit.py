@@ -404,24 +404,34 @@ with tabs[5]:
     
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("This chart shows the calculated overall probability that this universe configuration can support stable chemistry and life. Lower deviation values (closer to baseline constants) result in higher probability.")
-
-# === Element Abundance ===
+# === Element Abundance (Updated with Slider-Linked Half-Life Model) ===
 with tabs[6]:
     st.subheader("Element Abundance Probability")
+
+    # Recalculate half-life matrix using current slider values
+    strong_force = constants["Strong Force Multiplier"]
+    weak_force = constants["Weak Force Multiplier"]
+
+    atomic_numbers = np.arange(1, 121)
+    isotope_range = np.arange(1, 21)
+    Z_grid, iso_grid = np.meshgrid(atomic_numbers, isotope_range, indexing='ij')
+
+    base_half_life = np.exp(-np.abs(Z_grid - 50) / 20)
+    weak_decay_penalty = np.exp(-((weak_force - 1.0) ** 2) * 3)
+    strong_bonus = np.exp(-np.abs(Z_grid - 80) / (25 * strong_force))
+
+    half_life_matrix = base_half_life * weak_decay_penalty * strong_bonus
+    half_life_matrix = np.clip(half_life_matrix, 0, 1)
+
+    mean_half_life_per_element = half_life_matrix.mean(axis=1)
+    half_life_weight = np.mean(mean_half_life_per_element)
+
+    # Force-specific abundance, modulated by average isotope half-life
     forces = ["Strong", "EM", "Weak"]
-
-    # Original force-dependent abundance
-    strong_abundance = np.exp(-abs(constants["Strong Force Multiplier"] - 1))
-    em_abundance = np.exp(-abs(constants["Electromagnetic Force Multiplier"] - 1))
-    weak_abundance = np.exp(-abs(constants["Weak Force Multiplier"] - 1))
-
-    # Modify by half-life survival score
-    half_life_weight = np.mean(mean_half_life_per_element)  # average stability
-    abundance = [
-        strong_abundance * half_life_weight,
-        em_abundance * half_life_weight,
-        weak_abundance * half_life_weight
-    ]
+    strong_abundance = np.exp(-abs(strong_force - 1.0)) * half_life_weight
+    em_abundance = np.exp(-abs(constants["Electromagnetic Force Multiplier"] - 1.0)) * half_life_weight
+    weak_abundance = np.exp(-abs(weak_force - 1.0)) * half_life_weight
+    abundance = [strong_abundance, em_abundance, weak_abundance]
 
     # Plotting
     fig, ax = plt.subplots()
@@ -430,12 +440,11 @@ with tabs[6]:
     ax.set_title("Predicted Element Abundance per Force Multiplier")
     st.pyplot(fig)
 
-    # Summary
+    # Explanation
     st.markdown("### AI Analysis → Scientific Summary")
-    st.markdown("This graph estimates the abundance of elements in universes where the fundamental force strengths differ.")
-    st.markdown("- **Strong and weak forces** alter nuclear formation rates.")
-    st.markdown("- **EM changes** impact proton repulsion and molecular formation.")
-    st.markdown("- **Half-life weight** reduces abundance in unstable universes.")
+    st.markdown("- **This module now recalculates nuclear half-lives using live slider values.**")
+    st.markdown("- **Abundance = Force tuning × isotope survivability**, giving more realistic results.")
+    st.markdown("- Universes with poor isotope stability have low elemental abundance, even if forces are well-tuned.")
 # === Radiation Risk ===
 with tabs[7]:
     st.subheader("EM Radiation Risk")
