@@ -891,24 +891,23 @@ with tabs[14]:
     Z_grid, iso_grid = np.meshgrid(atomic_numbers, isotope_range, indexing='ij')
 
     # === Decay rate model ===
-    # Weak force controls decay speed (faster = shorter half-life)
-    # Strong force helps bind nucleus = longer half-life
-
-    base_half_life = np.exp(-np.abs(Z_grid - 50) / 20)  # Mid-Z elements last longer
+    base_half_life = np.exp(-np.abs(Z_grid - 50) / 20)
     weak_decay_penalty = np.exp(-((weak_force - 1.0) ** 2) * 3)
     strong_bonus = np.exp(-np.abs(Z_grid - 80) / (25 * strong_force))
 
-    # Final decay rate: Higher = longer half-life (normalized)
     half_life_matrix = base_half_life * weak_decay_penalty * strong_bonus
     half_life_matrix = np.clip(half_life_matrix, 0, 1)
 
-    # Prepare 3D plotting
+    # Normalize (so highest value = 1 for cross-universe comparability)
+    half_life_matrix /= half_life_matrix.max()
+
+    # === 3D Surface Plot ===
     fig = go.Figure(data=[go.Surface(
         z=half_life_matrix,
         x=atomic_numbers,
         y=isotope_range,
         colorscale='Cividis',
-        colorbar=dict(title='Relative Half-Life')
+        colorbar=dict(title='Normalized Half-Life')
     )])
 
     fig.update_layout(
@@ -922,8 +921,9 @@ with tabs[14]:
 
     st.plotly_chart(fig, use_container_width=True)
 
-    # === Histogram: Life-viable Isotopes ===
-    life_viable_isotopes = (half_life_matrix > 0.5).sum(axis=1)
+    # === Adaptive Histogram of Stable Isotopes ===
+    threshold = 0.1  # Top 10% of values in this universe
+    life_viable_isotopes = (half_life_matrix > threshold).sum(axis=1)
 
     fig2, ax = plt.subplots()
     ax.bar(atomic_numbers, life_viable_isotopes, color='darkorange')
@@ -932,9 +932,9 @@ with tabs[14]:
     ax.set_ylabel("# of Isotopes with Long Half-Life")
     st.pyplot(fig2)
 
-    # === Explanation ===
+    # === Summary ===
     st.markdown("### AI Analysis → Scientific Nuclear Summary")
-    st.markdown("- **Weak Force** governs decay rate. Universes with high weak force have short-lived isotopes.")
-    st.markdown("- **Strong Force** stabilizes the nucleus. Higher strong force preserves heavier isotopes.")
-    st.markdown("- **This simulation** shows which atomic numbers retain stable isotopes long enough for planetary and chemical evolution.")
-    st.markdown("- **Histogram**: Elements with many long-lived isotopes are more likely to participate in prebiotic or planetary chemistry.")
+    st.markdown("- **Weak Force** governs decay rate. Higher values cause short-lived isotopes.")
+    st.markdown("- **Strong Force** helps stabilize heavier nuclei, improving longevity.")
+    st.markdown("- **Top 10% logic** ensures that even unstable universes reveal which elements are most decay-resistant.")
+    st.markdown("- This method is more universal and realistic when comparing different multiverse physics models.")
