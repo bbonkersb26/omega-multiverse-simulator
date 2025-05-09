@@ -6,25 +6,30 @@ import matplotlib.pyplot as plt
 import os
 from PIL import Image
 import plotly.io as pio
-import matplotlib.pyplot as plt
 from fpdf import FPDF
 import datetime
+import openai
+
+# === MUST BE FIRST Streamlit command ===
 st.set_page_config(page_title="Multiverse Simulation", layout="wide")
+st.title("Multiverse Simulation")
+# === Save Plot Function ===
 def save_plot(fig, filename, is_plotly=True):
     output_dir = "pdf_visuals"
     os.makedirs(output_dir, exist_ok=True)
     path = os.path.join(output_dir, filename)
-
     if is_plotly:
         pio.write_image(fig, path, format='png')
     else:
         plt.savefig(path, bbox_inches='tight', dpi=300)
         plt.close()
+
+# === PDF Generation Function ===
 def generate_pdf(constants, summary_text, output_dir="pdf_visuals"):
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
 
-    # === Cover Page ===
+    # Cover Page
     pdf.add_page()
     pdf.set_font("Arial", "B", 24)
     pdf.cell(0, 15, "Omega Multiverse Simulation Report", ln=True, align="C")
@@ -34,7 +39,7 @@ def generate_pdf(constants, summary_text, output_dir="pdf_visuals"):
     pdf.cell(0, 10, f"Date: {date_str}", ln=True, align="C")
     pdf.cell(0, 10, "Generated via GPT-3.5 AI", ln=True, align="C")
 
-    # === Section: Parameters ===
+    # Parameters
     pdf.add_page()
     pdf.set_font("Arial", "B", 16)
     pdf.cell(0, 10, "Simulation Parameters", ln=True)
@@ -42,29 +47,15 @@ def generate_pdf(constants, summary_text, output_dir="pdf_visuals"):
     for k, v in constants.items():
         pdf.cell(0, 8, f"{k}: {v:.2f}", ln=True)
 
-    st.subheader("AI Global Universe Analysis")
+    # AI Summary
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(0, 10, "AI Universe Summary", ln=True)
+    pdf.set_font("Arial", size=12)
+    for line in summary_text.split('\n'):
+        pdf.multi_cell(0, 8, line)
 
-if st.button("Generate AI Universe Summary"):
-    with st.spinner("Generating summary using OpenAI..."):
-        user_context = "\n".join([f"{k}: {v:.2f}" for k, v in constants.items()])
-        try:
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are a physics and cosmology expert. Analyze universal constants and summarize what kind of universe this configuration would produce."},
-                    {"role": "user", "content": f"Here are the physical constants:\n{user_context}"}
-                ],
-                max_tokens=300,
-                temperature=0.7
-            )
-            summary = response.choices[0].message.content
-            st.session_state['summary'] = summary  # store it safely
-            st.success("Summary generated:")
-            st.markdown(summary)
-        except Exception as e:
-            st.error(f"Error generating summary: {e}")
-
-    # === Section: Visuals ===
+    # Visuals
     pdf.add_page()
     pdf.set_font("Arial", "B", 16)
     pdf.cell(0, 10, "Simulation Visuals", ln=True)
@@ -77,10 +68,7 @@ if st.button("Generate AI Universe Summary"):
         pdf.cell(0, 10, image_file.replace(".png", "").replace("_", " "), ln=True)
         pdf.image(path, w=180)
 
-    # Save
-    pdf.output("Multiverse_Report.pdf")
-st.set_page_config(page_title="Multiverse Simulation", layout="wide")
-st.title("Multiverse Simulation")
+    pdf.output("Omega_Universe_Simulation_Report.pdf")
 
 st.sidebar.header("Adjust Physical Constants")
 
