@@ -3,6 +3,21 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
+import os
+from PIL import Image
+import plotly.io as pio
+import matplotlib.pyplot as plt
+
+def save_plot(fig, filename, is_plotly=True):
+    output_dir = "pdf_visuals"
+    os.makedirs(output_dir, exist_ok=True)
+    path = os.path.join(output_dir, filename)
+
+    if is_plotly:
+        pio.write_image(fig, path, format='png')
+    else:
+        plt.savefig(path, bbox_inches='tight', dpi=300)
+        plt.close()
 
 st.set_page_config(page_title="Multiverse Simulation", layout="wide")
 st.title("Multiverse Simulation")
@@ -162,7 +177,7 @@ with tabs[0]:
     )
 
     st.plotly_chart(fig, use_container_width=True)
-
+    save_plot(fig, "Periodic Table Stability.png", is_plotly=True)
     st.markdown("**AI Analysis → Scientific Summary**")
     st.markdown("This advanced scientific model calculates element stability based on fundamental forces:")
     st.markdown("- **Strong Force Multiplier → Higher values stabilize heavier nuclei → reduces instability.**")
@@ -205,7 +220,7 @@ with tabs[1]:
     )
 
     st.plotly_chart(fig, use_container_width=True)
-
+    save_plot(fig, "Island of Instability.png", is_plotly=True)
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("This model combines periodic nuclear shell structure patterns and scientific tuning effects:")
     st.markdown("- **Periodic Pattern → Models peaks/valleys of nuclear shell closures (like magic numbers).**")
@@ -276,7 +291,7 @@ with tabs[2]:
     )
 
     st.plotly_chart(fig, use_container_width=True)
-
+    save_plot(fig, "Star Formation Potential.png", is_plotly=True)
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("This module models star formation based on five critical universal constants:")
     st.markdown("- **Gravity → Higher gravity compresses gas → promotes collapse → better star formation.**")
@@ -333,7 +348,7 @@ with tabs[3]:
     )
 
     st.plotly_chart(fig, use_container_width=True)
-
+    save_plot(fig, "Life Probability Map.png", is_plotly=True)
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("This life probability model now includes:")
     st.markdown("- **Forces Compatibility** → Molecular and atomic stability zones based on nuclear and EM forces.")
@@ -390,7 +405,7 @@ with tabs[4]:
     )
 
     st.plotly_chart(fig_3d, use_container_width=True)
-
+    save_plot(fig_3d, "Quantum Bonding Probability 3D.png", is_plotly=True)
     # === 2D Contour Plot (New Addition) ===
     fig_2d = go.Figure(data=go.Contour(
         z=bonding_prob,
@@ -409,7 +424,7 @@ with tabs[4]:
     )
 
     st.plotly_chart(fig_2d, use_container_width=True)
-
+    save_plot(fig_2d, "Quantum Bonding Probability 2D.png", is_plotly=True)
     # === Scientific Explanation ===
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("This upgraded bonding model includes:")
@@ -428,7 +443,7 @@ with tabs[5]:
     ax.set_ylabel("Probability")
     ax.set_title("Universe Viability Probability")
     st.pyplot(fig)
-    
+    save_plot(fig, "Universe Emergence Probability.png", is_plotly=False)
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("This chart shows the calculated overall probability that this universe configuration can support stable chemistry and life. Lower deviation values (closer to baseline constants) result in higher probability.")
 # === Element Abundance (Updated with Slider-Linked Half-Life Model) ===
@@ -466,7 +481,7 @@ with tabs[6]:
     ax.set_ylabel("Relative Abundance")
     ax.set_title("Predicted Element Abundance per Force Multiplier")
     st.pyplot(fig)
-
+    save_plot(fig, "Element Abundance Probability.png", is_plotly=False)
     # Explanation
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("- **This module now recalculates nuclear half-lives using live slider values.**")
@@ -485,7 +500,7 @@ with tabs[7]:
     ax.set_ylabel("Radiation Output Factor")
     ax.set_title("Predicted Radiation Output")
     st.pyplot(fig)
-
+    save_plot(fig, "EM Radiation Risk.png", is_plotly=False)
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("Higher EM force constants increase electromagnetic interactions, leading to more radiation. This graph models radiation risk scaling, important for universe habitability.")
 
@@ -535,7 +550,7 @@ with tabs[8]:
     )
 
     st.plotly_chart(fig, use_container_width=True)
-
+    save_plot(fig, "Star Lifespan Model.png", is_plotly=True)
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("This model uses stellar physics to calculate star lifespan based on gravitational strength:")
     st.markdown("- **Stellar Mass scales with gravity → Higher gravity → Higher stellar mass.**")
@@ -616,7 +631,7 @@ with tabs[9]:
     )
 
     st.plotly_chart(fig, use_container_width=True)
-
+    save_plot(fig, "Dark Matter Tendril Simulation.png", is_plotly=True)
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("This simulation links dark matter tendrils and cluster formation directly to physical constants:")
     st.markdown("- **Higher Gravity Multiplier** compresses clusters and tightens tendrils.")
@@ -695,7 +710,7 @@ with tabs[10]:
     )
 
     st.plotly_chart(fig, use_container_width=True)
-
+    save_plot(fig, "Atomic Stability Probability.png", is_plotly=True)
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("This advanced model simulates isotope stability based on strong, EM, and weak nuclear forces:")
     st.markdown("- **Strong Force → Higher values stabilize heavier nuclei → promotes stability.**")
@@ -760,7 +775,7 @@ with tabs[11]:
     )
 
     st.plotly_chart(fig, use_container_width=True)
-
+    save_plot(fig, "Universe Life Probability Over Time.png", is_plotly=True)
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("This graph shows how life probability in the universe changes over time:")
     st.markdown("- **Early Universe → Low Metallicity → Low Life Probability**")
@@ -827,7 +842,7 @@ with tabs[12]:
         yaxis_range=[0, 1.2]
     )
     st.plotly_chart(fig, use_container_width=True)
-
+    save_plot(fig, "Molecular Bonding Viability.png", is_plotly=True)
     # Analysis
     st.markdown("### AI Analysis → Scientific Chemistry Summary")
     st.markdown("- **This model is now isotope-aware**, penalizing bonding where atoms are too unstable to persist.")
@@ -896,7 +911,7 @@ with tabs[13]:
         yaxis_range=[0, 1.1]
     )
     st.plotly_chart(fig, use_container_width=True)
-
+    save_plot(fig, "Molecular Abundance Probability.png", is_plotly=True)
     # Summary
     st.markdown("### AI Analysis → Scientific Chemistry Summary")
     st.markdown("- **Now tethered to isotope survival rates.**")
@@ -941,7 +956,7 @@ with tabs[14]:
         )
     )
     st.plotly_chart(fig1, use_container_width=True)
-
+    save_plot(fig1, "Isotope Half-Life Map.png", is_plotly=True)
     # === Life-Compatible Isotope Bar Plot ===
     threshold = 0.1  # Define long-lived isotopes as top 10% within current universe
     life_viable_isotopes = (half_life_matrix > threshold).sum(axis=1)
@@ -952,7 +967,7 @@ with tabs[14]:
     ax.set_xlabel("Atomic Number")
     ax.set_ylabel("# of Isotopes with Long Half-Life")
     st.pyplot(fig2)
-
+    save_plot(fig2, "Life-Compatible Isotope Bar Plot.png", is_plotly=False)
     # === AI Summary ===
     st.markdown("### AI Analysis → Scientific Nuclear Summary")
     st.markdown("- **Weak Force Multiplier** → Controls decay rates. Higher = faster decay = fewer long-lived isotopes.")
@@ -1007,7 +1022,7 @@ with tabs[15]:
     )
 
     st.plotly_chart(fig, use_container_width=True)
-
+    save_plot(fig, "Periodic Table Expansion Potential.png", is_plotly=True)
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("- This model estimates the furthest stable atomic number (Z) a universe can support.")
     st.markdown("- **Strong Force** increases nuclear cohesion → allows higher Z before instability.")
@@ -1062,7 +1077,7 @@ with tabs[-1]:
         yaxis_range=[0, np.max(BE_per_A)*1.1]
     )
     st.plotly_chart(fig, use_container_width=True)
-
+    save_plot(fig, "Nuclear Binding Energy Map.png", is_plotly=True)
     # Highlight iron peak
     Z_peak = Z[np.argmax(BE_per_A)]
     st.markdown(f"**Peak BE/A at Z = {int(Z_peak)} → {BE_per_A.max():.2f} MeV/nucleon**")
@@ -1119,7 +1134,7 @@ with tabs[16]:
     )
 
     st.plotly_chart(fig, use_container_width=True)
-
+    save_plot(fig, "Proton–Neutron Ratio Heatmap.png", is_plotly=True)
     st.markdown("### AI Analysis → Scientific Summary")
     st.markdown("- This map models isotope viability based on **proton-to-neutron ratios** adjusted by force constants.")
     st.markdown("- **Heavier elements require a neutron surplus** to remain stable — modeled via a dynamic optimal ratio.")
