@@ -747,3 +747,82 @@ with tabs[12]:
     st.markdown("- **H₂O** → Depends heavily on polar EM behavior and temperature balance.")
     st.markdown("- **Uranium Compounds** → Require strong nuclear force to maintain heavy element stability.")
     st.markdown("- **Gray Bars** → Molecules likely cannot exist in this universe due to physical parameter divergence.")
+    # === tabs[13]: Molecular Abundance Map (Force & Thermal Influence) ===
+with tabs[13]:
+    st.subheader("Molecular Abundance Probability Map")
+
+    # Load key constants
+    em = constants["Electromagnetic Force Multiplier"]
+    strong = constants["Strong Force Multiplier"]
+    weak = constants["Weak Force Multiplier"]
+    temp = constants["Temperature Multiplier"]
+    pressure = constants["Pressure Multiplier"]
+
+    # Define molecular families
+    molecular_families = {
+        "Simple Covalent (H₂, O₂)": 1.0,
+        "Polar Molecules (H₂O)": 0.85,
+        "Carbon Chains (CH₄, CO₂)": 0.90,
+        "Metallic Bonds (Fe, Ni)": 0.70,
+        "Heavy Nuclear Compounds (U, Th)": 0.60
+    }
+
+    # Define family-specific weights to each physical parameter
+    abundance = {}
+    for molecule, base in molecular_families.items():
+        if "Covalent" in molecule:
+            force_penalty = np.exp(-abs(em - 1.0) * 2)
+            thermal_penalty = np.exp(-((temp - 1.0)**2) * 2)
+            abundance[molecule] = base * force_penalty * thermal_penalty
+
+        elif "Polar" in molecule:
+            dipole_support = np.exp(-abs(em - 1.0) * 2)
+            temp_balance = np.exp(-((temp - 1.0)**2) * 2)
+            pressure_help = np.exp(-((pressure - 1.0)**2) * 1.5)
+            abundance[molecule] = base * dipole_support * temp_balance * pressure_help
+
+        elif "Carbon" in molecule:
+            orbital_stability = np.exp(-abs(em - 1.0) * 1.5)
+            nuclear_bonus = np.exp(-abs(strong - 1.0) * 1.5)
+            abundance[molecule] = base * orbital_stability * nuclear_bonus
+
+        elif "Metallic" in molecule:
+            overlap_gain = np.exp(-((pressure - 1.0)**2) * 2.0)
+            em_shield = np.exp(-abs(em - 1.0) * 1.2)
+            abundance[molecule] = base * overlap_gain * em_shield
+
+        elif "Heavy" in molecule:
+            strong_dependence = np.exp(-abs(strong - 1.0) * 3)
+            weak_decay_penalty = np.exp(-abs(weak - 1.0) * 2)
+            abundance[molecule] = base * strong_dependence * weak_decay_penalty
+
+    # Normalize values
+    values = np.array(list(abundance.values()))
+    values /= np.max(values)
+
+    # Visualization
+    fig = go.Figure(data=[go.Bar(
+        x=list(abundance.keys()),
+        y=values,
+        marker_color='indigo',
+        text=[f"{v:.2f}" for v in values],
+        textposition='outside'
+    )])
+
+    fig.update_layout(
+        title="Relative Abundance of Molecular Families in This Universe",
+        xaxis_title="Molecular Family",
+        yaxis_title="Normalized Abundance Probability",
+        yaxis_range=[0, 1.1]
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Explanation
+    st.markdown("### AI Analysis → Scientific Summary")
+    st.markdown("- **Covalent Bonds** depend heavily on EM force and thermal agitation.")
+    st.markdown("- **Polar Molecules** are favored by stable EM dipoles and proper thermal/pressure range.")
+    st.markdown("- **Carbon Chains** rely on orbital stability and atomic retention (strong force).")
+    st.markdown("- **Metallic Bonds** benefit from high pressure and low EM noise.")
+    st.markdown("- **Heavy Element Compounds** are only stable if nuclear strong force is strong enough and weak force doesn’t cause fast decay.")
+    st.markdown("- This model suggests which types of chemistry would dominate in this universe’s physical regime.")
