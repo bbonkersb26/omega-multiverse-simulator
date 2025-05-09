@@ -9,7 +9,7 @@ import plotly.io as pio
 import matplotlib.pyplot as plt
 from fpdf import FPDF
 import datetime
-
+st.set_page_config(page_title="Multiverse Simulation", layout="wide")
 def save_plot(fig, filename, is_plotly=True):
     output_dir = "pdf_visuals"
     os.makedirs(output_dir, exist_ok=True)
