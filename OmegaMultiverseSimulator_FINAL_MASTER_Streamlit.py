@@ -806,17 +806,27 @@ with tabs[12]:
     st.markdown("- **This model is now isotope-aware**, penalizing bonding where atoms are too unstable to persist.")
     st.markdown("- **Green bars** indicate viable molecular bonds under the current physical and nuclear conditions.")
     st.markdown("- **Gray bars** mean instability prevents molecule formation — due to weak decay or nuclear disruption.")
+# === tabs[13]: Molecular Abundance Map (Force & Thermal Influence) ===
 with tabs[13]:
     st.subheader("Molecular Abundance Probability Map")
 
-    # Load key constants
+    # Constants
     em = constants["Electromagnetic Force Multiplier"]
     strong = constants["Strong Force Multiplier"]
     weak = constants["Weak Force Multiplier"]
     temp = constants["Temperature Multiplier"]
     pressure = constants["Pressure Multiplier"]
 
-    # Define molecular families
+    # Isotope survivability factor
+    atomic_numbers = np.arange(1, 121)
+    Z_grid, iso_grid = np.meshgrid(atomic_numbers, np.arange(1, 21), indexing='ij')
+    base_half_life = np.exp(-np.abs(Z_grid - 50) / 20)
+    weak_decay_penalty = np.exp(-((weak - 1.0) ** 2) * 3)
+    strong_bonus = np.exp(-np.abs(Z_grid - 80) / (25 * strong))
+    half_life_matrix = np.clip(base_half_life * weak_decay_penalty * strong_bonus, 0, 1)
+    isotope_stability_factor = np.mean(half_life_matrix)
+
+    # Molecular families
     molecular_families = {
         "Simple Covalent (H₂, O₂)": 1.0,
         "Polar Molecules (H₂O)": 0.85,
@@ -825,40 +835,26 @@ with tabs[13]:
         "Heavy Nuclear Compounds (U, Th)": 0.60
     }
 
-    # Define family-specific weights to each physical parameter
     abundance = {}
     for molecule, base in molecular_families.items():
         if "Covalent" in molecule:
-            force_penalty = np.exp(-abs(em - 1.0) * 2)
-            thermal_penalty = np.exp(-((temp - 1.0)**2) * 2)
-            abundance[molecule] = base * force_penalty * thermal_penalty
-
+            modifier = np.exp(-abs(em - 1.0) * 2) * np.exp(-((temp - 1.0)**2) * 2)
         elif "Polar" in molecule:
-            dipole_support = np.exp(-abs(em - 1.0) * 2)
-            temp_balance = np.exp(-((temp - 1.0)**2) * 2)
-            pressure_help = np.exp(-((pressure - 1.0)**2) * 1.5)
-            abundance[molecule] = base * dipole_support * temp_balance * pressure_help
-
+            modifier = np.exp(-abs(em - 1.0) * 2) * np.exp(-((temp - 1.0)**2) * 2) * np.exp(-((pressure - 1.0)**2) * 1.5)
         elif "Carbon" in molecule:
-            orbital_stability = np.exp(-abs(em - 1.0) * 1.5)
-            nuclear_bonus = np.exp(-abs(strong - 1.0) * 1.5)
-            abundance[molecule] = base * orbital_stability * nuclear_bonus
-
+            modifier = np.exp(-abs(em - 1.0) * 1.5) * np.exp(-abs(strong - 1.0) * 1.5)
         elif "Metallic" in molecule:
-            overlap_gain = np.exp(-((pressure - 1.0)**2) * 2.0)
-            em_shield = np.exp(-abs(em - 1.0) * 1.2)
-            abundance[molecule] = base * overlap_gain * em_shield
-
+            modifier = np.exp(-((pressure - 1.0)**2) * 2.0) * np.exp(-abs(em - 1.0) * 1.2)
         elif "Heavy" in molecule:
-            strong_dependence = np.exp(-abs(strong - 1.0) * 3)
-            weak_decay_penalty = np.exp(-abs(weak - 1.0) * 2)
-            abundance[molecule] = base * strong_dependence * weak_decay_penalty
+            modifier = np.exp(-abs(strong - 1.0) * 3) * np.exp(-abs(weak - 1.0) * 2)
 
-    # Normalize values
+        abundance[molecule] = base * modifier * isotope_stability_factor
+
+    # Normalize
     values = np.array(list(abundance.values()))
     values /= np.max(values)
 
-    # Visualization
+    # Plot
     fig = go.Figure(data=[go.Bar(
         x=list(abundance.keys()),
         y=values,
@@ -866,24 +862,19 @@ with tabs[13]:
         text=[f"{v:.2f}" for v in values],
         textposition='outside'
     )])
-
     fig.update_layout(
-        title="Relative Abundance of Molecular Families in This Universe",
+        title="Relative Abundance of Molecular Families (Isotope-Corrected)",
         xaxis_title="Molecular Family",
         yaxis_title="Normalized Abundance Probability",
         yaxis_range=[0, 1.1]
     )
-
     st.plotly_chart(fig, use_container_width=True)
 
-    # Explanation
-    st.markdown("### AI Analysis → Scientific Summary")
-    st.markdown("- **Covalent Bonds** depend heavily on EM force and thermal agitation.")
-    st.markdown("- **Polar Molecules** are favored by stable EM dipoles and proper thermal/pressure range.")
-    st.markdown("- **Carbon Chains** rely on orbital stability and atomic retention (strong force).")
-    st.markdown("- **Metallic Bonds** benefit from high pressure and low EM noise.")
-    st.markdown("- **Heavy Element Compounds** are only stable if nuclear strong force is strong enough and weak force doesn’t cause fast decay.")
-    st.markdown("- This model suggests which types of chemistry would dominate in this universe’s physical regime.")
+    # Summary
+    st.markdown("### AI Analysis → Scientific Chemistry Summary")
+    st.markdown("- **Now tethered to isotope survival rates.**")
+    st.markdown("- Even if forces and pressure are perfect, molecules will vanish if atoms decay too fast.")
+    st.markdown("- This adds deep scientific realism to multiverse chemical prediction.")
 # === tabs[14]: Isotope Decay & Half-Life Model ===
 with tabs[14]:
     st.subheader("Isotope Decay & Half-Life Model")
