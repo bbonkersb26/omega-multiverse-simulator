@@ -150,7 +150,7 @@ if st.button("Generate AI Universe Summary"):
             st.markdown(summary)
         except Exception as e:
             st.error(f"Error generating summary: {e}")
-if st.button("Generate Scientific PDF Report"):
+st.button("Download Full PDF Report"):
     with st.spinner("Compiling PDF..."):
         try:
             generate_pdf(constants, summary)
