@@ -1099,3 +1099,40 @@ with tabs[16]:
     st.markdown("- **Heavier elements require a neutron surplus** to remain stable — modeled via a dynamic optimal ratio.")
     st.markdown("- **Strong force** enhances high-Z nuclei stability.")
     st.markdown("- **Weak force** governs beta decay thresholds — deviations reduce isotope persistence.")
+import openai
+
+st.markdown("---")
+st.subheader("AI Global Universe Analysis")
+
+# Load API key securely
+openai.api_key = st.secrets["openai"]["api_key"]
+
+# Prepare prompt
+description_prompt = f"""
+You are an expert theoretical physicist AI.
+Analyze the simulated universe with the following physical constant multipliers:
+
+- Strong Force: {constants["Strong Force Multiplier"]}
+- Electromagnetic Force: {constants["Electromagnetic Force Multiplier"]}
+- Weak Force: {constants["Weak Force Multiplier"]}
+- Gravitational Constant: {constants["Gravitational Constant Multiplier"]}
+- Dark Energy: {constants["Dark Energy Multiplier"]}
+- Temperature: {constants["Temperature Multiplier"]}
+- Pressure: {constants["Pressure Multiplier"]}
+
+Summarize the overall viability of star formation, chemistry, molecular bonding, and life based on these parameters. Note any extreme instabilities or novel configurations.
+Respond scientifically but clearly for general scientists.
+"""
+
+if st.button("Generate AI Universe Summary"):
+    with st.spinner("Contacting OpenAI..."):
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": description_prompt}]
+            )
+            summary = response.choices[0].message.content
+            st.markdown("### AI Summary Output")
+            st.success(summary)
+        except Exception as e:
+            st.error(f"Error: {e}")
