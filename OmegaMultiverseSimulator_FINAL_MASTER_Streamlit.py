@@ -7,6 +7,8 @@ import os
 from PIL import Image
 import plotly.io as pio
 import matplotlib.pyplot as plt
+from fpdf import FPDF
+import datetime
 
 def save_plot(fig, filename, is_plotly=True):
     output_dir = "pdf_visuals"
@@ -18,7 +20,51 @@ def save_plot(fig, filename, is_plotly=True):
     else:
         plt.savefig(path, bbox_inches='tight', dpi=300)
         plt.close()
+def generate_pdf(constants, summary_text, output_dir="pdf_visuals"):
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
 
+    # === Cover Page ===
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 24)
+    pdf.cell(0, 15, "Omega Multiverse Simulation Report", ln=True, align="C")
+    pdf.ln(10)
+    pdf.set_font("Arial", size=14)
+    date_str = datetime.datetime.now().strftime("%B %d, %Y")
+    pdf.cell(0, 10, f"Date: {date_str}", ln=True, align="C")
+    pdf.cell(0, 10, "Generated via GPT-3.5 AI", ln=True, align="C")
+
+    # === Section: Parameters ===
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(0, 10, "Simulation Parameters", ln=True)
+    pdf.set_font("Arial", size=12)
+    for k, v in constants.items():
+        pdf.cell(0, 8, f"{k}: {v:.2f}", ln=True)
+
+    # === Section: AI Summary ===
+    pdf.ln(5)
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(0, 10, "Global AI Universe Summary", ln=True)
+    pdf.set_font("Arial", size=12)
+    for line in summary_text.split("\n"):
+        pdf.multi_cell(0, 8, line)
+
+    # === Section: Visuals ===
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(0, 10, "Simulation Visuals", ln=True)
+
+    image_files = sorted([f for f in os.listdir(output_dir) if f.endswith(".png")])
+    for image_file in image_files:
+        path = os.path.join(output_dir, image_file)
+        pdf.add_page()
+        pdf.set_font("Arial", "B", 14)
+        pdf.cell(0, 10, image_file.replace(".png", "").replace("_", " "), ln=True)
+        pdf.image(path, w=180)
+
+    # Save
+    pdf.output("Multiverse_Report.pdf")
 st.set_page_config(page_title="Multiverse Simulation", layout="wide")
 st.title("Multiverse Simulation")
 
@@ -122,7 +168,15 @@ tabs = st.tabs([
     "Proton–Neutron Ratio Heatmap",                # already fixed earlier
     "Nuclear Binding Energy Map"                   # <-- just add it here directly
 ])
+st.divider()
+st.subheader("Export Simulation Report")
 
+if st.button("Generate PDF Report"):
+    with st.spinner("Assembling PDF with all visuals and summary..."):
+        generate_pdf(constants, summary)
+        st.success("PDF Report generated successfully!")
+        with open("Multiverse_Report.pdf", "rb") as f:
+            st.download_button("Download PDF Report", f, file_name="Multiverse_Report.pdf")
 # --- Continue Tabs (starting from tab1) ---
 # === Periodic Table Stability (Scientific Model → Strong Force, EM Force, Weak Force Dependent) ===
 with tabs[0]:
