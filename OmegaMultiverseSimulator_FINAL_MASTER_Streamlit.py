@@ -9,42 +9,10 @@ import plotly.io as pio
 from fpdf import FPDF
 import datetime
 import openai
-import os
-def save_tab_summary(tab_title, summary_text, folder="pdf_summaries"):
-    os.makedirs(folder, exist_ok=True)
-    filename = os.path.join(folder, f"{tab_title.replace(' ', '_')}_summary.txt")
-    with open(filename, "w") as f:
-        f.write(summary_text)
-# Ensure required folders exist
-os.makedirs("pdf_visuals", exist_ok=True)
-os.makedirs("pdf_summaries", exist_ok=True)
+
 # === MUST BE FIRST Streamlit command ===
 st.set_page_config(page_title="Multiverse Simulation", layout="wide")
 st.title("Multiverse Simulation")
-
-tab_summaries = {
-    "Periodic Table Stability": "This model estimates element stability based on nuclear force interactions.",
-    "Island of Instability": "Simulates periodic nuclear structure effects and strong force tuning.",
-    "Star Formation Potential": "Models how gravity and dark energy affect star birth probability.",
-    "Life Probability (Heatmap)": "Estimates the viability of life emergence using metallicity and force multipliers.",
-    "Quantum Bonding": "Analyzes electron cloud bonding affected by force, temperature, and pressure.",
-    "Universe Emergence Probability": "Measures how likely the universe is to support stable chemistry and physics.",
-    "Element Abundance Probability": "Calculates relative abundance of elements under current constants.",
-    "EM Radiation Risk": "Models radiation levels from EM force and potential biological risk.",
-    "Star Lifespan Model": "Estimates stellar lifespan via gravitational scaling and luminosity curves.",
-    "Dark Matter Simulation": "Visualizes large-scale structure influenced by gravity and dark energy.",
-    "Atomic Stability": "Computes isotope stability based on nuclear force interplay.",
-    "Universe Life Probability Over Time": "Maps life viability across cosmic history using metallicity growth.",
-    "Molecular Bonding Model (Element Specific)": "Evaluates specific molecule stability like H2O and CO2.",
-    "Molecular Abundance Map": "Estimates how abundant molecule types are under universal parameters.",
-    "Isotope Decay & Half-Life Model": "Models isotope longevity based on weak and strong force.",
-    "Periodic Table Expansion Potential": "Predicts how far the periodic table could realistically extend.",
-    "Proton–Neutron Ratio Heatmap": "Simulates isotope viability based on nuclear symmetry.",
-    "Nuclear Binding Energy Map": "Uses SEMF model to visualize binding energy across elements.",
-    "Multiverse Decoherence Map": "Explores quantum divergence of parallel universes from entropy decay.",
-    "Quantum Gravity Horizon Map": "Visualizes spacetime curvature under quantum gravity conditions.",
-    "Multiverse Stability Basin Mapping": "Tracks phase space attractors to evaluate structural stability."
-}
 # === Save Plot Function ===
 def save_plot(fig, filename, is_plotly=True):
     output_dir = "pdf_visuals"
@@ -55,13 +23,12 @@ def save_plot(fig, filename, is_plotly=True):
     else:
         plt.savefig(path, bbox_inches='tight', dpi=300)
         plt.close()
-    st.sidebar.header("Adjust Physical Constants")
-def sanitize_text(text):
-    return text.encode('latin-1', 'replace').decode('latin-1')
-def generate_pdf_with_tab_summaries(constants, summary_text, tab_summaries, output_dir="pdf_visuals"):
-    # (Paste the entire body of your current working generate_pdf here)
+
+def generate_pdf(constants, summary_text, output_dir="pdf_visuals"):
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
+
+    # Use built-in core font for full compatibility (Helvetica)
     font = "Helvetica"
 
     # === Cover Page ===
@@ -80,49 +47,36 @@ def generate_pdf_with_tab_summaries(constants, summary_text, tab_summaries, outp
     pdf.cell(0, 10, "Simulation Parameters", ln=True)
     pdf.set_font(font, "", 12)
     for k, v in constants.items():
-        pdf.cell(0, 8, f"{k}: {v:.2f}", ln=True)
+        line = f"{k}: {v:.2f}"
+        pdf.cell(0, 8, line.encode('latin-1', 'replace').decode('latin-1'), ln=True)
 
-    # === Global AI Summary ===
+    # === AI Summary Page ===
     pdf.add_page()
     pdf.set_font(font, "B", 16)
-    pdf.cell(0, 10, "AI Global Universe Summary", ln=True)
+    pdf.cell(0, 10, "AI Universe Summary", ln=True)
     pdf.set_font(font, "", 12)
     for line in summary_text.split('\n'):
-        pdf.multi_cell(0, 8, line)
+        safe_line = line.encode('latin-1', 'replace').decode('latin-1')
+        pdf.multi_cell(0, 8, safe_line)
 
-    # === Visuals with Per-Tab AI Summaries ===
+    # === Visuals Section ===
+    pdf.add_page()
+    pdf.set_font(font, "B", 16)
+    pdf.cell(0, 10, "Simulation Visuals", ln=True)
+
     image_files = sorted([f for f in os.listdir(output_dir) if f.endswith(".png")])
     for image_file in image_files:
-        title = image_file.replace(".png", "").replace("_", " ")
-
+        path = os.path.join(output_dir, image_file)
         pdf.add_page()
         pdf.set_font(font, "B", 14)
-        pdf.cell(0, 10, title, ln=True)
-        image_path = os.path.join(output_dir, image_file)
-        pdf.image(image_path, w=180)
+        title = image_file.replace(".png", "").replace("_", " ")
+        title_safe = title.encode('latin-1', 'replace').decode('latin-1')
+        pdf.cell(0, 10, title_safe, ln=True)
+        pdf.image(path, w=180)
 
-        try:
-            tab_prompt = f"The graph title is: {title}.\nHere are the current universal constants:\n"
-            tab_prompt += "\n".join([f"{k}: {v:.2f}" for k, v in constants.items()])
-            tab_prompt += "\n\nWrite a 1-paragraph scientific summary about this graph."
+    pdf.output("Omega_Universe_Simulation_Report.pdf")    
+    st.sidebar.header("Adjust Physical Constants")
 
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are a physics researcher writing an academic simulation report."},
-                    {"role": "user", "content": tab_prompt}
-                ],
-                max_tokens=250,
-                temperature=0.6
-            )
-            tab_summary = response.choices[0].message.content
-            pdf.set_font(font, "", 11)
-            pdf.multi_cell(0, 8, tab_summary)
-        except Exception as e:
-            pdf.set_font(font, "", 11)
-            pdf.multi_cell(0, 8, f"(AI summary unavailable: {str(e)})")
-
-    pdf.output("Omega_Universe_Simulation_Report.pdf")
 def slider_with_input(label, min_val, max_val, default_val, step):
     col1, col2 = st.sidebar.columns([3, 1])
     slider_val = col1.slider(label, min_val, max_val, default_val, step=step)
@@ -136,44 +90,7 @@ def slider_with_input(label, min_val, max_val, default_val, step):
     percent_change = ((slider_val - 1.0) / 1.0) * 100
     st.sidebar.caption(f"Change from baseline: {percent_change:+.2f}%")
     return slider_val
-def generate_graph_summary(graph_name, data_description, constants, output_dir="pdf_summaries"):
-    import openai
-    import os
 
-    # OpenAI API key from Streamlit secrets
-    client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-    os.makedirs(output_dir, exist_ok=True)
-
-    constants_text = "\n".join([f"{k}: {v:.2f}" for k, v in constants.items()])
-    prompt = f"""
-    You are a scientific AI assistant. Analyze the simulation graph titled '{graph_name}' based on the following inputs.
-
-    Constants:
-    {constants_text}
-
-    Description:
-    {data_description}
-
-    Generate a scientific explanation of the results, trends, and implications for this universe.
-    """
-
-    try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=300,
-            temperature=0.7
-        )
-        summary = response.choices[0].message.content.strip()
-
-        with open(os.path.join(output_dir, f"{graph_name.replace(' ', '_')}_summary.txt"), "w") as f:
-            f.write(summary)
-
-        return summary
-    except Exception as e:
-        st.error(f"Summary generation failed for {graph_name}: {e}")
-        return "Summary generation failed."
-        # === FINAL PDF GENERATION BUTTON BLOCK ===
 
 constants = {
     "Strong Force Multiplier": slider_with_input("Strong Force Multiplier", 0.1, 10.0, 1.0, 0.01),
@@ -220,6 +137,25 @@ client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 st.subheader("AI Global Universe Analysis")
 
+if st.button("Generate AI Universe Summary"):
+    with st.spinner("Generating summary using OpenAI..."):
+        user_context = "\n".join([f"{k}: {v:.2f}" for k, v in constants.items()])
+        try:
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a physics and cosmology expert. Analyze universal constants and summarize what kind of universe this configuration would produce."},
+                    {"role": "user", "content": f"Here are the physical constants:\n{user_context}"}
+                ],
+                max_tokens=500,
+                temperature=0.7
+            )
+            summary = response.choices[0].message.content
+            st.session_state["summary"] = summary  # Persist the summary
+            st.success("Summary generated:")
+            st.markdown(summary)
+        except Exception as e:
+            st.error(f"Error generating summary: {e}")
 tabs = st.tabs([
     "Periodic Table Stability",
     "Island of Instability",
@@ -243,28 +179,28 @@ tabs = st.tabs([
     "Quantum Branch Count Estimator",
     "Quantum Gravity Horizon Map"
 ])
+st.divider()
 st.subheader("Export Simulation Report")
 
-if st.button("Generate Final PDF Report"):
-    with st.spinner("Compiling full scientific PDF with AI summary and visuals..."):
+if st.button("Generate Scientific PDF Report"):
+    with st.spinner("Compiling PDF..."):
         try:
             summary_text = st.session_state.get("summary", "No AI summary generated yet.")
-            generate_pdf_with_tab_summaries(constants, summary_text, tab_summaries)
-            st.success("PDF Report generated successfully!")
-
-            with open("Omega_Universe_Simulation_Report.pdf", "rb") as f:
+            generate_pdf(constants, summary_text)
+            st.success("PDF generated successfully!")
+            with open("Omega_Universe_Simulation_Report.pdf", "rb") as file:
                 st.download_button(
-                    label="Download Final PDF Report",
-                    data=f,
+                    label="Download Scientific Report PDF",
+                    data=file,
                     file_name="Omega_Universe_Simulation_Report.pdf",
                     mime="application/pdf"
                 )
         except Exception as e:
-            st.error(f"PDF generation failed: {e}")
-
+            st.error(f"PDF generation failed: {e}")# === Periodic Table Stability (Scientific Model → Strong Force, EM Force, Weak Force Dependent) ===
+            
 with tabs[0]:
     st.subheader("Periodic Table Stability Probability")
-    tab_title = "Periodic Table Stability"
+
     atomic_numbers = np.arange(1, 121)
 
     # Pull slider values from physical constants
@@ -315,27 +251,6 @@ with tabs[0]:
 
     st.plotly_chart(fig, use_container_width=True)
     save_plot(fig, "Periodic Table Stability.png", is_plotly=True)
-if st.button(f"Generate AI Summary for {tab_title}"):
-    with st.spinner("Generating summary..."):
-        try:
-            # Replace `tab_data_context` with relevant values from graph inputs or constants
-            tab_data_context = f"Current constants:\n{[f'{k}: {v:.2f}' for k, v in constants.items()]}"
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": f"You are a physics AI generating a scientific summary for a simulation tab titled '{tab_title}'."},
-                    {"role": "user", "content": f"{tab_data_context}"}
-                ],
-                max_tokens=300
-            )
-            tab_summary = response.choices[0].message.content
-            st.success("AI summary generated.")
-            st.markdown(tab_summary)
-
-            # Save it
-            save_tab_summary(tab_title, tab_summary)
-        except Exception as e:
-            st.error(f"Summary generation failed: {e}")
     st.markdown("**AI Analysis → Scientific Summary**")
     st.markdown("This advanced scientific model calculates element stability based on fundamental forces:")
     st.markdown("- **Strong Force Multiplier → Higher values stabilize heavier nuclei → reduces instability.**")
