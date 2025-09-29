@@ -1,10 +1,11 @@
 numpy
 matplotlib
 pandas
-plotly
 pyvista
 scipy
 streamlit[all]
 openai>=1.0.0
-fpdf
-kaleido
+plotly>=5.17
+kaleido==0.2.1
+fpdf2
+Pillow
