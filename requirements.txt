@@ -10,3 +10,10 @@ streamlit>=1.30
 plotly>=5.20
 altair>=5
 kaleido==0.2.1
+streamlit
+numpy
+matplotlib
+plotly
+fpdf
+kaleido
+openai
