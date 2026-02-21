@@ -346,14 +346,14 @@ instability_score = float(1.0 - viability_score)
 # =========================
 # AI Summary
 # =========================
-st.subheader("AI Global Universe Analysis")
+st.subheader("Variant Universe Analysis")
 ai_ok = ("OPENAI_API_KEY" in st.secrets) and (openai is not None)
 
 if not ai_ok:
     st.info("OpenAI not configured. Add OPENAI_API_KEY to .streamlit/secrets.toml to enable.")
 else:
     client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-    if st.button("Generate AI Universe Summary"):
+    if st.button("Generate Universe Summary"):
         with st.spinner("Generating summary..."):
             user_context = "\n".join([f"{k}: {v:.4f}" for k, v in constants.items()])
             try:
