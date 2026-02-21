@@ -1,3 +1,5 @@
+Ok here’s my code. Implement it so it changes based on values for graphs: 
+
 import os
 import datetime
 import numpy as np
@@ -20,7 +22,7 @@ except Exception:
 # Streamlit Page Setup
 # =========================
 st.set_page_config(page_title="Omega Multiverse Simulator", layout="wide")
-st.title("Multiverse Simulator")
+st.title("Omega Multiverse Simulator")
 
 # Divider compatibility (older Streamlit)
 if not hasattr(st, "divider"):
@@ -109,12 +111,12 @@ def generate_pdf(constants, summary_text, output_dir=OUTPUT_DIR):
     # Cover
     pdf.add_page()
     pdf.set_font(font, "B", 22)
-    pdf.cell(0, 12, "Multiverse Simulation Report", ln=True, align="C")
+    pdf.cell(0, 12, "Omega Multiverse Simulation Report", ln=True, align="C")
     pdf.ln(6)
     pdf.set_font(font, "", 12)
     date_str = datetime.datetime.now().strftime("%B %d, %Y")
     pdf.cell(0, 8, f"Date: {date_str}", ln=True, align="C")
-    pdf.cell(0, 8, "Generated via Multiverse Simulator", ln=True, align="C")
+    pdf.cell(0, 8, "Generated via Omega Multiverse Simulator", ln=True, align="C")
 
     # Params
     pdf.add_page()
@@ -152,7 +154,7 @@ def generate_pdf(constants, summary_text, output_dir=OUTPUT_DIR):
             pdf.set_font(font, "", 10)
             pdf.multi_cell(0, 6, f"(Could not embed image: {image_file})")
 
-    outname = "Universe_Simulation_Report.pdf"
+    outname = "Omega_Universe_Simulation_Report.pdf"
     pdf.output(outname)
     return outname
 
@@ -276,7 +278,7 @@ if deviation < 1.5:
 elif deviation < 4.0:
     st.warning("Moderate deviation → some instabilities possible.")
 else:
-    st.error("High deviation → instability likely across physics and chemistry.")
+    st.error("High deviation → instability likely across physics & chemistry.")
 
 st.divider()
 
@@ -304,14 +306,14 @@ isotope_viable_per_Z = (nuclear_stability > 0.20).sum(axis=1)
 # =========================
 # AI Summary (Optional)
 # =========================
-st.subheader("Global Universe Analysis")
+st.subheader("AI Global Universe Analysis (Optional)")
 ai_ok = ("OPENAI_API_KEY" in st.secrets) and (openai is not None)
 
 if not ai_ok:
     st.info("OpenAI not configured. Add OPENAI_API_KEY to .streamlit/secrets.toml to enable.")
 else:
     client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-    if st.button("Generate Universe Summary"):
+    if st.button("Generate AI Universe Summary"):
         with st.spinner("Generating summary..."):
             user_context = "\n".join([f"{k}: {v:.4f}" for k, v in constants.items()])
             try:
