@@ -449,7 +449,7 @@ with tabs[0]:
         z=stab_em,
         x=em_sweep,
         y=Z_vals,
-        title="Stability vs EM",
+        title="Stability vs Electromagnetic Force",
         xlab="EM Multiplier",
         ylab="Atomic Number Z",
         zlab="Stability",
