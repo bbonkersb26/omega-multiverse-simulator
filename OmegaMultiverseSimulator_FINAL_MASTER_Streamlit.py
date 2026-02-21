@@ -885,3 +885,591 @@ with tabs[9]:
 
         register_pdf_plot(
             "Dark_Matter_3D.png",
+            "Cosmic Web",
+            (
+                f"3D structure appears where density exceeds a threshold. "
+                f"With Gravity={G:.2f} and Dark Energy={DE:.2f}, clustering is "
+                f"{'strong' if G > 1.2 and DE < 1.2 else 'weaker'} and filaments are "
+                f"{'more compact' if DE < 1.0 else 'more stretched'}."
+            )
+        )
+
+    st.markdown(
+        "- Higher gravity compresses structure.\n"
+        "- Higher dark energy expands voids and reduces clustering."
+    )
+
+
+# -------------------------
+# Tab 10: Atomic Stability
+# -------------------------
+with tabs[10]:
+    st.subheader("Atomic Stability")
+
+    Zs = Z[::3]
+    Ns = N[::3]
+    stab_ds = nuclear_stability[::3, ::3]
+
+    show_surface_or_heatmap(
+        z=stab_ds,
+        x=Ns,
+        y=Zs,
+        title="Isotope Stability Map",
+        xlab="Neutrons N",
+        ylab="Protons Z",
+        zlab="Stability",
+        fname_base="Atomic_Stability",
+        colorscale="Plasma",
+        pdf_title="Isotope Stability Map",
+        pdf_text=(
+            f"This map visualizes the stability band across neutron and proton counts. "
+            f"Mean nuclear stability is {mean_nuclear_stability:.2f}. "
+            f"Strong={S:.2f} increases binding, EM={EM:.2f} penalizes high Z, and Weak={W:.2f} shapes beta decay routes."
+        )
+    )
+
+    st.markdown(
+        "- Stability follows a valley where neutron and proton counts balance binding and decay.\n"
+        "- Strong boosts binding, EM penalizes high charge, weak controls beta decay pressure."
+    )
+
+
+# -------------------------
+# Tab 11: Life Over Time
+# -------------------------
+with tabs[11]:
+    st.subheader("Life Over Time")
+
+    time = np.linspace(0, 1, 200)
+
+    sfr_now = np.clip((G**1.1) / (DE**1.2 + 0.15) * (1 / (1 + EM**1.3)), 0, 10)
+    sfr_now = float(np.tanh(sfr_now / 2.0))
+
+    metals = 1 - np.exp(-(2.0 + 5.0 * sfr_now) * time)
+    metals = np.clip(metals, 0, 1)
+
+    star_window = float(np.exp(-abs(G - 1.0) * 0.6))
+    chem_window = float(np.exp(-abs(S - 1.0) * 0.4) * np.exp(-abs(EM - 1.0) * 0.4) * np.exp(-((W - 1.0) ** 2) * 0.4))
+    thermo_window = float(np.exp(-((T - 1.0) ** 2) * 0.6) * np.exp(-((P - 1.0) ** 2) * 0.4))
+
+    life_t = np.clip(metals * star_window * chem_window * thermo_window, 0, 1)
+
+    show_ribbon_or_line(
+        x=time,
+        y=life_t,
+        title="Life Score Over Time",
+        xlab="Cosmic Time",
+        ylab="Life Score",
+        fname_base="Life_Over_Time",
+        ribbon_width=1.6,
+        pdf_title="Life Score Over Time",
+        pdf_text=(
+            f"Life score rises as metals accumulate, then saturates. "
+            f"With current parameters, star window={star_window:.2f}, chemistry window={chem_window:.2f}, thermal window={thermo_window:.2f}. "
+            f"Faster star formation increases early enrichment; high dark energy delays it."
+        )
+    )
+
+    show_ribbon_or_line(
+        x=time,
+        y=metals,
+        title="Metallicity Over Time",
+        xlab="Cosmic Time",
+        ylab="Metallicity",
+        fname_base="Metallicity_Over_Time",
+        ribbon_width=1.2,
+        pdf_title="Metallicity Over Time",
+        pdf_text=(
+            f"Metallicity tracks heavy-element buildup from stellar processing. "
+            f"With Gravity={G:.2f}, Dark Energy={DE:.2f}, and EM={EM:.2f}, the enrichment rate is {sfr_now:.2f}. "
+            f"Higher enrichment supports more complex chemistry and larger molecular diversity."
+        )
+    )
+
+
+# -------------------------
+# Tab 12: Molecular Bonding
+# -------------------------
+with tabs[12]:
+    st.subheader("Molecular Bonding")
+
+    isotope_factor = float(np.mean(isotope_viable_per_Z) / np.max(isotope_viable_per_Z))
+    isotope_factor = np.clip(isotope_factor, 0, 1)
+
+    families = {
+        "Simple Covalent": 0.95,
+        "Polar": 0.90,
+        "Carbon Backbone": 0.88,
+        "Metallic": 0.75,
+        "Heavy Chemistry": 0.60,
+    }
+
+    em_mod = np.exp(-abs(EM - 1.0) * 0.7)
+    strong_mod = np.exp(-abs(S - 1.0) * 0.6)
+    weak_mod = np.exp(-((W - 1.0) ** 2) * 0.4)
+    temp_mod = np.exp(-((T - 1.0) ** 2) * 0.9)
+    press_mod = np.tanh(P / 1.6)
+
+    global_mod = float(np.clip(em_mod * strong_mod * weak_mod * temp_mod * press_mod * (0.6 + 0.4 * isotope_factor), 0, 1))
+
+    names = list(families.keys())
+    vals = [float(np.clip(families[k] * global_mod, 0, 1)) for k in names]
+
+    fig = go.Figure(data=[go.Bar(x=names, y=vals, text=[f"{v:.2f}" for v in vals], textposition="outside")])
+    fig.update_layout(
+        title="Molecular Bonding Viability",
+        yaxis_title="Viability",
+        yaxis_range=[0, 1.15]
+    )
+    st.plotly_chart(fig, use_container_width=True)
+    save_plot(fig, "Molecular_Bonding.png", is_plotly=True)
+
+    best_idx = int(np.argmax(vals))
+    register_pdf_plot(
+        "Molecular_Bonding.png",
+        "Molecular Bonding Viability",
+        (
+            f"Bonding viability scales with EM, Strong, temperature, pressure, and isotope availability. "
+            f"Global bonding modifier is {global_mod:.2f} with isotope factor {isotope_factor:.2f}. "
+            f"Highest family score is {names[best_idx]} at {vals[best_idx]:.2f}. "
+            f"High temperature or large EM and Strong shifts reduce stable molecular diversity."
+        )
+    )
+
+
+# -------------------------
+# Tab 13: Molecular Abundance
+# -------------------------
+with tabs[13]:
+    st.subheader("Molecular Abundance")
+
+    tvals = np.linspace(0.1, 10.0, max(30, res_3d // 2))
+    pvals = np.linspace(0.1, 10.0, max(30, res_3d // 2))
+    T2, P2 = np.meshgrid(tvals, pvals, indexing="ij")
+
+    force_gate = float(np.exp(-abs(S - 1.0) * 0.4) * np.exp(-abs(EM - 1.0) * 0.4))
+    thermo_gate = np.exp(-((T2 - 1.0) ** 2) * 0.8) * np.exp(-((P2 - 1.0) ** 2) * 0.6)
+    abundance = np.clip(force_gate * thermo_gate, 0, 1)
+
+    abundance_mean = float(np.nanmean(abundance))
+    abundance_peak = float(np.nanmax(abundance))
+
+    show_surface_or_heatmap(
+        z=abundance,
+        x=pvals,
+        y=tvals,
+        title="Molecular Abundance Map",
+        xlab="Pressure Multiplier",
+        ylab="Temperature Multiplier",
+        zlab="Abundance",
+        fname_base="Molecular_Abundance",
+        colorscale="Viridis",
+        pdf_title="Molecular Abundance Map",
+        pdf_text=(
+            f"Molecular abundance rises when forces support bonding and conditions sit near stable temperature and pressure. "
+            f"Force gate is {force_gate:.2f} from Strong={S:.2f} and EM={EM:.2f}. "
+            f"Surface mean is {abundance_mean:.2f} and peak is {abundance_peak:.2f}. "
+            f"Shifting temperature or pressure away from 1 compresses the viable region."
+        )
+    )
+
+
+# -------------------------
+# Tab 14: Isotope Half-Life
+# -------------------------
+with tabs[14]:
+    st.subheader("Isotope Half-Life")
+
+    half_life = np.clip(nuclear_stability * np.exp(-abs(W - 1.0) * 0.6), 0, 1)
+
+    Zs = Z[::3]
+    Ns = N[::3]
+    hl_ds = half_life[::3, ::3]
+
+    hl_mean = float(np.nanmean(half_life))
+    long_lived = (half_life > 0.35).sum(axis=1).astype(float)
+    long_lived_total = float(np.sum(long_lived))
+
+    show_surface_or_heatmap(
+        z=hl_ds,
+        x=Ns,
+        y=Zs,
+        title="Half-Life Map",
+        xlab="Neutrons N",
+        ylab="Protons Z",
+        zlab="Half-Life",
+        fname_base="Half_Life",
+        colorscale="Cividis",
+        pdf_title="Half-Life Map",
+        pdf_text=(
+            f"Half-life score follows nuclear stability and weak-force tuning. "
+            f"With Weak={W:.2f}, mean half-life score is {hl_mean:.2f}. "
+            f"Long-lived isotopes support steady heat sources and long-term chemistry."
+        )
+    )
+
+    show_ribbon_or_line(
+        x=Z,
+        y=long_lived,
+        title="Long-Lived Isotopes per Z",
+        xlab="Atomic Number Z",
+        ylab="Count",
+        fname_base="Half_Life_LongLived_Count",
+        ribbon_width=1.2,
+        pdf_title="Long-Lived Isotopes per Z",
+        pdf_text=(
+            f"This curve counts isotopes above a longevity threshold. "
+            f"Total long-lived count across Z is {long_lived_total:.0f}. "
+            f"Higher Strong and near-baseline Weak increase the pool of long-lived nuclei."
+        )
+    )
+
+
+# -------------------------
+# Tab 15: Periodic Table Expansion
+# -------------------------
+with tabs[15]:
+    st.subheader("Periodic Table Expansion")
+
+    Z_ext = np.arange(1, 201)
+    cohesion = np.exp(-np.abs(Z_ext - 82) / (30.0 * max(S, 1e-3)))
+    coulomb = 1 / (1 + np.exp(-(Z_ext - 110) / (12.0 / max(EM, 1e-3))))
+    decay = np.exp(-((W - 1.0) ** 2) * 1.2)
+
+    stability_curve = np.clip(cohesion * (1 - coulomb) * decay, 0, 1)
+    maxZ = int(Z_ext[stability_curve > 0.12][-1]) if np.any(stability_curve > 0.12) else 0
+
+    show_ribbon_or_line(
+        x=Z_ext,
+        y=stability_curve,
+        title="Expansion Limit Curve",
+        xlab="Atomic Number Z",
+        ylab="Stability Potential",
+        fname_base="Periodic_Table_Expansion_Curve",
+        ribbon_width=1.2,
+        pdf_title="Expansion Limit Curve",
+        pdf_text=(
+            f"This curve estimates how far the periodic table can extend before instability dominates. "
+            f"With Strong={S:.2f}, EM={EM:.2f}, Weak={W:.2f}, the estimated stable limit is Z≈{maxZ}. "
+            f"Stronger cohesion pushes the limit higher; higher EM pulls it lower."
+        )
+    )
+
+    st.markdown(f"**Estimated stable limit Z: {maxZ}**")
+
+    em_vals = np.linspace(0.1, 10.0, max(30, res_3d // 2))
+    Z2, EM2 = np.meshgrid(Z_ext, em_vals, indexing="ij")
+    cohesion2 = np.exp(-np.abs(Z2 - 82) / (30.0 * max(S, 1e-3)))
+    coulomb2 = 1 / (1 + np.exp(-(Z2 - 110) / (12.0 / np.maximum(EM2, 1e-3))))
+    stab2 = np.clip(cohesion2 * (1 - coulomb2) * decay, 0, 1)
+
+    show_surface_or_heatmap(
+        z=stab2,
+        x=em_vals,
+        y=Z_ext,
+        title="Expansion vs Z and EM",
+        xlab="EM Multiplier",
+        ylab="Atomic Number Z",
+        zlab="Stability",
+        fname_base="Periodic_Table_Expansion_Map",
+        colorscale="Viridis",
+        pdf_title="Expansion vs Z and EM",
+        pdf_text=(
+            f"This surface shows how the expansion limit shifts as EM changes. "
+            f"At EM={EM:.2f}, high Z stability drops quickly once Coulomb repulsion dominates. "
+            f"If EM is reduced, the viable high-Z region expands and superheavy chemistry becomes more plausible."
+        )
+    )
+
+
+# -------------------------
+# Tab 16: Proton–Neutron Map
+# -------------------------
+with tabs[16]:
+    st.subheader("Proton–Neutron Map")
+
+    Zs = Z[::3]
+    Ns = N[::3]
+    vi_ds = nuclear_stability[::3, ::3]
+
+    show_surface_or_heatmap(
+        z=vi_ds,
+        x=Ns,
+        y=Zs,
+        title="Viability in Z and N",
+        xlab="Neutrons N",
+        ylab="Protons Z",
+        zlab="Viability",
+        fname_base="PN_Viability",
+        colorscale="Magma",
+        pdf_title="Viability in Z and N",
+        pdf_text=(
+            f"This surface highlights the stable band in proton–neutron space. "
+            f"Mean viability is {mean_nuclear_stability:.2f}. "
+            f"Strong={S:.2f} widens the viable band, EM={EM:.2f} narrows it at high Z, and Weak={W:.2f} shifts decay balance."
+        )
+    )
+
+    target_line = (1.0 + (Z / 80.0)) * Z
+    show_ribbon_or_line(
+        x=Z,
+        y=target_line,
+        title="Valley Target N",
+        xlab="Protons Z",
+        ylab="Target Neutrons N",
+        fname_base="PN_Target_Curve",
+        ribbon_width=1.2,
+        pdf_title="Valley Target N",
+        pdf_text=(
+            "This curve is a simple valley target where stable isotopes tend to cluster. "
+            "As Z increases, extra neutrons are required to dilute charge repulsion and sustain binding."
+        )
+    )
+
+
+# -------------------------
+# Tab 17: Binding Energy
+# -------------------------
+with tabs[17]:
+    st.subheader("Binding Energy")
+
+    a_v = 15.8 * S
+    a_s = 18.3
+    a_c = 0.714 * EM
+    a_sym = 23.2 * (1 / max(W, 1e-3))
+    a_pair = 12.0
+
+    A = Ag
+    pairing = np.where(((Zg % 2 == 0) & (Ng % 2 == 0)), +1, -1)
+
+    BE = (
+        a_v * A
+        - a_s * (A ** (2 / 3))
+        - a_c * (Zg * (Zg - 1)) / np.maximum(A ** (1 / 3), 1e-9)
+        - a_sym * ((A - 2 * Zg) ** 2) / np.maximum(A, 1e-9)
+        + pairing * a_pair / np.maximum(A ** 0.5, 1e-9)
+    )
+
+    BE_per_A = np.clip(BE / np.maximum(A, 1), 0, None)
+    BE_per_A = np.clip(BE_per_A, 0, np.nanpercentile(BE_per_A, 99))
+
+    Zs = Z[::3]
+    Ns = N[::3]
+    be_ds = BE_per_A[::3, ::3]
+
+    be_mean = float(np.nanmean(BE_per_A))
+
+    show_surface_or_heatmap(
+        z=be_ds,
+        x=Ns,
+        y=Zs,
+        title="Binding Energy per Nucleon",
+        xlab="Neutrons N",
+        ylab="Protons Z",
+        zlab="BE per A",
+        fname_base="Binding_Energy",
+        colorscale="Viridis",
+        pdf_title="Binding Energy per Nucleon",
+        pdf_text=(
+            f"Binding energy per nucleon indicates how tightly nuclei hold together. "
+            f"Mean BE/A is {be_mean:.2f} in this grid. "
+            f"Strong={S:.2f} raises the volume term, EM={EM:.2f} increases Coulomb penalty, and Weak={W:.2f} shifts symmetry pressure."
+        )
+    )
+
+    target_line = (1.0 + (Z / 80.0)) * Z
+    N_pick = np.clip(target_line.astype(int), 1, N[-1])
+    idxN = N_pick - 1
+    be_line = BE_per_A[np.arange(len(Z)), idxN]
+
+    peakZ = int(Z[np.nanargmax(be_line)])
+    peakBE = float(np.nanmax(be_line))
+
+    show_ribbon_or_line(
+        x=Z,
+        y=be_line,
+        title="Binding Energy Along Valley",
+        xlab="Protons Z",
+        ylab="BE per A",
+        fname_base="Binding_Energy_Line",
+        ribbon_width=1.2,
+        pdf_title="Binding Energy Along Valley",
+        pdf_text=(
+            f"Along the valley target, BE/A peaks at Z≈{peakZ} with peak value {peakBE:.2f}. "
+            f"This peak marks the most tightly bound region, which tends to dominate stable nucleosynthesis pathways."
+        )
+    )
+
+    st.markdown(f"**Peak along valley near Z ≈ {peakZ}**")
+
+
+# -------------------------
+# Tab 18: Decoherence Map
+# -------------------------
+with tabs[18]:
+    st.subheader("Decoherence Map")
+
+    s_vals = np.linspace(0.1, 10.0, max(30, res_3d // 2))
+    em_vals = np.linspace(0.1, 10.0, max(30, res_3d // 2))
+    t_vals = np.linspace(0, 1, max(30, res_3d // 2))
+
+    S2, EM2, TT = np.meshgrid(s_vals, em_vals, t_vals, indexing="ij")
+
+    dist2 = (
+        (S2 - S) ** 2 +
+        (EM2 - EM) ** 2 +
+        (W - 1.0) ** 2 +
+        (G - 1.0) ** 2 +
+        (DE - 1.0) ** 2
+    )
+
+    coherence = np.exp(-dist2 / 4.0) * np.exp(-TT * (0.8 + 0.6 * deviation / 4.0))
+    mid = coherence[:, :, len(t_vals) // 2]
+
+    coh_mean = float(np.nanmean(mid))
+    coh_peak = float(np.nanmax(mid))
+
+    show_surface_or_heatmap(
+        z=mid,
+        x=em_vals,
+        y=s_vals,
+        title="Coherence Slice",
+        xlab="EM Multiplier",
+        ylab="Strong Multiplier",
+        zlab="Coherence",
+        fname_base="Decoherence_MidTime",
+        colorscale="Magma",
+        pdf_title="Coherence Slice",
+        pdf_text=(
+            f"This slice shows how quickly coherence drops as constants drift from baseline. "
+            f"Deviation={deviation:.3f} yields mean coherence {coh_mean:.2f} and peak {coh_peak:.2f}. "
+            f"Larger deviation causes faster decay and a narrower region of high coherence."
+        )
+    )
+
+    st.markdown(
+        "- Coherence decreases with parameter distance and time.\n"
+        "- Higher deviation compresses the high-coherence region."
+    )
+
+
+# -------------------------
+# Tab 19: Branch Count
+# -------------------------
+with tabs[19]:
+    st.subheader("Branch Count")
+
+    steps = 200
+    t = np.linspace(0, 1, steps)
+
+    rate = (S * EM * G) / (DE * (W + 0.2))
+    rate = float(np.clip(rate, 0.05, 10.0))
+
+    branches = np.exp((0.8 * rate) * t * (1.0 + 0.25 * deviation))
+    branches = np.clip(branches, 1, 1e18)
+
+    branches_log = np.log10(branches + 1e-9)
+    end_log = float(branches_log[-1])
+
+    show_ribbon_or_line(
+        x=t,
+        y=branches_log,
+        title="Branch Growth Over Time",
+        xlab="Time",
+        ylab="log10 Branch Count",
+        fname_base="Branch_Count_Log",
+        ribbon_width=1.2,
+        pdf_title="Branch Growth Over Time",
+        pdf_text=(
+            f"Branch growth rate scales with Strong, EM, and Gravity and is suppressed by Dark Energy and Weak. "
+            f"Rate={rate:.2f} with deviation={deviation:.3f} yields final log10 branch count {end_log:.2f} at late time."
+        )
+    )
+
+    d_vals = np.linspace(0, 6, max(30, res_3d // 2))
+    TT, DD = np.meshgrid(t[::3], d_vals, indexing="ij")
+    branches2 = np.exp((0.8 * rate) * TT * (1.0 + 0.25 * DD))
+    branches2 = np.clip(branches2, 1, 1e18)
+
+    show_surface_or_heatmap(
+        z=np.log10(branches2 + 1e-9),
+        x=d_vals,
+        y=t[::3],
+        title="Branch Growth vs Deviation",
+        xlab="Deviation",
+        ylab="Time",
+        zlab="log10 Branches",
+        fname_base="Branch_Count_Surface",
+        colorscale="Viridis",
+        pdf_title="Branch Growth vs Deviation",
+        pdf_text=(
+            f"This surface shows how branch count accelerates as deviation grows. "
+            f"At your current deviation={deviation:.3f}, growth follows the lower edge of the surface. "
+            f"Universes far from baseline split more aggressively in this toy model."
+        )
+    )
+
+
+# -------------------------
+# Tab 20: Quantum Gravity Horizon
+# -------------------------
+with tabs[20]:
+    st.subheader("Quantum Gravity Horizon")
+
+    r_vals = np.linspace(0.1, 10.0, max(30, res_3d // 2))
+    g_vals = np.linspace(0.1, 10.0, max(30, res_3d // 2))
+    R, GG = np.meshgrid(r_vals, g_vals, indexing="ij")
+
+    curvature = (GG * G) / (R + 1e-6)
+    curvature *= (1.0 / (1.0 + 0.25 * DE))
+    curvature = np.clip(curvature, 0, 2.0)
+    curvature_gr = curvature.T
+
+    curv_mean = float(np.nanmean(curvature_gr))
+    curv_peak = float(np.nanmax(curvature_gr))
+
+    show_surface_or_heatmap(
+        z=curvature_gr,
+        x=r_vals,
+        y=g_vals,
+        title="Curvature Map",
+        xlab="Radius r",
+        ylab="Gravity Field",
+        zlab="Curvature",
+        fname_base="Quantum_Gravity",
+        colorscale="Cividis",
+        pdf_title="Curvature Map",
+        pdf_text=(
+            f"Curvature increases with gravity strength and decreases with radius. "
+            f"With Gravity={G:.2f} and Dark Energy={DE:.2f}, mean curvature is {curv_mean:.2f} and peak is {curv_peak:.2f}. "
+            f"Regions near the cap represent horizon-like, high-curvature zones in this proxy."
+        )
+    )
+
+    st.markdown(
+        "- Higher gravity raises curvature and pushes toward horizon-like behavior.\n"
+        "- Dark energy reduces effective curvature in this simplified mapping."
+    )
+
+
+# =========================
+# PDF Export
+# =========================
+st.divider()
+st.subheader("Export Simulation Report")
+
+if st.button("Generate Scientific PDF Report"):
+    with st.spinner("Compiling PDF..."):
+        try:
+            summary_text = st.session_state.get("summary", "No AI summary generated.")
+            outpdf = generate_pdf(constants, summary_text)
+            st.success("PDF generated successfully!")
+            with open(outpdf, "rb") as f:
+                st.download_button(
+                    label="Download PDF",
+                    data=f,
+                    file_name=outpdf,
+                    mime="application/pdf"
+                )
+        except Exception as e:
+            st.error(f"PDF generation failed: {e}")
