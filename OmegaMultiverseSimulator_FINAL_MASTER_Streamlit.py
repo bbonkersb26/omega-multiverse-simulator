@@ -1,4 +1,3 @@
-Ok here’s my code. Implement it so it changes based on values for graphs: 
 
 import os
 import datetime
