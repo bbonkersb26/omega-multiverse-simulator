@@ -47,6 +47,10 @@ auto_save_plots = st.sidebar.checkbox(
     value=True
 )
 
+def clamp(x, eps=1e-6):
+    """Array-safe clamp (works for scalars and numpy arrays)."""
+    return np.maximum(x, eps)
+
 def save_plot(fig, filename, is_plotly=True):
     """Never crash the app if export fails."""
     if not auto_save_plots:
@@ -195,14 +199,13 @@ Zg, Ng = np.meshgrid(Z, N, indexing="ij")
 Ag = Zg + Ng
 
 # A soft “valley-of-stability” target:
-# N/Z increases with Z due to Coulomb repulsion (phenomenological)
 Nz_target = 1.0 + (Zg / 80.0)
-ratio = Ng / np.maximum(Zg, 1)
+ratio = Ng / clamp(Zg, 1)
 
 # nuclear stability proxy:
 ratio_penalty = np.exp(-((ratio - Nz_target) ** 2) * 8.0)
-strong_bonus = np.exp(-np.abs(Zg - 82) / (28.0 * max(S, 1e-3)))
-em_penalty = np.exp(-np.maximum(Zg - 20, 0) / (30.0 / max(EM, 1e-3)))
+strong_bonus = np.exp(-np.abs(Zg - 82) / (28.0 * clamp(S, 1e-3)))
+em_penalty = np.exp(-np.maximum(Zg - 20, 0) / (30.0 / clamp(EM, 1e-3)))
 weak_opt = np.exp(-((W - 1.0) ** 2) * 2.5)
 
 nuclear_stability = np.clip(ratio_penalty * strong_bonus * em_penalty * weak_opt, 0, 1)
@@ -284,13 +287,18 @@ with tabs[0]:
     Z2, EM2 = np.meshgrid(Z_vals, em_vals, indexing="ij")
 
     base_shell = np.exp(-np.abs(Z2 - 30) / 22.0)
-    strong_term = np.exp(-np.abs(Z2 - 82) / (28.0 * max(S, 1e-3)))
-    em_term = np.exp(-np.abs(EM2 - EM) / 1.2) * np.exp(-np.maximum(Z2 - 20, 0) / (40.0 / max(EM2, 1e-3)))
+    strong_term = np.exp(-np.abs(Z2 - 82) / (28.0 * clamp(S, 1e-3)))
+
+    # ✅ FIX: array-safe clamp (no Python max on arrays)
+    em_term = (
+        np.exp(-np.abs(EM2 - EM) / 1.2)
+        * np.exp(-np.maximum(Z2 - 20, 0) / (40.0 / clamp(EM2, 1e-3)))
+    )
+
     weak_term = np.exp(-((W - 1.0) ** 2) * 2.5)
 
     stability = np.clip(base_shell * strong_term * em_term * weak_term, 0, 1)
 
-    # 2D heatmap
     fig2d = go.Figure(data=go.Heatmap(
         z=stability.T,
         x=Z_vals,
@@ -343,11 +351,10 @@ with tabs[1]:
 
     shell_waves = (0.55 + 0.45*np.sin(Z2 / 7.0)**2) * (0.55 + 0.45*np.sin(Z2 / 11.0)**2)
     strong_opt = np.exp(-np.abs(S2 - S) / 1.6)
-    coulomb = np.exp(-np.maximum(Z2 - 60, 0) / (25.0 / max(EM, 1e-3)))
+    coulomb = np.exp(-np.maximum(Z2 - 60, 0) / (25.0 / clamp(EM, 1e-3)))
 
     instability = np.clip((1 - strong_opt) * shell_waves * (1 / np.maximum(coulomb, 1e-6)), 0, 2.0)
 
-    # 2D contour
     fig2d = go.Figure(data=go.Contour(
         z=instability.T,
         x=Z_vals,
@@ -399,11 +406,8 @@ with tabs[2]:
     de_vals = np.linspace(0.1, 10.0, 80)
     G2, DE2 = np.meshgrid(g_vals, de_vals, indexing="ij")
 
-    # collapse vs expansion competition
     collapse = (G2**1.1) / (DE2**1.2 + 0.15)
-    # EM → radiation pressure & opacity effects
     rad_pressure = 1 / (1 + (EM**1.3))
-    # strong/weak affect ignition (toy proxy)
     ignition = np.exp(-np.abs(S - 1.0) * 0.8) * np.exp(-((W - 1.0) ** 2) * 1.2)
 
     sfr = safe_norm(collapse * rad_pressure * ignition)
@@ -459,11 +463,7 @@ with tabs[3]:
     S2, EM2 = np.meshgrid(s_vals, em_vals, indexing="ij")
 
     force_window = np.exp(-((S2 - 1.0) ** 2) / 1.6) * np.exp(-((EM2 - 1.0) ** 2) / 1.6) * np.exp(-((W - 1.0) ** 2) / 2.0)
-
-    # temperature/pressure “habitability window”
     thermo = np.exp(-((T - 1.0) ** 2) * 1.2) * np.exp(-((P - 1.0) ** 2) * 1.0)
-
-    # metallicity proxy from star formation (approx): stronger structure -> higher metals
     metals = np.clip((G / (DE + 0.2)) * np.exp(-abs(EM - 1.0)*0.6), 0, 5)
     metals_factor = np.tanh(metals / 1.5)
 
@@ -484,7 +484,6 @@ with tabs[3]:
     st.plotly_chart(fig2d, use_container_width=True)
     save_plot(fig2d, "Life_Probability_2D.png", is_plotly=True)
 
-    # a contour for “zones”
     figc = go.Figure(data=go.Contour(
         z=life.T,
         x=s_vals,
@@ -517,7 +516,6 @@ with tabs[4]:
     em_vals = np.linspace(0.1, 10.0, 80)
     S2, EM2 = np.meshgrid(s_vals, em_vals, indexing="ij")
 
-    # orbital overlap proxy: EM governs electron binding; T reduces bonding; P increases overlap
     em_binding = np.exp(-((EM2 - 1.0) ** 2) / 1.4)
     strong_chem = np.exp(-abs(S2 - 1.0) / 2.0)
     temp_kill = np.exp(-((T - 1.0) ** 2) * 1.8)
@@ -572,7 +570,6 @@ with tabs[4]:
 with tabs[5]:
     st.subheader("Universe Emergence / Viability Score")
 
-    # a soft “viability” score based on deviation (toy)
     viability = float(np.exp(-0.35 * deviation))
     chaos = float(1.0 - viability)
 
@@ -600,7 +597,6 @@ with tabs[5]:
 with tabs[6]:
     st.subheader("Element Abundance Probability (toy nucleosynthesis proxy)")
 
-    # abundance ~ isotope survivability * stellar processing proxy
     surv = safe_norm(isotope_viable_per_Z.astype(float))
     stellar = np.clip((G / (DE + 0.2)) * np.exp(-abs(EM - 1.0)*0.4) * np.exp(-abs(S - 1.0)*0.3), 0, 3)
     stellar_factor = np.tanh(stellar / 1.3)
@@ -617,10 +613,8 @@ with tabs[6]:
     st.plotly_chart(fig, use_container_width=True)
     save_plot(fig, "Element_Abundance_Line.png", is_plotly=True)
 
-    # 2D heatmap: abundance vs Z and time-like parameter
-    t = np.linspace(0, 1, 60)  # normalized cosmic time
+    t = np.linspace(0, 1, 60)
     Z2, T2 = np.meshgrid(Z, t, indexing="ij")
-    # cosmic enrichment: rises then plateaus; higher stellar_factor accelerates
     enrich = 1 - np.exp(-T2 * (2.0 + 4.0*stellar_factor))
     abund_time = np.clip((abundance[:, None]) * enrich, 0, 1)
 
@@ -652,7 +646,6 @@ with tabs[7]:
     st.subheader("EM Radiation Risk")
 
     x = np.linspace(0.1, 10.0, 600)
-    # radiation ~ EM^2 scaled; add T as a proxy for “activity”
     y = (x ** 2) * (0.4 + 0.6*np.tanh(T / 2.0)) / 20.0
     y = np.clip(y, 0, 1)
 
@@ -677,11 +670,8 @@ with tabs[8]:
     st.subheader("Star Lifespan Model (mass-luminosity proxy)")
 
     g_vals = np.linspace(0.1, 10.0, 400)
-    # Let characteristic stellar mass scale with gravity (toy)
     M = g_vals
-    # Luminosity ~ M^3.5 * EM feedback
     L = (M ** 3.5) * (1.0 + 0.15*(EM-1.0))
-    # Lifetime ~ fuel / burn rate ~ M / L
     tau = (M / np.maximum(L, 1e-9))
     tau = safe_norm(tau)
 
@@ -708,9 +698,8 @@ with tabs[9]:
     size = 32
     scale = 8.0
 
-    # tighter clustering with higher G, larger voids with higher DE
-    cluster_spread = (3.5 / max(G, 1e-3))
-    stretch = (1.0 / max(DE, 1e-3))
+    cluster_spread = (3.5 / clamp(G, 1e-3))
+    stretch = (1.0 / clamp(DE, 1e-3))
 
     x = np.linspace(-scale*stretch, scale*stretch, size)
     y = np.linspace(-scale*stretch, scale*stretch, size)
@@ -727,7 +716,6 @@ with tabs[9]:
 
     density = safe_norm(density)
 
-    # 2D slice
     mid = size // 2
     slice2d = density[:, :, mid]
 
@@ -844,7 +832,8 @@ with tabs[11]:
 with tabs[12]:
     st.subheader("Molecular Bonding Viability (element families)")
 
-    isotope_factor = float(np.mean(isotope_viable_per_Z) / np.max(isotope_viable_per_Z))
+    denom = np.max(isotope_viable_per_Z)
+    isotope_factor = float(np.mean(isotope_viable_per_Z) / denom) if denom > 0 else 0.0
     isotope_factor = np.clip(isotope_factor, 0, 1)
 
     families = {
@@ -958,8 +947,8 @@ with tabs[15]:
     st.subheader("Periodic Table Expansion Potential")
 
     Z_ext = np.arange(1, 201)
-    cohesion = np.exp(-np.abs(Z_ext - 82) / (30.0 * max(S, 1e-3)))
-    coulomb = 1 / (1 + np.exp(-(Z_ext - 110) / (12.0 / max(EM, 1e-3))))
+    cohesion = np.exp(-np.abs(Z_ext - 82) / (30.0 * clamp(S, 1e-3)))
+    coulomb = 1 / (1 + np.exp(-(Z_ext - 110) / (12.0 / clamp(EM, 1e-3))))
     decay = np.exp(-((W - 1.0) ** 2) * 1.2)
 
     stability_curve = np.clip(cohesion * (1 - coulomb) * decay, 0, 1)
@@ -979,8 +968,8 @@ with tabs[15]:
 
     em_vals = np.linspace(0.1, 10.0, 80)
     Z2, EM2 = np.meshgrid(Z_ext, em_vals, indexing="ij")
-    cohesion2 = np.exp(-np.abs(Z2 - 82) / (30.0 * max(S, 1e-3)))
-    coulomb2 = 1 / (1 + np.exp(-(Z2 - 110) / (12.0 / np.maximum(EM2, 1e-3))))
+    cohesion2 = np.exp(-np.abs(Z2 - 82) / (30.0 * clamp(S, 1e-3)))
+    coulomb2 = 1 / (1 + np.exp(-(Z2 - 110) / (12.0 / clamp(EM2, 1e-3))))
     stab2 = np.clip(cohesion2 * (1 - coulomb2) * decay, 0, 1)
 
     fig2d = go.Figure(data=go.Heatmap(
@@ -1002,10 +991,8 @@ with tabs[15]:
 with tabs[16]:
     st.subheader("Proton–Neutron Ratio / Valley of Stability")
 
-    viability = nuclear_stability
-
     fig2d = go.Figure(data=go.Heatmap(
-        z=viability.T,
+        z=nuclear_stability.T,
         x=Z, y=N,
         colorscale="Magma",
         colorbar=dict(title="Viability")
@@ -1039,7 +1026,7 @@ with tabs[17]:
     a_v = 15.8 * S
     a_s = 18.3
     a_c = 0.714 * EM
-    a_sym = 23.2 * (1 / max(W, 1e-3))
+    a_sym = 23.2 * (1 / clamp(W, 1e-3))
     a_pair = 12.0
 
     A = Ag
@@ -1048,12 +1035,12 @@ with tabs[17]:
     BE = (
         a_v * A
         - a_s * (A ** (2/3))
-        - a_c * (Zg * (Zg - 1)) / np.maximum(A ** (1/3), 1e-9)
-        - a_sym * ((A - 2*Zg) ** 2) / np.maximum(A, 1e-9)
-        + pairing * a_pair / np.maximum(A ** 0.5, 1e-9)
+        - a_c * (Zg * (Zg - 1)) / clamp(A ** (1/3), 1e-9)
+        - a_sym * ((A - 2*Zg) ** 2) / clamp(A, 1e-9)
+        + pairing * a_pair / clamp(A ** 0.5, 1e-9)
     )
 
-    BE_per_A = np.clip(BE / np.maximum(A, 1), 0, None)
+    BE_per_A = np.clip(BE / clamp(A, 1), 0, None)
     BE_per_A = np.clip(BE_per_A, 0, np.nanpercentile(BE_per_A, 99))
 
     fig2d = go.Figure(data=go.Heatmap(
