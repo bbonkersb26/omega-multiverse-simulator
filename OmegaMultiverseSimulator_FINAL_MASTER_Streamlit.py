@@ -62,21 +62,24 @@ res_3d = st.sidebar.slider(
 )
 st.sidebar.caption("Lower resolution renders faster on iPhone.")
 
-# --- Plotly display config (prevents iPhone modebar covering titles) ---
+# --- Plotly display config (KEEP tools, avoid title overlap) ---
 PLOTLY_CONFIG = {
-    "displayModeBar": False,   # key fix: removes the overlay toolbar
+    "displayModeBar": True,   # keep zoom/pan tools
     "responsive": True,
     "displaylogo": False
 }
 
-TITLE_TOP_MARGIN = 110  # extra headroom so titles never get clipped/covered
+# Big enough so the modebar never covers/clips the title (esp iPhone Safari)
+TITLE_TOP_MARGIN = 150
 
 def apply_plot_title(fig, title: str):
+    # Put title safely below modebar overlay
     fig.update_layout(
         title=dict(
             text=title,
             x=0.5, xanchor="center",
-            y=0.94, yanchor="top",   # slightly lower to avoid overlap/clipping
+            y=0.88, yanchor="top",
+            pad=dict(t=10, b=0)
         )
     )
 
@@ -202,11 +205,12 @@ def generate_pdf(constants, summary_text, output_dir=OUTPUT_DIR):
 # =========================
 # Plot Helpers
 # =========================
-def show_surface_or_heatmap(z, x, y, title, xlab, ylab, zlab, fname_base, colorscale="Viridis",
-                            pdf_title=None, pdf_text=None):
+def show_surface_or_heatmap(
+    z, x, y, title, xlab, ylab, zlab, fname_base, colorscale="Viridis",
+    pdf_title=None, pdf_text=None
+):
     """
     z must be shape (len(y), len(x)) if you pass x as x-axis and y as y-axis.
-    Uses stable camera + margins to reduce iPhone blank WebGL risk.
     """
     z = np.asarray(z, dtype=float)
 
@@ -254,15 +258,16 @@ def show_surface_or_heatmap(z, x, y, title, xlab, ylab, zlab, fname_base, colors
         fname = f"{fname_base}_2D.png"
         save_plot(fig2d, fname, is_plotly=True)
 
-    # Register PDF metadata
     if pdf_title or pdf_text:
         register_pdf_plot(fname, pdf_title or title, pdf_text or "")
 
 
-def show_ribbon_or_line(x, y, title, xlab, ylab, fname_base, ribbon_width=1.2,
-                        pdf_title=None, pdf_text=None):
+def show_ribbon_or_line(
+    x, y, title, xlab, ylab, fname_base, ribbon_width=1.2,
+    pdf_title=None, pdf_text=None
+):
     """
-    3D-first: shows a thin surface ribbon for reliability/consistency.
+    3D-first: shows a thin surface ribbon.
     Falls back to 2D line if 3D disabled.
     """
     x = np.asarray(x, dtype=float)
@@ -309,6 +314,73 @@ def show_ribbon_or_line(x, y, title, xlab, ylab, fname_base, ribbon_width=1.2,
 
     if pdf_title or pdf_text:
         register_pdf_plot(fname, pdf_title or title, pdf_text or "")
+
+
+def show_category_ribbon_or_bar(
+    labels, values, title, xlab, ylab, fname_base, ribbon_width=1.2,
+    pdf_title=None, pdf_text=None
+):
+    """
+    Ensures this chart is ALSO 3D when 3D is enabled (no "2D-only" charts).
+    3D: surface ribbon with category ticks.
+    2D: bar chart.
+    """
+    values = np.asarray(values, dtype=float)
+    x_pos = np.arange(len(labels), dtype=float)
+
+    if not disable_3d:
+        yy = np.array([0.0, ribbon_width])
+        X2, Y2 = np.meshgrid(x_pos, yy, indexing="xy")
+        Z2 = np.vstack([values, values])
+
+        fig3d = go.Figure(data=[go.Surface(
+            x=X2,
+            y=Y2,
+            z=Z2,
+            colorscale="Viridis",
+            showscale=False
+        )])
+        fig3d.update_layout(
+            scene=dict(
+                xaxis=dict(
+                    title=xlab,
+                    tickmode="array",
+                    tickvals=x_pos.tolist(),
+                    ticktext=labels
+                ),
+                yaxis_title="",
+                zaxis=dict(title=ylab, range=[0, max(1.0, float(np.max(values) * 1.15))]),
+                aspectmode="auto",
+                camera=dict(eye=dict(x=1.7, y=1.4, z=1.0))
+            ),
+            margin=dict(l=0, r=0, t=TITLE_TOP_MARGIN, b=0)
+        )
+        apply_plot_title(fig3d, title)
+        st.plotly_chart(fig3d, use_container_width=True, config=PLOTLY_CONFIG)
+        fname = f"{fname_base}_3D.png"
+        save_plot(fig3d, fname, is_plotly=True)
+    else:
+        fig2d = go.Figure(data=[go.Bar(
+            x=labels,
+            y=values,
+            text=[f"{v:.2f}" for v in values],
+            textposition="outside"
+        )])
+        fig2d.update_layout(
+            xaxis_title=xlab,
+            yaxis_title=ylab,
+            margin=dict(l=0, r=0, t=TITLE_TOP_MARGIN, b=0),
+            yaxis_range=[0, max(1.0, float(np.max(values) * 1.15))]
+        )
+        apply_plot_title(fig2d, title)
+        st.plotly_chart(fig2d, use_container_width=True, config=PLOTLY_CONFIG)
+        fname = f"{fname_base}_2D.png"
+        save_plot(fig2d, fname, is_plotly=True)
+
+    if pdf_title or pdf_text:
+        register_pdf_plot(fname, pdf_title or title, pdf_text or "")
+
+    return fname
 
 
 # =========================
@@ -365,7 +437,6 @@ weak_opt = np.exp(-((W - 1.0) ** 2) * 2.5)
 nuclear_stability = np.clip(ratio_penalty * strong_bonus * em_penalty * weak_opt, 0, 1)
 isotope_viable_per_Z = (nuclear_stability > 0.20).sum(axis=1)
 
-# Some global summary metrics used in value-dependent text
 mean_nuclear_stability = float(np.nanmean(nuclear_stability))
 viability_score = float(np.exp(-0.35 * deviation))
 instability_score = float(1.0 - viability_score)
@@ -439,15 +510,9 @@ with tabs[0]:
 
     Z_vals = np.arange(1, 121)
 
-    # Shared base shell structure (purely proxy)
-    Z2_base = Z_vals[:, None]
-    base_shell = np.exp(-np.abs(Z2_base - 30) / 22.0)
-
-    # Helper to build the stability map for a chosen sweep axis
     def stability_map(Z_vals, sweep_vals, sweep_name):
         Z2, X2 = np.meshgrid(Z_vals, sweep_vals, indexing="ij")
 
-        # Use the swept variable as the one on the x-axis, others fixed at current sliders
         if sweep_name == "EM":
             EM_use = np.maximum(X2, 1e-3)
             S_use = max(S, 1e-3)
@@ -463,7 +528,6 @@ with tabs[0]:
         else:
             raise ValueError("Unknown sweep")
 
-        # Proxy terms
         strong_term = np.exp(-np.abs(Z2 - 82) / (28.0 * S_use))
         em_term = np.exp(-np.maximum(Z2 - 20, 0) / (40.0 / EM_use))
         weak_term = np.exp(-((W_use - 1.0) ** 2) * 2.5)
@@ -471,7 +535,6 @@ with tabs[0]:
         stab = np.clip((0.55 + 0.45*np.exp(-np.abs(Z2 - 30) / 22.0)) * strong_term * em_term * weak_term, 0, 1)
         return stab
 
-    # 1) Z vs EM
     em_sweep = np.linspace(0.1, 10.0, res_3d)
     stab_em = stability_map(Z_vals, em_sweep, "EM")
     show_surface_or_heatmap(
@@ -492,7 +555,6 @@ with tabs[0]:
 
     st.divider()
 
-    # 2) Z vs Strong
     s_sweep = np.linspace(0.1, 10.0, res_3d)
     stab_s = stability_map(Z_vals, s_sweep, "S")
     show_surface_or_heatmap(
@@ -513,7 +575,6 @@ with tabs[0]:
 
     st.divider()
 
-    # 3) Z vs Weak
     w_sweep = np.linspace(0.1, 10.0, res_3d)
     stab_w = stability_map(Z_vals, w_sweep, "W")
     show_surface_or_heatmap(
@@ -575,7 +636,6 @@ with tabs[1]:
         "- Stronger nuclear cohesion reduces the unstable ridge and widens the viable region."
     )
 
-
 # -------------------------
 # Tab 2: Star Formation
 # -------------------------
@@ -617,7 +677,6 @@ with tabs[2]:
         "- Higher gravity promotes collapse.\n"
         "- Higher dark energy suppresses large-scale structure and slows star formation."
     )
-
 
 # -------------------------
 # Tab 3: Life Probability
@@ -669,7 +728,6 @@ with tabs[3]:
         "- It rises when chemistry, temperature, pressure, and element supply align."
     )
 
-
 # -------------------------
 # Tab 4: Quantum Bonding
 # -------------------------
@@ -712,7 +770,6 @@ with tabs[4]:
         "- Bonding is strongest near baseline forces.\n"
         "- Higher temperature weakens stable molecules; pressure partially restores overlap."
     )
-
 
 # -------------------------
 # Tab 5: Universe Viability
@@ -776,7 +833,6 @@ with tabs[5]:
         "- It is a compact comparative score, not a literal emergence probability."
     )
 
-
 # -------------------------
 # Tab 6: Element Abundance
 # -------------------------
@@ -808,7 +864,6 @@ with tabs[6]:
         )
     )
 
-    # Evolution surface
     t = np.linspace(0, 1, max(30, res_3d // 2))
     Z_ds = Z[::2]
     abundance_ds = abundance[::2]
@@ -840,7 +895,6 @@ with tabs[6]:
         "- Faster enrichment supports complex chemistry by supplying heavier elements."
     )
 
-
 # -------------------------
 # Tab 7: Radiation Risk
 # -------------------------
@@ -867,7 +921,6 @@ with tabs[7]:
             f"Higher EM can intensify radiative effects and reduce habitability margins."
         )
     )
-
 
 # -------------------------
 # Tab 8: Star Lifespan
@@ -898,7 +951,6 @@ with tabs[8]:
         )
     )
 
-
 # -------------------------
 # Tab 9: Cosmic Web
 # -------------------------
@@ -927,26 +979,21 @@ with tabs[9]:
     density = safe_norm(density)
 
     mid = size // 2
-    slice2d = density[:, :, mid]
+    slice2d = density[:, :, mid]  # shape (size, size)
 
-    fig2d = go.Figure(data=go.Heatmap(
-        z=slice2d.T, x=x, y=y,
+    # IMPORTANT: this is now ALSO 3D when 3D is enabled
+    show_surface_or_heatmap(
+        z=slice2d.T,        # (len(y), len(x))
+        x=x,
+        y=y,
+        title="Cosmic Web Slice",
+        xlab="X",
+        ylab="Y",
+        zlab="Density",
+        fname_base="Dark_Matter_Slice",
         colorscale="Inferno",
-        colorbar=dict(title="Density")
-    ))
-    fig2d.update_layout(
-        xaxis_title="X",
-        yaxis_title="Y",
-        margin=dict(l=0, r=0, t=TITLE_TOP_MARGIN, b=0)
-    )
-    apply_plot_title(fig2d, "Cosmic Web Slice")
-    st.plotly_chart(fig2d, use_container_width=True, config=PLOTLY_CONFIG)
-    save_plot(fig2d, "Dark_Matter_2D_Slice.png", is_plotly=True)
-
-    register_pdf_plot(
-        "Dark_Matter_2D_Slice.png",
-        "Cosmic Web Slice",
-        (
+        pdf_title="Cosmic Web Slice",
+        pdf_text=(
             f"This slice shows how structure clusters under gravity and stretches under dark energy. "
             f"Gravity={G:.2f} tightens clusters, Dark Energy={DE:.2f} expands the scale and thins filaments."
         )
@@ -990,7 +1037,6 @@ with tabs[9]:
         "- Higher dark energy expands voids and reduces clustering."
     )
 
-
 # -------------------------
 # Tab 10: Atomic Stability
 # -------------------------
@@ -1023,7 +1069,6 @@ with tabs[10]:
         "- Stability follows a valley where neutron and proton counts balance binding and decay.\n"
         "- Strong boosts binding, EM penalizes high charge, weak controls beta decay pressure."
     )
-
 
 # -------------------------
 # Tab 11: Life Over Time
@@ -1077,7 +1122,6 @@ with tabs[11]:
         )
     )
 
-
 # -------------------------
 # Tab 12: Molecular Bonding
 # -------------------------
@@ -1106,28 +1150,22 @@ with tabs[12]:
     names = list(families.keys())
     vals = [float(np.clip(families[k] * global_mod, 0, 1)) for k in names]
 
-    fig = go.Figure(data=[go.Bar(x=names, y=vals, text=[f"{v:.2f}" for v in vals], textposition="outside")])
-    fig.update_layout(
-        yaxis_title="Viability",
-        yaxis_range=[0, 1.15],
-        margin=dict(l=0, r=0, t=TITLE_TOP_MARGIN, b=0)
-    )
-    apply_plot_title(fig, "Molecular Bonding Viability")
-    st.plotly_chart(fig, use_container_width=True, config=PLOTLY_CONFIG)
-    save_plot(fig, "Molecular_Bonding.png", is_plotly=True)
-
-    best_idx = int(np.argmax(vals))
-    register_pdf_plot(
-        "Molecular_Bonding.png",
-        "Molecular Bonding Viability",
-        (
+    fname = show_category_ribbon_or_bar(
+        labels=names,
+        values=vals,
+        title="Molecular Bonding Viability",
+        xlab="Family",
+        ylab="Viability",
+        fname_base="Molecular_Bonding",
+        ribbon_width=1.2,
+        pdf_title="Molecular Bonding Viability",
+        pdf_text=(
             f"Bonding viability scales with EM, Strong, temperature, pressure, and isotope availability. "
             f"Global bonding modifier is {global_mod:.2f} with isotope factor {isotope_factor:.2f}. "
-            f"Highest family score is {names[best_idx]} at {vals[best_idx]:.2f}. "
+            f"Highest family score is {names[int(np.argmax(vals))]} at {float(np.max(vals)):.2f}. "
             f"High temperature or large EM and Strong shifts reduce stable molecular diversity."
         )
     )
-
 
 # -------------------------
 # Tab 13: Molecular Abundance
@@ -1164,7 +1202,6 @@ with tabs[13]:
             f"Shifting temperature or pressure away from 1 compresses the viable region."
         )
     )
-
 
 # -------------------------
 # Tab 14: Isotope Half-Life
@@ -1215,7 +1252,6 @@ with tabs[14]:
             f"Higher Strong and near-baseline Weak increase the pool of long-lived nuclei."
         )
     )
-
 
 # -------------------------
 # Tab 15: Periodic Table Expansion
@@ -1273,7 +1309,6 @@ with tabs[15]:
         )
     )
 
-
 # -------------------------
 # Tab 16: Proton–Neutron Map
 # -------------------------
@@ -1317,7 +1352,6 @@ with tabs[16]:
             "As Z increases, extra neutrons are required to dilute charge repulsion and sustain binding."
         )
     )
-
 
 # -------------------------
 # Tab 17: Binding Energy
@@ -1394,7 +1428,6 @@ with tabs[17]:
 
     st.markdown(f"**Peak along valley near Z ≈ {peakZ}**")
 
-
 # -------------------------
 # Tab 18: Decoherence Map
 # -------------------------
@@ -1443,7 +1476,6 @@ with tabs[18]:
         "- Coherence decreases with parameter distance and time.\n"
         "- Higher deviation compresses the high-coherence region."
     )
-
 
 # -------------------------
 # Tab 19: Branch Count
@@ -1501,7 +1533,6 @@ with tabs[19]:
         )
     )
 
-
 # -------------------------
 # Tab 20: Quantum Gravity Horizon
 # -------------------------
@@ -1542,7 +1573,6 @@ with tabs[20]:
         "- Higher gravity raises curvature and pushes toward horizon-like behavior.\n"
         "- Dark energy reduces effective curvature in this simplified mapping."
     )
-
 
 # =========================
 # PDF Export
