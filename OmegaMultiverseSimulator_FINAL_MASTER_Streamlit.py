@@ -20,7 +20,7 @@ except Exception:
 # Streamlit Page Setup
 # =========================
 st.set_page_config(page_title="Omega Multiverse Simulator", layout="wide")
-st.title("Omega Multiverse Simulator")
+st.title("Multiverse Simulator")
 
 # Divider compatibility (older Streamlit)
 if not hasattr(st, "divider"):
@@ -118,12 +118,12 @@ def generate_pdf(constants, summary_text, output_dir=OUTPUT_DIR):
     # Cover
     pdf.add_page()
     pdf.set_font(font, "B", 22)
-    pdf.cell(0, 12, "Omega Multiverse Simulation Report", ln=True, align="C")
+    pdf.cell(0, 12, "Multiverse Simulation Report", ln=True, align="C")
     pdf.ln(6)
     pdf.set_font(font, "", 12)
     date_str = datetime.datetime.now().strftime("%B %d, %Y")
     pdf.cell(0, 8, f"Date: {date_str}", ln=True, align="C")
-    pdf.cell(0, 8, "Generated via Omega Multiverse Simulator", ln=True, align="C")
+    pdf.cell(0, 8, "Generated via Multiverse Simulator", ln=True, align="C")
 
     # Params
     pdf.add_page()
@@ -137,7 +137,7 @@ def generate_pdf(constants, summary_text, output_dir=OUTPUT_DIR):
     # AI Summary
     pdf.add_page()
     pdf.set_font(font, "B", 16)
-    pdf.cell(0, 10, "AI Universe Summary", ln=True)
+    pdf.cell(0, 10, "Universe Summary", ln=True)
     pdf.set_font(font, "", 12)
     for line in (summary_text or "").split("\n"):
         pdf.multi_cell(0, 7, _latin1(line))
@@ -176,7 +176,7 @@ def generate_pdf(constants, summary_text, output_dir=OUTPUT_DIR):
             pdf.set_font(font, "", 11)
             pdf.multi_cell(0, 6, _latin1(expl))
 
-    outname = "Omega_Universe_Simulation_Report.pdf"
+    outname = "Universe_Simulation_Report.pdf"
     pdf.output(outname)
     return outname
 
