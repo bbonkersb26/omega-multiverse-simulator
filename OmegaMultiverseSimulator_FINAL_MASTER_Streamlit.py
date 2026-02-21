@@ -47,10 +47,6 @@ auto_save_plots = st.sidebar.checkbox(
     value=True
 )
 
-def clamp(x, eps=1e-6):
-    """Array-safe clamp (works for scalars and numpy arrays)."""
-    return np.maximum(x, eps)
-
 def save_plot(fig, filename, is_plotly=True):
     """Never crash the app if export fails."""
     if not auto_save_plots:
@@ -97,6 +93,130 @@ def safe_norm(arr):
     if m <= 0 or not np.isfinite(m):
         return np.zeros_like(arr)
     return np.clip(arr / m, 0, 1)
+
+
+def show_surface_or_heatmap(z, x, y, title, xlab, ylab, zlab, fname_base, colorscale="Viridis"):
+    """
+    Prefer 3D Surface; if disabled, show 2D Heatmap.
+    Convention:
+      - x is the horizontal axis (columns)
+      - y is the vertical axis (rows)
+      - z shape must be (len(y), len(x))
+    """
+    z = np.asarray(z)
+    if z.shape != (len(y), len(x)):
+        st.error(f"Shape mismatch in {title}: z{z.shape} must be ({len(y)}, {len(x)})")
+        return
+
+    if not disable_3d:
+        fig3d = go.Figure(data=[go.Surface(
+            z=z,
+            x=x,
+            y=y,
+            colorscale=colorscale,
+            colorbar=dict(title=zlab)
+        )])
+        fig3d.update_layout(
+            title=title + " (3D)",
+            scene=dict(
+                xaxis_title=xlab,
+                yaxis_title=ylab,
+                zaxis_title=zlab
+            )
+        )
+        st.plotly_chart(fig3d, use_container_width=True)
+        save_plot(fig3d, f"{fname_base}_3D.png", is_plotly=True)
+    else:
+        fig2d = go.Figure(data=go.Heatmap(
+            z=z,
+            x=x,
+            y=y,
+            colorscale=colorscale,
+            colorbar=dict(title=zlab)
+        ))
+        fig2d.update_layout(
+            title=title + " (2D fallback)",
+            xaxis_title=xlab,
+            yaxis_title=ylab
+        )
+        st.plotly_chart(fig2d, use_container_width=True)
+        save_plot(fig2d, f"{fname_base}_2D.png", is_plotly=True)
+
+
+def show_ribbon_or_line(x, y_line, title, xlab, ylab, fname_base, colorscale="Viridis", ribbon_width=0.6):
+    """
+    Make a "max 3D" ribbon surface for a 1D curve.
+    - If 3D enabled: Surface with a small dummy y-axis
+    - If disabled: 2D line plot
+    """
+    x = np.asarray(x)
+    y_line = np.asarray(y_line)
+
+    if not disable_3d:
+        y_dummy = np.linspace(-ribbon_width/2, ribbon_width/2, 12)
+        Zs = np.tile(y_line, (len(y_dummy), 1))  # shape (len(y_dummy), len(x))
+
+        fig3d = go.Figure(data=[go.Surface(
+            z=Zs,
+            x=x,
+            y=y_dummy,
+            colorscale=colorscale,
+            showscale=True,
+            colorbar=dict(title=ylab)
+        )])
+        fig3d.update_layout(
+            title=title + " (3D ribbon)",
+            scene=dict(
+                xaxis_title=xlab,
+                yaxis_title="Ribbon axis (dummy)",
+                zaxis_title=ylab
+            )
+        )
+        st.plotly_chart(fig3d, use_container_width=True)
+        save_plot(fig3d, f"{fname_base}_3D.png", is_plotly=True)
+    else:
+        fig2d = go.Figure()
+        fig2d.add_trace(go.Scatter(x=x, y=y_line, mode="lines", name=ylab))
+        fig2d.update_layout(title=title, xaxis_title=xlab, yaxis_title=ylab)
+        st.plotly_chart(fig2d, use_container_width=True)
+        save_plot(fig2d, f"{fname_base}_2D.png", is_plotly=True)
+
+
+def show_3d_points_or_bar(categories, values, title, fname_base):
+    """
+    "Max 3D" for categorical bars:
+    - If 3D enabled: Scatter3d pillars (markers) at category index
+    - If disabled: standard 2D bar
+    """
+    categories = list(categories)
+    values = np.asarray(values, dtype=float)
+    x = np.arange(len(categories))
+
+    if not disable_3d:
+        fig = go.Figure(data=[go.Scatter3d(
+            x=x,
+            y=np.zeros_like(x),
+            z=values,
+            mode="markers+text",
+            text=[f"{v:.2f}" for v in values],
+            textposition="top center",
+            marker=dict(size=8, color=values, colorscale="Viridis", opacity=0.9)
+        )])
+        fig.update_layout(
+            title=title + " (3D points)",
+            scene=dict(
+                xaxis=dict(title="Category", tickmode="array", tickvals=x, ticktext=categories),
+                yaxis_title="(dummy)",
+                zaxis_title="Value"
+            )
+        )
+        st.plotly_chart(fig, use_container_width=True)
+        save_plot(fig, f"{fname_base}_3D.png", is_plotly=True)
+    else:
+        fig2d = go.Figure(data=[go.Bar(x=categories, y=values)])
+        fig2d.update_layout(title=title, yaxis_title="Value")
+        st.plotly_chart(fig2d, use_container_width=True)
+        save_plot(fig2d, f"{fname_base}_2D.png", is_plotly=True)
 
 
 def generate_pdf(constants, summary_text, output_dir=OUTPUT_DIR):
@@ -198,19 +318,15 @@ N = np.arange(1, 181)                # neutron number
 Zg, Ng = np.meshgrid(Z, N, indexing="ij")
 Ag = Zg + Ng
 
-# A soft “valley-of-stability” target:
 Nz_target = 1.0 + (Zg / 80.0)
-ratio = Ng / clamp(Zg, 1)
+ratio = Ng / np.maximum(Zg, 1)
 
-# nuclear stability proxy:
 ratio_penalty = np.exp(-((ratio - Nz_target) ** 2) * 8.0)
-strong_bonus = np.exp(-np.abs(Zg - 82) / (28.0 * clamp(S, 1e-3)))
-em_penalty = np.exp(-np.maximum(Zg - 20, 0) / (30.0 / clamp(EM, 1e-3)))
+strong_bonus = np.exp(-np.abs(Zg - 82) / (28.0 * max(S, 1e-3)))
+em_penalty = np.exp(-np.maximum(Zg - 20, 0) / (30.0 / max(EM, 1e-3)))
 weak_opt = np.exp(-((W - 1.0) ** 2) * 2.5)
 
 nuclear_stability = np.clip(ratio_penalty * strong_bonus * em_penalty * weak_opt, 0, 1)
-
-# isotopes count approximation
 isotope_viable_per_Z = (nuclear_stability > 0.20).sum(axis=1)
 
 
@@ -277,61 +393,37 @@ tabs = st.tabs([
 
 
 # -------------------------
-# Tab 0: Periodic Table Stability
+# Tab 0: Periodic Table Stability (MAX 3D)
 # -------------------------
 with tabs[0]:
-    st.subheader("Periodic Table Stability (2D + 3D)")
+    st.subheader("Periodic Table Stability (MAX 3D)")
 
     em_vals = np.linspace(0.1, 10.0, 70)
     Z_vals = np.arange(1, 121)
-    Z2, EM2 = np.meshgrid(Z_vals, em_vals, indexing="ij")
+
+    # z must be (len(y), len(x)) = (len(Z_vals), len(em_vals))
+    Z2, EM2 = np.meshgrid(Z_vals, em_vals, indexing="ij")  # shapes (Z, EM)
 
     base_shell = np.exp(-np.abs(Z2 - 30) / 22.0)
-    strong_term = np.exp(-np.abs(Z2 - 82) / (28.0 * clamp(S, 1e-3)))
+    strong_term = np.exp(-np.abs(Z2 - 82) / (28.0 * max(S, 1e-3)))
 
-    # ✅ FIX: array-safe clamp (no Python max on arrays)
-    em_term = (
-        np.exp(-np.abs(EM2 - EM) / 1.2)
-        * np.exp(-np.maximum(Z2 - 20, 0) / (40.0 / clamp(EM2, 1e-3)))
-    )
+    # ✅ FIX: use np.maximum for arrays (NOT Python max())
+    em_term = np.exp(-np.abs(EM2 - EM) / 1.2) * np.exp(-np.maximum(Z2 - 20, 0) / (40.0 / np.maximum(EM2, 1e-3)))
 
     weak_term = np.exp(-((W - 1.0) ** 2) * 2.5)
-
     stability = np.clip(base_shell * strong_term * em_term * weak_term, 0, 1)
 
-    fig2d = go.Figure(data=go.Heatmap(
-        z=stability.T,
-        x=Z_vals,
-        y=em_vals,
-        colorscale="Viridis",
-        colorbar=dict(title="Stability")
-    ))
-    fig2d.update_layout(
+    show_surface_or_heatmap(
+        z=stability,
+        x=em_vals,
+        y=Z_vals,
         title="Stability vs Atomic Number and EM Multiplier",
-        xaxis_title="Atomic Number (Z)",
-        yaxis_title="EM Multiplier"
+        xlab="EM Multiplier",
+        ylab="Atomic Number (Z)",
+        zlab="Stability",
+        fname_base="Periodic_Table_Stability",
+        colorscale="Viridis"
     )
-    st.plotly_chart(fig2d, use_container_width=True)
-    save_plot(fig2d, "Periodic_Table_Stability_2D.png", is_plotly=True)
-
-    if not disable_3d:
-        fig3d = go.Figure(data=[go.Surface(
-            z=stability,
-            x=em_vals,
-            y=Z_vals,
-            colorscale="Viridis",
-            colorbar=dict(title="Stability")
-        )])
-        fig3d.update_layout(
-            title="3D Stability Surface",
-            scene=dict(
-                xaxis_title="EM Multiplier",
-                yaxis_title="Atomic Number (Z)",
-                zaxis_title="Stability"
-            )
-        )
-        st.plotly_chart(fig3d, use_container_width=True)
-        save_plot(fig3d, "Periodic_Table_Stability_3D.png", is_plotly=True)
 
     st.markdown(
         "- Nuclear stability rises with **strong force** (cohesion) and falls with **EM** (Coulomb repulsion).\n"
@@ -340,71 +432,51 @@ with tabs[0]:
 
 
 # -------------------------
-# Tab 1: Island of Instability
+# Tab 1: Island of Instability (MAX 3D)
 # -------------------------
 with tabs[1]:
-    st.subheader("Island of Instability (shell-like periodicity + force tuning)")
+    st.subheader("Island of Instability (MAX 3D)")
 
     Z_vals = np.linspace(40, 140, 100)
     S_vals = np.linspace(0.1, 10.0, 90)
-    Z2, S2 = np.meshgrid(Z_vals, S_vals, indexing="ij")
+
+    Z2, S2 = np.meshgrid(Z_vals, S_vals, indexing="ij")  # (Z, S)
 
     shell_waves = (0.55 + 0.45*np.sin(Z2 / 7.0)**2) * (0.55 + 0.45*np.sin(Z2 / 11.0)**2)
     strong_opt = np.exp(-np.abs(S2 - S) / 1.6)
-    coulomb = np.exp(-np.maximum(Z2 - 60, 0) / (25.0 / clamp(EM, 1e-3)))
+    coulomb = np.exp(-np.maximum(Z2 - 60, 0) / (25.0 / max(EM, 1e-3)))
 
     instability = np.clip((1 - strong_opt) * shell_waves * (1 / np.maximum(coulomb, 1e-6)), 0, 2.0)
 
-    fig2d = go.Figure(data=go.Contour(
-        z=instability.T,
-        x=Z_vals,
-        y=S_vals,
-        contours_coloring="heatmap",
-        colorscale="Inferno",
-        colorbar=dict(title="Instability")
-    ))
-    fig2d.update_layout(
-        title="Instability Contours (Z vs Strong Force)",
-        xaxis_title="Atomic Number (Z)",
-        yaxis_title="Strong Force Multiplier"
+    # x = Strong, y = Z, z = Instability -> need z shape (len(y)=len(Z_vals), len(x)=len(S_vals))
+    show_surface_or_heatmap(
+        z=instability,
+        x=S_vals,
+        y=Z_vals,
+        title="Instability Surface (Z vs Strong Force)",
+        xlab="Strong Force Multiplier",
+        ylab="Atomic Number (Z)",
+        zlab="Instability",
+        fname_base="Island_Instability",
+        colorscale="Inferno"
     )
-    st.plotly_chart(fig2d, use_container_width=True)
-    save_plot(fig2d, "Island_Instability_2D.png", is_plotly=True)
-
-    if not disable_3d:
-        fig3d = go.Figure(data=[go.Surface(
-            z=instability,
-            x=S_vals,
-            y=Z_vals,
-            colorscale="Inferno",
-            colorbar=dict(title="Instability")
-        )])
-        fig3d.update_layout(
-            title="3D Instability Surface",
-            scene=dict(
-                xaxis_title="Strong Force",
-                yaxis_title="Atomic Number (Z)",
-                zaxis_title="Instability"
-            )
-        )
-        st.plotly_chart(fig3d, use_container_width=True)
-        save_plot(fig3d, "Island_Instability_3D.png", is_plotly=True)
 
     st.markdown(
-        "- This tab visualizes a synthetic “island of instability” combining shell-like periodic structure with force tuning.\n"
+        "- Shell-like periodic structure + force tuning proxy.\n"
         "- Higher **EM** pushes heavy nuclei toward instability; higher **Strong** can counteract it."
     )
 
 
 # -------------------------
-# Tab 2: Star Formation Potential
+# Tab 2: Star Formation Potential (MAX 3D)
 # -------------------------
 with tabs[2]:
-    st.subheader("Star Formation Potential (Gravity vs Dark Energy + radiative feedback)")
+    st.subheader("Star Formation Potential (MAX 3D)")
 
     g_vals = np.linspace(0.1, 10.0, 80)
     de_vals = np.linspace(0.1, 10.0, 80)
-    G2, DE2 = np.meshgrid(g_vals, de_vals, indexing="ij")
+
+    G2, DE2 = np.meshgrid(g_vals, de_vals, indexing="ij")  # (G, DE)
 
     collapse = (G2**1.1) / (DE2**1.2 + 0.15)
     rad_pressure = 1 / (1 + (EM**1.3))
@@ -412,108 +484,72 @@ with tabs[2]:
 
     sfr = safe_norm(collapse * rad_pressure * ignition)
 
-    fig2d = go.Figure(data=go.Heatmap(
-        z=sfr.T,
-        x=g_vals,
-        y=de_vals,
-        colorscale="Viridis",
-        colorbar=dict(title="Star Formation")
-    ))
-    fig2d.update_layout(
-        title="Star Formation Potential (2D)",
-        xaxis_title="Gravity Multiplier",
-        yaxis_title="Dark Energy Multiplier"
+    # sfr shape (len(g), len(de)) => y=g, x=de
+    show_surface_or_heatmap(
+        z=sfr,
+        x=de_vals,
+        y=g_vals,
+        title="Star Formation Potential (Gravity vs Dark Energy)",
+        xlab="Dark Energy Multiplier",
+        ylab="Gravity Multiplier",
+        zlab="Star Formation Potential",
+        fname_base="Star_Formation",
+        colorscale="Viridis"
     )
-    st.plotly_chart(fig2d, use_container_width=True)
-    save_plot(fig2d, "Star_Formation_2D.png", is_plotly=True)
-
-    if not disable_3d:
-        fig3d = go.Figure(data=[go.Surface(
-            z=sfr,
-            x=g_vals,
-            y=de_vals,
-            colorscale="Viridis",
-            colorbar=dict(title="Star Formation")
-        )])
-        fig3d.update_layout(
-            title="Star Formation Potential (3D)",
-            scene=dict(
-                xaxis_title="Gravity",
-                yaxis_title="Dark Energy",
-                zaxis_title="Potential"
-            )
-        )
-        st.plotly_chart(fig3d, use_container_width=True)
-        save_plot(fig3d, "Star_Formation_3D.png", is_plotly=True)
 
     st.markdown(
-        "- Higher **Gravity** promotes collapse; higher **Dark Energy** suppresses large-scale structure formation.\n"
-        "- **EM** adds radiative pressure feedback; **Strong/Weak** influence ignition efficiency (toy proxy)."
+        "- Higher **Gravity** promotes collapse; higher **Dark Energy** suppresses structure formation.\n"
+        "- **EM** adds radiative pressure feedback; **Strong/Weak** influence ignition efficiency (proxy)."
     )
 
 
 # -------------------------
-# Tab 3: Life Probability (Heatmap)
+# Tab 3: Life Probability (MAX 3D)
 # -------------------------
 with tabs[3]:
-    st.subheader("Life Probability Map (forces + thermal window + metallicity proxy)")
+    st.subheader("Life Probability Map (MAX 3D)")
 
     s_vals = np.linspace(0.1, 10.0, 90)
     em_vals = np.linspace(0.1, 10.0, 90)
-    S2, EM2 = np.meshgrid(s_vals, em_vals, indexing="ij")
+
+    S2, EM2 = np.meshgrid(s_vals, em_vals, indexing="ij")  # (S, EM)
 
     force_window = np.exp(-((S2 - 1.0) ** 2) / 1.6) * np.exp(-((EM2 - 1.0) ** 2) / 1.6) * np.exp(-((W - 1.0) ** 2) / 2.0)
     thermo = np.exp(-((T - 1.0) ** 2) * 1.2) * np.exp(-((P - 1.0) ** 2) * 1.0)
+
     metals = np.clip((G / (DE + 0.2)) * np.exp(-abs(EM - 1.0)*0.6), 0, 5)
     metals_factor = np.tanh(metals / 1.5)
 
     life = np.clip(force_window * thermo * metals_factor, 0, 1)
 
-    fig2d = go.Figure(data=go.Heatmap(
-        z=life.T,
-        x=s_vals,
-        y=em_vals,
-        colorscale="Plasma",
-        colorbar=dict(title="Life Probability")
-    ))
-    fig2d.update_layout(
-        title="Life Probability (2D)",
-        xaxis_title="Strong Force Multiplier",
-        yaxis_title="EM Force Multiplier"
+    # life shape (len(s), len(em)) => y=s, x=em
+    show_surface_or_heatmap(
+        z=life,
+        x=em_vals,
+        y=s_vals,
+        title="Life Probability Surface (Strong vs EM)",
+        xlab="EM Force Multiplier",
+        ylab="Strong Force Multiplier",
+        zlab="Life Probability (proxy)",
+        fname_base="Life_Probability",
+        colorscale="Plasma"
     )
-    st.plotly_chart(fig2d, use_container_width=True)
-    save_plot(fig2d, "Life_Probability_2D.png", is_plotly=True)
-
-    figc = go.Figure(data=go.Contour(
-        z=life.T,
-        x=s_vals,
-        y=em_vals,
-        contours_coloring="heatmap",
-        colorscale="Plasma",
-        colorbar=dict(title="Life Probability")
-    ))
-    figc.update_layout(
-        title="Life Probability Zones (Contour)",
-        xaxis_title="Strong",
-        yaxis_title="EM"
-    )
-    st.plotly_chart(figc, use_container_width=True)
-    save_plot(figc, "Life_Probability_Contour.png", is_plotly=True)
 
     st.markdown(
-        "- This combines a **force-compatibility window** (chemistry) + **thermodynamic window** (T/P) + a **metallicity proxy** (needs stars & heavy elements).\n"
-        "- Treat as a scientific *proxy* model: consistent, not a claim of real probabilities."
+        "- Force-compatibility window + thermodynamic window (T/P) + metallicity proxy.\n"
+        "- Proxy model: internally consistent exploration, not a literal probability."
     )
 
 
 # -------------------------
-# Tab 4: Quantum Bonding
+# Tab 4: Quantum Bonding (MAX 3D)
 # -------------------------
 with tabs[4]:
-    st.subheader("Quantum Bonding (2D contour + optional 3D)")
+    st.subheader("Quantum Bonding (MAX 3D)")
 
     s_vals = np.linspace(0.1, 10.0, 80)
     em_vals = np.linspace(0.1, 10.0, 80)
+
     S2, EM2 = np.meshgrid(s_vals, em_vals, indexing="ij")
 
     em_binding = np.exp(-((EM2 - 1.0) ** 2) / 1.4)
@@ -523,79 +559,51 @@ with tabs[4]:
 
     bonding = np.clip(em_binding * strong_chem * temp_kill * pressure_help, 0, 1)
 
-    fig2d = go.Figure(data=go.Contour(
-        z=bonding.T,
-        x=s_vals,
-        y=em_vals,
-        contours_coloring="heatmap",
-        colorscale="Viridis",
-        colorbar=dict(title="Bonding")
-    ))
-    fig2d.update_layout(
-        title="Quantum Bonding Zone Map (2D)",
-        xaxis_title="Strong",
-        yaxis_title="EM"
+    show_surface_or_heatmap(
+        z=bonding,
+        x=em_vals,
+        y=s_vals,
+        title="Quantum Bonding Surface (Strong vs EM)",
+        xlab="EM Multiplier",
+        ylab="Strong Multiplier",
+        zlab="Bonding (proxy)",
+        fname_base="Quantum_Bonding",
+        colorscale="Viridis"
     )
-    st.plotly_chart(fig2d, use_container_width=True)
-    save_plot(fig2d, "Quantum_Bonding_2D.png", is_plotly=True)
-
-    if not disable_3d:
-        fig3d = go.Figure(data=[go.Surface(
-            z=bonding,
-            x=s_vals,
-            y=em_vals,
-            colorscale="Viridis",
-            colorbar=dict(title="Bonding")
-        )])
-        fig3d.update_layout(
-            title="Quantum Bonding Surface (3D)",
-            scene=dict(
-                xaxis_title="Strong",
-                yaxis_title="EM",
-                zaxis_title="Bonding"
-            )
-        )
-        st.plotly_chart(fig3d, use_container_width=True)
-        save_plot(fig3d, "Quantum_Bonding_3D.png", is_plotly=True)
 
     st.markdown(
         "- Bonding rises near EM≈1 and Strong≈1, but falls at high temperature.\n"
-        "- Pressure increases overlap (proxy), raising bonding in this simplified model."
+        "- Pressure increases overlap (proxy)."
     )
 
 
 # -------------------------
-# Tab 5: Universe Emergence Probability
+# Tab 5: Universe Emergence Probability (MAX 3D)
 # -------------------------
 with tabs[5]:
-    st.subheader("Universe Emergence / Viability Score")
+    st.subheader("Universe Emergence / Viability Score (MAX 3D)")
 
     viability = float(np.exp(-0.35 * deviation))
     chaos = float(1.0 - viability)
 
-    fig = go.Figure(data=[
-        go.Bar(name="Viability", x=["Score"], y=[viability]),
-        go.Bar(name="Chaos/Instability", x=["Score"], y=[chaos]),
-    ])
-    fig.update_layout(
-        barmode="stack",
+    show_3d_points_or_bar(
+        categories=["Viability", "Chaos/Instability"],
+        values=[viability, chaos],
         title="Global Viability Proxy",
-        yaxis_title="Normalized Score"
+        fname_base="Universe_Viability"
     )
-    st.plotly_chart(fig, use_container_width=True)
-    save_plot(fig, "Universe_Viability.png", is_plotly=True)
 
     st.markdown(
-        "- This is a **global proxy** based on how far constants deviate from baseline.\n"
-        "- It’s not a physical probability; it’s a compact “distance-from-our-universe” viability score."
+        "- A global proxy based on distance-from-baseline constants.\n"
+        "- Not a physical probability; a compact viability score."
     )
 
 
 # -------------------------
-# Tab 6: Element Abundance Probability
+# Tab 6: Element Abundance Probability (MAX 3D)
 # -------------------------
 with tabs[6]:
-    st.subheader("Element Abundance Probability (toy nucleosynthesis proxy)")
+    st.subheader("Element Abundance Probability (MAX 3D)")
 
     surv = safe_norm(isotope_viable_per_Z.astype(float))
     stellar = np.clip((G / (DE + 0.2)) * np.exp(-abs(EM - 1.0)*0.4) * np.exp(-abs(S - 1.0)*0.3), 0, 3)
@@ -603,71 +611,70 @@ with tabs[6]:
 
     abundance = np.clip(surv * stellar_factor, 0, 1)
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=Z, y=abundance, mode="lines", name="Abundance Proxy"))
-    fig.update_layout(
+    # 3D ribbon for abundance(Z)
+    show_ribbon_or_line(
+        x=Z,
+        y_line=abundance,
         title="Element Abundance vs Z",
-        xaxis_title="Atomic Number (Z)",
-        yaxis_title="Relative Abundance (proxy)"
+        xlab="Atomic Number (Z)",
+        ylab="Relative Abundance (proxy)",
+        fname_base="Element_Abundance_Line",
+        colorscale="Cividis"
     )
-    st.plotly_chart(fig, use_container_width=True)
-    save_plot(fig, "Element_Abundance_Line.png", is_plotly=True)
 
+    # 3D surface for abundance evolution
     t = np.linspace(0, 1, 60)
     Z2, T2 = np.meshgrid(Z, t, indexing="ij")
     enrich = 1 - np.exp(-T2 * (2.0 + 4.0*stellar_factor))
-    abund_time = np.clip((abundance[:, None]) * enrich, 0, 1)
+    abund_time = np.clip((abundance[:, None]) * enrich, 0, 1)  # (Z, t)
 
-    fig2d = go.Figure(data=go.Heatmap(
-        z=abund_time.T,
-        x=Z,
-        y=t,
-        colorscale="Cividis",
-        colorbar=dict(title="Abundance")
-    ))
-    fig2d.update_layout(
-        title="Abundance Evolution (2D)",
-        xaxis_title="Z",
-        yaxis_title="Normalized Cosmic Time"
+    # need z shape (len(y)=len(Z), len(x)=len(t)) => y=Z, x=t
+    show_surface_or_heatmap(
+        z=abund_time,
+        x=t,
+        y=Z,
+        title="Abundance Evolution (Z vs Time)",
+        xlab="Normalized Cosmic Time",
+        ylab="Atomic Number (Z)",
+        zlab="Abundance (proxy)",
+        fname_base="Element_Abundance_Time",
+        colorscale="Cividis"
     )
-    st.plotly_chart(fig2d, use_container_width=True)
-    save_plot(fig2d, "Element_Abundance_2D.png", is_plotly=True)
 
     st.markdown(
-        "- Combines isotope survivability with a crude star-processing/enrichment proxy.\n"
-        "- Useful for comparative “what if constants change?” exploration."
+        "- Combines isotope survivability with star-processing/enrichment proxy.\n"
+        "- Comparative exploration for constant changes."
     )
 
 
 # -------------------------
-# Tab 7: EM Radiation Risk
+# Tab 7: EM Radiation Risk (MAX 3D)
 # -------------------------
 with tabs[7]:
-    st.subheader("EM Radiation Risk")
+    st.subheader("EM Radiation Risk (MAX 3D)")
 
     x = np.linspace(0.1, 10.0, 600)
     y = (x ** 2) * (0.4 + 0.6*np.tanh(T / 2.0)) / 20.0
     y = np.clip(y, 0, 1)
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x, y=y, mode="lines", name="Radiation Risk"))
-    fig.add_vline(x=EM, line_dash="dash", annotation_text="Current EM", annotation_position="top")
-    fig.update_layout(
+    show_ribbon_or_line(
+        x=x,
+        y_line=y,
         title="Radiation Risk vs EM Multiplier",
-        xaxis_title="EM Multiplier",
-        yaxis_title="Normalized Risk"
+        xlab="EM Multiplier",
+        ylab="Normalized Risk",
+        fname_base="EM_Radiation_Risk",
+        colorscale="Plasma"
     )
-    st.plotly_chart(fig, use_container_width=True)
-    save_plot(fig, "EM_Radiation_Risk.png", is_plotly=True)
 
-    st.markdown("- Higher EM generally increases radiative coupling; this is a proxy curve for comparative risk.")
+    st.markdown("- Higher EM generally increases radiative coupling; proxy curve for comparative risk.")
 
 
 # -------------------------
-# Tab 8: Star Lifespan Model
+# Tab 8: Star Lifespan Model (MAX 3D)
 # -------------------------
 with tabs[8]:
-    st.subheader("Star Lifespan Model (mass-luminosity proxy)")
+    st.subheader("Star Lifespan Model (MAX 3D)")
 
     g_vals = np.linspace(0.1, 10.0, 400)
     M = g_vals
@@ -675,31 +682,30 @@ with tabs[8]:
     tau = (M / np.maximum(L, 1e-9))
     tau = safe_norm(tau)
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=g_vals, y=tau, mode="lines", name="Relative Lifetime"))
-    fig.add_vline(x=G, line_dash="dash", annotation_text="Current G", annotation_position="top")
-    fig.update_layout(
+    show_ribbon_or_line(
+        x=g_vals,
+        y_line=tau,
         title="Relative Stellar Lifetime vs Gravity",
-        xaxis_title="Gravity Multiplier",
-        yaxis_title="Relative Lifetime"
+        xlab="Gravity Multiplier",
+        ylab="Relative Lifetime",
+        fname_base="Star_Lifespan",
+        colorscale="Viridis"
     )
-    st.plotly_chart(fig, use_container_width=True)
-    save_plot(fig, "Star_Lifespan.png", is_plotly=True)
 
     st.markdown("- Stronger gravity → more massive characteristic stars → shorter lifetimes (proxy).")
 
 
 # -------------------------
-# Tab 9: Dark Matter Simulation
+# Tab 9: Dark Matter Simulation (MAX 3D where possible)
 # -------------------------
 with tabs[9]:
-    st.subheader("Dark Matter / Cosmic Web Proxy (3D + 2D slice)")
+    st.subheader("Dark Matter / Cosmic Web Proxy (MAX 3D)")
 
     size = 32
     scale = 8.0
 
-    cluster_spread = (3.5 / clamp(G, 1e-3))
-    stretch = (1.0 / clamp(DE, 1e-3))
+    cluster_spread = (3.5 / max(G, 1e-3))
+    stretch = (1.0 / max(DE, 1e-3))
 
     x = np.linspace(-scale*stretch, scale*stretch, size)
     y = np.linspace(-scale*stretch, scale*stretch, size)
@@ -717,21 +723,22 @@ with tabs[9]:
     density = safe_norm(density)
 
     mid = size // 2
-    slice2d = density[:, :, mid]
+    slice2d = density[:, :, mid]  # (x,y)
 
-    fig2d = go.Figure(data=go.Heatmap(
-        z=slice2d.T,
-        x=x, y=y,
-        colorscale="Inferno",
-        colorbar=dict(title="Density")
-    ))
-    fig2d.update_layout(
-        title="Cosmic Web Density Slice (2D)",
-        xaxis_title="X", yaxis_title="Y"
+    # For slice, prefer 3D surface (x vs y)
+    show_surface_or_heatmap(
+        z=slice2d.T,          # need (len(y), len(x)) -> slice2d is (len(x), len(y))
+        x=x,
+        y=y,
+        title="Cosmic Web Density Slice",
+        xlab="X",
+        ylab="Y",
+        zlab="Density",
+        fname_base="Dark_Matter_Slice",
+        colorscale="Inferno"
     )
-    st.plotly_chart(fig2d, use_container_width=True)
-    save_plot(fig2d, "Dark_Matter_2D_Slice.png", is_plotly=True)
 
+    # 3D point cloud (if enabled)
     if not disable_3d:
         thr = 0.25
         pts = np.where(density > thr)
@@ -754,51 +761,32 @@ with tabs[9]:
 
 
 # -------------------------
-# Tab 10: Atomic Stability
+# Tab 10: Atomic Stability (MAX 3D)
 # -------------------------
 with tabs[10]:
-    st.subheader("Atomic / Isotope Stability (2D + optional 3D)")
+    st.subheader("Atomic / Isotope Stability (MAX 3D)")
 
-    fig2d = go.Figure(data=go.Heatmap(
-        z=nuclear_stability.T,
-        x=Z, y=N,
-        colorscale="Plasma",
-        colorbar=dict(title="Stability")
-    ))
-    fig2d.update_layout(
-        title="Isotope Stability Map (Z vs N)",
-        xaxis_title="Z (protons)",
-        yaxis_title="N (neutrons)"
+    # nuclear_stability is (Z, N) => y=Z, x=N
+    show_surface_or_heatmap(
+        z=nuclear_stability,
+        x=N,
+        y=Z,
+        title="Isotope Stability Map",
+        xlab="N (neutrons)",
+        ylab="Z (protons)",
+        zlab="Stability",
+        fname_base="Atomic_Stability",
+        colorscale="Plasma"
     )
-    st.plotly_chart(fig2d, use_container_width=True)
-    save_plot(fig2d, "Atomic_Stability_2D.png", is_plotly=True)
 
-    if not disable_3d:
-        Zs = Z[::3]
-        Ns = N[::3]
-        stab_ds = nuclear_stability[::3, ::3]
-        fig3d = go.Figure(data=[go.Surface(
-            z=stab_ds,
-            x=Zs,
-            y=Ns,
-            colorscale="Plasma",
-            colorbar=dict(title="Stability")
-        )])
-        fig3d.update_layout(
-            title="Stability Surface (Downsampled 3D)",
-            scene=dict(xaxis_title="Z", yaxis_title="N", zaxis_title="Stability")
-        )
-        st.plotly_chart(fig3d, use_container_width=True)
-        save_plot(fig3d, "Atomic_Stability_3D.png", is_plotly=True)
-
-    st.markdown("- Built from a valley-of-stability proxy: strong force helps binding; EM penalizes high-Z; weak sets beta-decay efficiency.")
+    st.markdown("- Valley-of-stability proxy: strong helps binding; EM penalizes high-Z; weak sets beta-decay efficiency.")
 
 
 # -------------------------
-# Tab 11: Universe Life Probability Over Time
+# Tab 11: Universe Life Probability Over Time (MAX 3D)
 # -------------------------
 with tabs[11]:
-    st.subheader("Life Probability Over Cosmic Time (metals + stable stars + chemistry window)")
+    st.subheader("Life Probability Over Cosmic Time (MAX 3D)")
 
     time = np.linspace(0, 1, 200)
 
@@ -814,26 +802,36 @@ with tabs[11]:
 
     life_t = np.clip(metals * star_window * chem_window * thermo_window, 0, 1)
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=time, y=metals, mode="lines", name="Metallicity"))
-    fig.add_trace(go.Scatter(x=time, y=life_t, mode="lines", name="Life Probability (proxy)"))
-    fig.update_layout(
-        title="Life Probability Over Time (Proxy)",
-        xaxis_title="Normalized Cosmic Time",
-        yaxis_title="Value"
-    )
-    st.plotly_chart(fig, use_container_width=True)
-    save_plot(fig, "Life_Over_Time.png", is_plotly=True)
+    if not disable_3d:
+        fig = go.Figure()
+        fig.add_trace(go.Scatter3d(x=time, y=np.zeros_like(time), z=metals, mode="lines", name="Metallicity"))
+        fig.add_trace(go.Scatter3d(x=time, y=np.ones_like(time),  z=life_t, mode="lines", name="Life Probability (proxy)"))
+        fig.update_layout(
+            title="Life Probability Over Time (3D lanes)",
+            scene=dict(
+                xaxis_title="Time",
+                yaxis=dict(title="Lane", tickmode="array", tickvals=[0, 1], ticktext=["Metals", "Life"]),
+                zaxis_title="Value"
+            )
+        )
+        st.plotly_chart(fig, use_container_width=True)
+        save_plot(fig, "Life_Over_Time_3D.png", is_plotly=True)
+    else:
+        fig2d = go.Figure()
+        fig2d.add_trace(go.Scatter(x=time, y=metals, mode="lines", name="Metallicity"))
+        fig2d.add_trace(go.Scatter(x=time, y=life_t, mode="lines", name="Life Probability (proxy)"))
+        fig2d.update_layout(title="Life Probability Over Time", xaxis_title="Time", yaxis_title="Value")
+        st.plotly_chart(fig2d, use_container_width=True)
+        save_plot(fig2d, "Life_Over_Time_2D.png", is_plotly=True)
 
 
 # -------------------------
-# Tab 12: Molecular Bonding Model
+# Tab 12: Molecular Bonding Model (MAX 3D)
 # -------------------------
 with tabs[12]:
-    st.subheader("Molecular Bonding Viability (element families)")
+    st.subheader("Molecular Bonding Viability (MAX 3D)")
 
-    denom = np.max(isotope_viable_per_Z)
-    isotope_factor = float(np.mean(isotope_viable_per_Z) / denom) if denom > 0 else 0.0
+    isotope_factor = float(np.mean(isotope_viable_per_Z) / np.max(isotope_viable_per_Z))
     isotope_factor = np.clip(isotope_factor, 0, 1)
 
     families = {
@@ -855,178 +853,167 @@ with tabs[12]:
     names = list(families.keys())
     vals = [np.clip(families[k] * global_mod, 0, 1) for k in names]
 
-    fig = go.Figure(data=[go.Bar(x=names, y=vals, text=[f"{v:.2f}" for v in vals], textposition="outside")])
-    fig.update_layout(
+    show_3d_points_or_bar(
+        categories=names,
+        values=vals,
         title="Molecular Bonding Viability (Proxy)",
-        yaxis_title="Viability",
-        yaxis_range=[0, 1.15]
+        fname_base="Molecular_Bonding"
     )
-    st.plotly_chart(fig, use_container_width=True)
-    save_plot(fig, "Molecular_Bonding.png", is_plotly=True)
 
 
 # -------------------------
-# Tab 13: Molecular Abundance Map
+# Tab 13: Molecular Abundance Map (MAX 3D)
 # -------------------------
 with tabs[13]:
-    st.subheader("Molecular Abundance (2D map over Temperature & Pressure)")
+    st.subheader("Molecular Abundance (MAX 3D)")
 
     tvals = np.linspace(0.1, 10.0, 80)
     pvals = np.linspace(0.1, 10.0, 80)
-    T2, P2 = np.meshgrid(tvals, pvals, indexing="ij")
+    T2, P2 = np.meshgrid(tvals, pvals, indexing="ij")  # (T, P)
 
     force_gate = float(np.exp(-abs(S - 1.0)*0.4) * np.exp(-abs(EM - 1.0)*0.4))
     thermo_gate = np.exp(-((T2 - 1.0)**2) * 0.8) * np.exp(-((P2 - 1.0)**2) * 0.6)
-    abundance = np.clip(force_gate * thermo_gate, 0, 1)
+    abundance = np.clip(force_gate * thermo_gate, 0, 1)  # (T, P)
 
-    fig2d = go.Figure(data=go.Heatmap(
-        z=abundance.T,
-        x=tvals, y=pvals,
-        colorscale="Viridis",
-        colorbar=dict(title="Abundance")
-    ))
-    fig2d.update_layout(
+    # y=T, x=P
+    show_surface_or_heatmap(
+        z=abundance,
+        x=pvals,
+        y=tvals,
         title="Molecular Abundance (T vs P)",
-        xaxis_title="Temperature Multiplier",
-        yaxis_title="Pressure Multiplier"
+        xlab="Pressure Multiplier",
+        ylab="Temperature Multiplier",
+        zlab="Abundance (proxy)",
+        fname_base="Molecular_Abundance",
+        colorscale="Viridis"
     )
-    st.plotly_chart(fig2d, use_container_width=True)
-    save_plot(fig2d, "Molecular_Abundance_2D.png", is_plotly=True)
-
-    if not disable_3d:
-        fig3d = go.Figure(data=[go.Surface(
-            z=abundance,
-            x=tvals, y=pvals,
-            colorscale="Viridis",
-            colorbar=dict(title="Abundance")
-        )])
-        fig3d.update_layout(
-            title="Molecular Abundance Surface (3D)",
-            scene=dict(xaxis_title="T", yaxis_title="P", zaxis_title="Abundance")
-        )
-        st.plotly_chart(fig3d, use_container_width=True)
-        save_plot(fig3d, "Molecular_Abundance_3D.png", is_plotly=True)
 
 
 # -------------------------
-# Tab 14: Isotope Decay & Half-Life Model
+# Tab 14: Isotope Decay & Half-Life Model (MAX 3D)
 # -------------------------
 with tabs[14]:
-    st.subheader("Isotope Half-Life Proxy (Z vs N) + long-lived count")
+    st.subheader("Isotope Half-Life Proxy (MAX 3D)")
 
     half_life = np.clip(nuclear_stability * np.exp(-abs(W - 1.0) * 0.6), 0, 1)
 
-    fig2d = go.Figure(data=go.Heatmap(
-        z=half_life.T,
-        x=Z, y=N,
-        colorscale="Cividis",
-        colorbar=dict(title="Half-life (proxy)")
-    ))
-    fig2d.update_layout(
-        title="Half-Life Proxy Map (Z vs N)",
-        xaxis_title="Z", yaxis_title="N"
+    # y=Z, x=N
+    show_surface_or_heatmap(
+        z=half_life,
+        x=N,
+        y=Z,
+        title="Half-Life Proxy Map",
+        xlab="N (neutrons)",
+        ylab="Z (protons)",
+        zlab="Half-life (proxy)",
+        fname_base="Half_Life_Map",
+        colorscale="Cividis"
     )
-    st.plotly_chart(fig2d, use_container_width=True)
-    save_plot(fig2d, "Half_Life_2D.png", is_plotly=True)
 
     long_lived = (half_life > 0.35).sum(axis=1)
-    fig = go.Figure(data=[go.Bar(x=Z, y=long_lived)])
-    fig.update_layout(
-        title="Count of Long-Lived Isotopes per Z (proxy threshold)",
-        xaxis_title="Z",
-        yaxis_title="# long-lived isotopes"
+    # "Max 3D" points for long-lived counts
+    show_ribbon_or_line(
+        x=Z,
+        y_line=long_lived,
+        title="Count of Long-Lived Isotopes per Z",
+        xlab="Atomic Number (Z)",
+        ylab="# long-lived isotopes",
+        fname_base="Half_Life_LongLived_Count",
+        colorscale="Viridis"
     )
-    st.plotly_chart(fig, use_container_width=True)
-    save_plot(fig, "Half_Life_LongLived_Count.png", is_plotly=True)
 
 
 # -------------------------
-# Tab 15: Periodic Table Expansion Potential
+# Tab 15: Periodic Table Expansion Potential (MAX 3D)
 # -------------------------
 with tabs[15]:
-    st.subheader("Periodic Table Expansion Potential")
+    st.subheader("Periodic Table Expansion Potential (MAX 3D)")
 
     Z_ext = np.arange(1, 201)
-    cohesion = np.exp(-np.abs(Z_ext - 82) / (30.0 * clamp(S, 1e-3)))
-    coulomb = 1 / (1 + np.exp(-(Z_ext - 110) / (12.0 / clamp(EM, 1e-3))))
+
+    cohesion = np.exp(-np.abs(Z_ext - 82) / (30.0 * max(S, 1e-3)))
+    coulomb = 1 / (1 + np.exp(-(Z_ext - 110) / (12.0 / max(EM, 1e-3))))
     decay = np.exp(-((W - 1.0) ** 2) * 1.2)
 
     stability_curve = np.clip(cohesion * (1 - coulomb) * decay, 0, 1)
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=Z_ext, y=stability_curve, mode="lines", name="Stability Potential"))
-    fig.update_layout(
+    show_ribbon_or_line(
+        x=Z_ext,
+        y_line=stability_curve,
         title="Expansion Limit Curve",
-        xaxis_title="Z",
-        yaxis_title="Stability Potential"
+        xlab="Z",
+        ylab="Stability Potential",
+        fname_base="Periodic_Table_Expansion_Curve",
+        colorscale="Viridis"
     )
-    st.plotly_chart(fig, use_container_width=True)
-    save_plot(fig, "Periodic_Table_Expansion.png", is_plotly=True)
 
     maxZ = int(Z_ext[stability_curve > 0.12][-1]) if np.any(stability_curve > 0.12) else 0
     st.markdown(f"**Estimated max potentially-stable Z (proxy threshold): {maxZ}**")
 
     em_vals = np.linspace(0.1, 10.0, 80)
-    Z2, EM2 = np.meshgrid(Z_ext, em_vals, indexing="ij")
-    cohesion2 = np.exp(-np.abs(Z2 - 82) / (30.0 * clamp(S, 1e-3)))
-    coulomb2 = 1 / (1 + np.exp(-(Z2 - 110) / (12.0 / clamp(EM2, 1e-3))))
+    Z2, EM2 = np.meshgrid(Z_ext, em_vals, indexing="ij")  # (Z, EM)
+
+    cohesion2 = np.exp(-np.abs(Z2 - 82) / (30.0 * max(S, 1e-3)))
+    coulomb2 = 1 / (1 + np.exp(-(Z2 - 110) / (12.0 / np.maximum(EM2, 1e-3))))
     stab2 = np.clip(cohesion2 * (1 - coulomb2) * decay, 0, 1)
 
-    fig2d = go.Figure(data=go.Heatmap(
-        z=stab2.T, x=Z_ext, y=em_vals, colorscale="Viridis",
-        colorbar=dict(title="Stability")
-    ))
-    fig2d.update_layout(
+    # y=Z, x=EM
+    show_surface_or_heatmap(
+        z=stab2,
+        x=em_vals,
+        y=Z_ext,
         title="Expansion Potential Map (Z vs EM)",
-        xaxis_title="Z",
-        yaxis_title="EM"
+        xlab="EM Multiplier",
+        ylab="Z",
+        zlab="Stability",
+        fname_base="Periodic_Table_Expansion_Map",
+        colorscale="Viridis"
     )
-    st.plotly_chart(fig2d, use_container_width=True)
-    save_plot(fig2d, "Periodic_Table_Expansion_2D.png", is_plotly=True)
 
 
 # -------------------------
-# Tab 16: Proton–Neutron Ratio Heatmap
+# Tab 16: Proton–Neutron Ratio Heatmap (MAX 3D)
 # -------------------------
 with tabs[16]:
-    st.subheader("Proton–Neutron Ratio / Valley of Stability")
+    st.subheader("Proton–Neutron Ratio / Valley of Stability (MAX 3D)")
 
-    fig2d = go.Figure(data=go.Heatmap(
-        z=nuclear_stability.T,
-        x=Z, y=N,
-        colorscale="Magma",
-        colorbar=dict(title="Viability")
-    ))
-    fig2d.update_layout(
+    viability = nuclear_stability  # (Z, N)
+
+    # y=Z, x=N
+    show_surface_or_heatmap(
+        z=viability,
+        x=N,
+        y=Z,
         title="Viability in (Z, N)",
-        xaxis_title="Z",
-        yaxis_title="N"
+        xlab="N (neutrons)",
+        ylab="Z (protons)",
+        zlab="Viability",
+        fname_base="PN_Viability",
+        colorscale="Magma"
     )
-    st.plotly_chart(fig2d, use_container_width=True)
-    save_plot(fig2d, "PN_Heatmap.png", is_plotly=True)
 
     target_line = (1.0 + (Z / 80.0)) * Z
-    figline = go.Figure()
-    figline.add_trace(go.Scatter(x=Z, y=target_line, mode="lines", name="Target N(Z)"))
-    figline.update_layout(
+    show_ribbon_or_line(
+        x=Z,
+        y_line=target_line,
         title="Valley-of-Stability Target Curve (proxy)",
-        xaxis_title="Z",
-        yaxis_title="Target N"
+        xlab="Z",
+        ylab="Target N",
+        fname_base="PN_Target_Curve",
+        colorscale="Viridis"
     )
-    st.plotly_chart(figline, use_container_width=True)
-    save_plot(figline, "PN_Target_Curve.png", is_plotly=True)
 
 
 # -------------------------
-# Tab 17: Nuclear Binding Energy Map
+# Tab 17: Nuclear Binding Energy Map (MAX 3D)
 # -------------------------
 with tabs[17]:
-    st.subheader("Nuclear Binding Energy (SEMF-style proxy)")
+    st.subheader("Nuclear Binding Energy (MAX 3D)")
 
     a_v = 15.8 * S
     a_s = 18.3
     a_c = 0.714 * EM
-    a_sym = 23.2 * (1 / clamp(W, 1e-3))
+    a_sym = 23.2 * (1 / max(W, 1e-3))
     a_pair = 12.0
 
     A = Ag
@@ -1035,58 +1022,57 @@ with tabs[17]:
     BE = (
         a_v * A
         - a_s * (A ** (2/3))
-        - a_c * (Zg * (Zg - 1)) / clamp(A ** (1/3), 1e-9)
-        - a_sym * ((A - 2*Zg) ** 2) / clamp(A, 1e-9)
-        + pairing * a_pair / clamp(A ** 0.5, 1e-9)
+        - a_c * (Zg * (Zg - 1)) / np.maximum(A ** (1/3), 1e-9)
+        - a_sym * ((A - 2*Zg) ** 2) / np.maximum(A, 1e-9)
+        + pairing * a_pair / np.maximum(A ** 0.5, 1e-9)
     )
 
-    BE_per_A = np.clip(BE / clamp(A, 1), 0, None)
+    BE_per_A = np.clip(BE / np.maximum(A, 1), 0, None)
     BE_per_A = np.clip(BE_per_A, 0, np.nanpercentile(BE_per_A, 99))
 
-    fig2d = go.Figure(data=go.Heatmap(
-        z=BE_per_A.T,
-        x=Z, y=N,
-        colorscale="Viridis",
-        colorbar=dict(title="BE/A (proxy)")
-    ))
-    fig2d.update_layout(
-        title="Binding Energy per Nucleon Map (Z vs N)",
-        xaxis_title="Z",
-        yaxis_title="N"
+    # y=Z, x=N
+    show_surface_or_heatmap(
+        z=BE_per_A,
+        x=N,
+        y=Z,
+        title="Binding Energy per Nucleon Map",
+        xlab="N (neutrons)",
+        ylab="Z (protons)",
+        zlab="BE/A (proxy)",
+        fname_base="Binding_Energy_Map",
+        colorscale="Viridis"
     )
-    st.plotly_chart(fig2d, use_container_width=True)
-    save_plot(fig2d, "Binding_Energy_2D.png", is_plotly=True)
 
     target_line = (1.0 + (Z / 80.0)) * Z
     N_pick = np.clip(target_line.astype(int), 1, N[-1])
     idxN = N_pick - 1
     be_line = BE_per_A[np.arange(len(Z)), idxN]
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=Z, y=be_line, mode="lines+markers", name="BE/A along valley"))
-    fig.update_layout(
+    show_ribbon_or_line(
+        x=Z,
+        y_line=be_line,
         title="BE/A along Valley-of-Stability (proxy)",
-        xaxis_title="Z",
-        yaxis_title="BE/A"
+        xlab="Z",
+        ylab="BE/A",
+        fname_base="Binding_Energy_Line",
+        colorscale="Viridis"
     )
-    st.plotly_chart(fig, use_container_width=True)
-    save_plot(fig, "Binding_Energy_Line.png", is_plotly=True)
 
     peakZ = int(Z[np.nanargmax(be_line)])
     st.markdown(f"**Peak along valley at Z ≈ {peakZ} (proxy)**")
 
 
 # -------------------------
-# Tab 18: Multiverse Decoherence Map
+# Tab 18: Multiverse Decoherence Map (MAX 3D)
 # -------------------------
 with tabs[18]:
-    st.subheader("Multiverse Decoherence Map (parameter-space distance + time decay)")
+    st.subheader("Multiverse Decoherence Map (MAX 3D)")
 
     s_vals = np.linspace(0.1, 10.0, 70)
     em_vals = np.linspace(0.1, 10.0, 70)
     t_vals = np.linspace(0, 1, 60)
 
-    S2, EM2, TT = np.meshgrid(s_vals, em_vals, t_vals, indexing="ij")
+    S2, EM2, TT = np.meshgrid(s_vals, em_vals, t_vals, indexing="ij")  # (S, EM, t)
 
     dist2 = (
         (S2 - S)**2 +
@@ -1097,45 +1083,29 @@ with tabs[18]:
     )
 
     coherence = np.exp(-dist2 / 4.0) * np.exp(-TT * (0.8 + 0.6*deviation/4.0))
+    mid = coherence[:, :, len(t_vals)//2]  # (S, EM)
 
-    mid = coherence[:, :, len(t_vals)//2]
-
-    fig2d = go.Figure(data=go.Heatmap(
-        z=mid.T, x=s_vals, y=em_vals,
-        colorscale="Magma",
-        colorbar=dict(title="Coherence")
-    ))
-    fig2d.update_layout(
-        title="Mid-Time Coherence Slice (2D)",
-        xaxis_title="Strong",
-        yaxis_title="EM"
+    # y=Strong, x=EM
+    show_surface_or_heatmap(
+        z=mid,
+        x=em_vals,
+        y=s_vals,
+        title="Mid-Time Coherence Slice",
+        xlab="EM Multiplier",
+        ylab="Strong Multiplier",
+        zlab="Coherence",
+        fname_base="Decoherence_MidTime",
+        colorscale="Magma"
     )
-    st.plotly_chart(fig2d, use_container_width=True)
-    save_plot(fig2d, "Decoherence_MidTime_2D.png", is_plotly=True)
 
-    if not disable_3d:
-        fig3d = go.Figure(data=[go.Surface(
-            z=mid,
-            x=s_vals,
-            y=em_vals,
-            colorscale="Magma",
-            colorbar=dict(title="Coherence")
-        )])
-        fig3d.update_layout(
-            title="Coherence Surface (3D, mid-time)",
-            scene=dict(xaxis_title="Strong", yaxis_title="EM", zaxis_title="Coherence")
-        )
-        st.plotly_chart(fig3d, use_container_width=True)
-        save_plot(fig3d, "Decoherence_MidTime_3D.png", is_plotly=True)
-
-    st.markdown("- A toy Everett-style visualization: coherence decays with parameter-distance and time.")
+    st.markdown("- Toy Everett-style visualization: coherence decays with parameter-distance and time.")
 
 
 # -------------------------
-# Tab 19: Quantum Branch Count Estimator
+# Tab 19: Quantum Branch Count Estimator (MAX 3D)
 # -------------------------
 with tabs[19]:
-    st.subheader("Quantum Branch Count Estimator (decoherence-driven growth)")
+    st.subheader("Quantum Branch Count Estimator (MAX 3D)")
 
     steps = 200
     t = np.linspace(0, 1, steps)
@@ -1146,78 +1116,62 @@ with tabs[19]:
     branches = np.exp((0.8 * rate) * t * (1.0 + 0.25*deviation))
     branches = np.clip(branches, 1, 1e18)
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=t, y=branches, mode="lines", name="Estimated Branches"))
-    fig.update_layout(
-        title="Branch Count vs Time (log scale)",
-        xaxis_title="Normalized Time",
-        yaxis_title="Branch Count",
-        yaxis_type="log"
+    # 3D ribbon (log display)
+    show_ribbon_or_line(
+        x=t,
+        y_line=np.log10(branches),
+        title="Branch Count vs Time (log10)",
+        xlab="Normalized Time",
+        ylab="log10(Branch Count)",
+        fname_base="Branch_Count",
+        colorscale="Viridis"
     )
-    st.plotly_chart(fig, use_container_width=True)
-    save_plot(fig, "Branch_Count.png", is_plotly=True)
 
     d_vals = np.linspace(0, 6, 80)
-    TT, DD = np.meshgrid(t, d_vals, indexing="ij")
+    TT, DD = np.meshgrid(t, d_vals, indexing="ij")  # (t, d)
     branches2 = np.exp((0.8 * rate) * TT * (1.0 + 0.25*DD))
     branches2 = np.clip(branches2, 1, 1e18)
 
-    fig2d = go.Figure(data=go.Heatmap(
-        z=np.log10(branches2.T + 1e-9),
-        x=t, y=d_vals,
-        colorscale="Viridis",
-        colorbar=dict(title="log10(branches)")
-    ))
-    fig2d.update_layout(
-        title="Branch Growth vs Time and Deviation (2D)",
-        xaxis_title="Time",
-        yaxis_title="Deviation"
+    Zmap = np.log10(branches2 + 1e-9)  # (t, d) => y=t, x=d if we want x=d
+    show_surface_or_heatmap(
+        z=Zmap,
+        x=d_vals,
+        y=t,
+        title="Branch Growth vs Deviation and Time",
+        xlab="Deviation",
+        ylab="Time",
+        zlab="log10(branches)",
+        fname_base="Branch_Count_Map",
+        colorscale="Viridis"
     )
-    st.plotly_chart(fig2d, use_container_width=True)
-    save_plot(fig2d, "Branch_Count_2D.png", is_plotly=True)
 
 
 # -------------------------
-# Tab 20: Quantum Gravity Horizon Map
+# Tab 20: Quantum Gravity Horizon Map (MAX 3D)
 # -------------------------
 with tabs[20]:
-    st.subheader("Quantum Gravity Horizon Map (curvature proxy)")
+    st.subheader("Quantum Gravity Horizon Map (MAX 3D)")
 
     r_vals = np.linspace(0.1, 10.0, 120)
     g_vals = np.linspace(0.1, 10.0, 120)
-    R, GG = np.meshgrid(r_vals, g_vals, indexing="ij")
+    R, GG = np.meshgrid(r_vals, g_vals, indexing="ij")  # (r, g)
 
     curvature = (GG * G) / (R + 1e-6)
     curvature *= (1.0 / (1.0 + 0.25*DE))
     curvature = np.clip(curvature, 0, 2.0)
 
-    fig2d = go.Figure(data=go.Heatmap(
-        z=curvature.T,
-        x=r_vals, y=g_vals,
-        colorscale="Cividis",
-        colorbar=dict(title="Curvature")
-    ))
-    fig2d.update_layout(
-        title="Curvature Map (2D)",
-        xaxis_title="Radial coordinate r (proxy)",
-        yaxis_title="Gravitational field multiplier"
+    # curvature shape (r, g) => y=r, x=g
+    show_surface_or_heatmap(
+        z=curvature,
+        x=g_vals,
+        y=r_vals,
+        title="Curvature Map (Horizon-like Zones)",
+        xlab="Gravitational field multiplier",
+        ylab="Radial coordinate r (proxy)",
+        zlab="Curvature (proxy)",
+        fname_base="Quantum_Gravity",
+        colorscale="Cividis"
     )
-    st.plotly_chart(fig2d, use_container_width=True)
-    save_plot(fig2d, "Quantum_Gravity_2D.png", is_plotly=True)
-
-    if not disable_3d:
-        fig3d = go.Figure(data=[go.Surface(
-            z=curvature,
-            x=r_vals, y=g_vals,
-            colorscale="Cividis",
-            colorbar=dict(title="Curvature")
-        )])
-        fig3d.update_layout(
-            title="Curvature Surface (3D)",
-            scene=dict(xaxis_title="r", yaxis_title="G-field", zaxis_title="Curvature")
-        )
-        st.plotly_chart(fig3d, use_container_width=True)
-        save_plot(fig3d, "Quantum_Gravity_3D.png", is_plotly=True)
 
     st.markdown("- Regions approaching the cap represent horizon-like Planck-curvature zones (proxy).")
 
