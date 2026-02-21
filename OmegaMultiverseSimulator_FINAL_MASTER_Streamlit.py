@@ -62,6 +62,24 @@ res_3d = st.sidebar.slider(
 )
 st.sidebar.caption("Lower resolution renders faster on iPhone.")
 
+
+# =========================
+# Plot Title Layout Fix (prevents PNG title cut-off)
+# =========================
+TITLE_TOP_MARGIN = 90  # extra headroom so kaleido exports don't clip titles
+
+def apply_plot_title(fig, title: str):
+    """Push title upward and give it headroom so it won't get cut in exported PNGs."""
+    fig.update_layout(
+        title=dict(
+            text=title,
+            x=0.5, xanchor="center",
+            y=0.98, yanchor="top",
+            pad=dict(t=10, b=10)
+        )
+    )
+
+
 def save_plot(fig, filename, is_plotly=True):
     """Never crash the app if export fails."""
     if not auto_save_plots:
@@ -205,7 +223,6 @@ def show_surface_or_heatmap(z, x, y, title, xlab, ylab, zlab, fname_base, colors
             colorbar=dict(title=zlab)
         )])
         fig3d.update_layout(
-            title=title,
             scene=dict(
                 xaxis_title=xlab,
                 yaxis_title=ylab,
@@ -213,8 +230,9 @@ def show_surface_or_heatmap(z, x, y, title, xlab, ylab, zlab, fname_base, colors
                 aspectmode="auto",
                 camera=dict(eye=dict(x=1.6, y=1.6, z=0.9))
             ),
-            margin=dict(l=0, r=0, t=40, b=0)
+            margin=dict(l=0, r=0, t=TITLE_TOP_MARGIN, b=0)
         )
+        apply_plot_title(fig3d, title)
         st.plotly_chart(fig3d, use_container_width=True)
         fname = f"{fname_base}_3D.png"
         save_plot(fig3d, fname, is_plotly=True)
@@ -226,7 +244,12 @@ def show_surface_or_heatmap(z, x, y, title, xlab, ylab, zlab, fname_base, colors
             colorscale=colorscale,
             colorbar=dict(title=zlab)
         ))
-        fig2d.update_layout(title=title, xaxis_title=xlab, yaxis_title=ylab)
+        fig2d.update_layout(
+            xaxis_title=xlab,
+            yaxis_title=ylab,
+            margin=dict(l=0, r=0, t=TITLE_TOP_MARGIN, b=0)
+        )
+        apply_plot_title(fig2d, title)
         st.plotly_chart(fig2d, use_container_width=True)
         fname = f"{fname_base}_2D.png"
         save_plot(fig2d, fname, is_plotly=True)
@@ -258,7 +281,6 @@ def show_ribbon_or_line(x, y, title, xlab, ylab, fname_base, ribbon_width=1.2,
             showscale=False
         )])
         fig3d.update_layout(
-            title=title,
             scene=dict(
                 xaxis_title=xlab,
                 yaxis_title="",
@@ -266,15 +288,21 @@ def show_ribbon_or_line(x, y, title, xlab, ylab, fname_base, ribbon_width=1.2,
                 aspectmode="auto",
                 camera=dict(eye=dict(x=1.7, y=1.4, z=1.0))
             ),
-            margin=dict(l=0, r=0, t=40, b=0)
+            margin=dict(l=0, r=0, t=TITLE_TOP_MARGIN, b=0)
         )
+        apply_plot_title(fig3d, title)
         st.plotly_chart(fig3d, use_container_width=True)
         fname = f"{fname_base}_3D.png"
         save_plot(fig3d, fname, is_plotly=True)
     else:
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=x, y=y, mode="lines", name=title))
-        fig.update_layout(title=title, xaxis_title=xlab, yaxis_title=ylab)
+        fig.update_layout(
+            xaxis_title=xlab,
+            yaxis_title=ylab,
+            margin=dict(l=0, r=0, t=TITLE_TOP_MARGIN, b=0)
+        )
+        apply_plot_title(fig, title)
         st.plotly_chart(fig, use_container_width=True)
         fname = f"{fname_base}_2D.png"
         save_plot(fig, fname, is_plotly=True)
@@ -402,6 +430,7 @@ tabs = st.tabs([
     "Branch Count",
     "Quantum Gravity Horizon",
 ])
+
 # -------------------------
 # Tab 0: Periodic Table Stability
 # -------------------------
@@ -502,6 +531,7 @@ with tabs[0]:
         f"- Current universe: Strong={S:.2f}, EM={EM:.2f}\n"
         f"- Weak sets beta-decay pacing in this proxy: far from 1.0 reduces long-lived isotopes."
     )
+
 # -------------------------
 # Tab 1: Island of Instability
 # -------------------------
@@ -545,7 +575,6 @@ with tabs[1]:
         "- Stronger nuclear cohesion reduces the unstable ridge and widens the viable region."
     )
 
-
 # -------------------------
 # Tab 2: Star Formation
 # -------------------------
@@ -587,7 +616,6 @@ with tabs[2]:
         "- Higher gravity promotes collapse.\n"
         "- Higher dark energy suppresses large-scale structure and slows star formation."
     )
-
 
 # -------------------------
 # Tab 3: Life Probability
@@ -639,7 +667,6 @@ with tabs[3]:
         "- It rises when chemistry, temperature, pressure, and element supply align."
     )
 
-
 # -------------------------
 # Tab 4: Quantum Bonding
 # -------------------------
@@ -683,7 +710,6 @@ with tabs[4]:
         "- Higher temperature weakens stable molecules; pressure partially restores overlap."
     )
 
-
 # -------------------------
 # Tab 5: Universe Viability
 # -------------------------
@@ -707,7 +733,6 @@ with tabs[5]:
             colorbar=dict(title="Score")
         )])
         fig.update_layout(
-            title="Global Viability",
             scene=dict(
                 xaxis=dict(title="", tickmode="array", tickvals=[0, 1], ticktext=["Viability", "Instability"]),
                 yaxis_title="",
@@ -715,14 +740,19 @@ with tabs[5]:
                 aspectmode="auto",
                 camera=dict(eye=dict(x=1.8, y=1.5, z=1.0))
             ),
-            margin=dict(l=0, r=0, t=40, b=0)
+            margin=dict(l=0, r=0, t=TITLE_TOP_MARGIN, b=0)
         )
+        apply_plot_title(fig, "Global Viability")
         st.plotly_chart(fig, use_container_width=True)
         fname = "Universe_Viability_3D.png"
         save_plot(fig, fname, is_plotly=True)
     else:
         fig2d = go.Figure(data=[go.Bar(x=["Viability", "Instability"], y=[viability, chaos])])
-        fig2d.update_layout(title="Global Viability", yaxis_title="Score")
+        fig2d.update_layout(
+            yaxis_title="Score",
+            margin=dict(l=0, r=0, t=TITLE_TOP_MARGIN, b=0)
+        )
+        apply_plot_title(fig2d, "Global Viability")
         st.plotly_chart(fig2d, use_container_width=True)
         fname = "Universe_Viability_2D.png"
         save_plot(fig2d, fname, is_plotly=True)
@@ -741,7 +771,6 @@ with tabs[5]:
         "- Viability is based on distance from baseline constants.\n"
         "- It is a compact comparative score, not a literal emergence probability."
     )
-
 
 # -------------------------
 # Tab 6: Element Abundance
@@ -806,7 +835,6 @@ with tabs[6]:
         "- Faster enrichment supports complex chemistry by supplying heavier elements."
     )
 
-
 # -------------------------
 # Tab 7: Radiation Risk
 # -------------------------
@@ -833,7 +861,6 @@ with tabs[7]:
             f"Higher EM can intensify radiative effects and reduce habitability margins."
         )
     )
-
 
 # -------------------------
 # Tab 8: Star Lifespan
@@ -863,7 +890,6 @@ with tabs[8]:
             f"Short lifetimes reduce the time available for complex chemistry and biology to develop."
         )
     )
-
 
 # -------------------------
 # Tab 9: Cosmic Web
@@ -900,7 +926,12 @@ with tabs[9]:
         colorscale="Inferno",
         colorbar=dict(title="Density")
     ))
-    fig2d.update_layout(title="Cosmic Web Slice", xaxis_title="X", yaxis_title="Y")
+    fig2d.update_layout(
+        xaxis_title="X",
+        yaxis_title="Y",
+        margin=dict(l=0, r=0, t=TITLE_TOP_MARGIN, b=0)
+    )
+    apply_plot_title(fig2d, "Cosmic Web Slice")
     st.plotly_chart(fig2d, use_container_width=True)
     save_plot(fig2d, "Dark_Matter_2D_Slice.png", is_plotly=True)
 
@@ -925,13 +956,13 @@ with tabs[9]:
             marker=dict(size=2, color=Cp, colorscale="Inferno", opacity=0.7)
         )])
         fig3d.update_layout(
-            title="Cosmic Web",
             scene=dict(
                 xaxis_title="X", yaxis_title="Y", zaxis_title="Z",
                 camera=dict(eye=dict(x=1.6, y=1.6, z=0.9))
             ),
-            margin=dict(l=0, r=0, t=40, b=0)
+            margin=dict(l=0, r=0, t=TITLE_TOP_MARGIN, b=0)
         )
+        apply_plot_title(fig3d, "Cosmic Web")
         st.plotly_chart(fig3d, use_container_width=True)
         save_plot(fig3d, "Dark_Matter_3D.png", is_plotly=True)
 
@@ -950,7 +981,6 @@ with tabs[9]:
         "- Higher gravity compresses structure.\n"
         "- Higher dark energy expands voids and reduces clustering."
     )
-
 
 # -------------------------
 # Tab 10: Atomic Stability
@@ -984,7 +1014,6 @@ with tabs[10]:
         "- Stability follows a valley where neutron and proton counts balance binding and decay.\n"
         "- Strong boosts binding, EM penalizes high charge, weak controls beta decay pressure."
     )
-
 
 # -------------------------
 # Tab 11: Life Over Time
@@ -1038,7 +1067,6 @@ with tabs[11]:
         )
     )
 
-
 # -------------------------
 # Tab 12: Molecular Bonding
 # -------------------------
@@ -1069,10 +1097,11 @@ with tabs[12]:
 
     fig = go.Figure(data=[go.Bar(x=names, y=vals, text=[f"{v:.2f}" for v in vals], textposition="outside")])
     fig.update_layout(
-        title="Molecular Bonding Viability",
         yaxis_title="Viability",
-        yaxis_range=[0, 1.15]
+        yaxis_range=[0, 1.15],
+        margin=dict(l=0, r=0, t=TITLE_TOP_MARGIN, b=0)
     )
+    apply_plot_title(fig, "Molecular Bonding Viability")
     st.plotly_chart(fig, use_container_width=True)
     save_plot(fig, "Molecular_Bonding.png", is_plotly=True)
 
@@ -1087,7 +1116,6 @@ with tabs[12]:
             f"High temperature or large EM and Strong shifts reduce stable molecular diversity."
         )
     )
-
 
 # -------------------------
 # Tab 13: Molecular Abundance
@@ -1124,7 +1152,6 @@ with tabs[13]:
             f"Shifting temperature or pressure away from 1 compresses the viable region."
         )
     )
-
 
 # -------------------------
 # Tab 14: Isotope Half-Life
@@ -1175,7 +1202,6 @@ with tabs[14]:
             f"Higher Strong and near-baseline Weak increase the pool of long-lived nuclei."
         )
     )
-
 
 # -------------------------
 # Tab 15: Periodic Table Expansion
@@ -1233,7 +1259,6 @@ with tabs[15]:
         )
     )
 
-
 # -------------------------
 # Tab 16: Proton–Neutron Map
 # -------------------------
@@ -1277,7 +1302,6 @@ with tabs[16]:
             "As Z increases, extra neutrons are required to dilute charge repulsion and sustain binding."
         )
     )
-
 
 # -------------------------
 # Tab 17: Binding Energy
@@ -1354,7 +1378,6 @@ with tabs[17]:
 
     st.markdown(f"**Peak along valley near Z ≈ {peakZ}**")
 
-
 # -------------------------
 # Tab 18: Decoherence Map
 # -------------------------
@@ -1403,7 +1426,6 @@ with tabs[18]:
         "- Coherence decreases with parameter distance and time.\n"
         "- Higher deviation compresses the high-coherence region."
     )
-
 
 # -------------------------
 # Tab 19: Branch Count
@@ -1461,7 +1483,6 @@ with tabs[19]:
         )
     )
 
-
 # -------------------------
 # Tab 20: Quantum Gravity Horizon
 # -------------------------
@@ -1502,7 +1523,6 @@ with tabs[20]:
         "- Higher gravity raises curvature and pushes toward horizon-like behavior.\n"
         "- Dark energy reduces effective curvature in this simplified mapping."
     )
-
 
 # =========================
 # PDF Export
