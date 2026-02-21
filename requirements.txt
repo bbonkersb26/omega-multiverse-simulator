@@ -9,3 +9,5 @@ plotly>=5.17
 kaleido==0.2.1
 fpdf2
 Pillow
+streamlit==1.19.0
+altair==4.2.2
