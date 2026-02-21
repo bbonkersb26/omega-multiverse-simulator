@@ -402,54 +402,106 @@ tabs = st.tabs([
     "Branch Count",
     "Quantum Gravity Horizon",
 ])
-
-
 # -------------------------
 # Tab 0: Periodic Table Stability
 # -------------------------
 with tabs[0]:
     st.subheader("Periodic Table Stability")
 
-    em_vals = np.linspace(0.1, 10.0, res_3d)
     Z_vals = np.arange(1, 121)
-    Z2, EM2 = np.meshgrid(Z_vals, em_vals, indexing="ij")
 
-    base_shell = np.exp(-np.abs(Z2 - 30) / 22.0)
-    strong_term = np.exp(-np.abs(Z2 - 82) / (28.0 * max(S, 1e-3)))
-    em_term = np.exp(-np.abs(EM2 - EM) / 1.2) * np.exp(-np.maximum(Z2 - 20, 0) / (40.0 / np.maximum(EM2, 1e-3)))
-    weak_term = np.exp(-((W - 1.0) ** 2) * 2.5)
+    # Shared base shell structure (purely proxy)
+    Z2_base = Z_vals[:, None]
+    base_shell = np.exp(-np.abs(Z2_base - 30) / 22.0)
 
-    stability = np.clip(base_shell * strong_term * em_term * weak_term, 0, 1)
+    # Helper to build the stability map for a chosen sweep axis
+    def stability_map(Z_vals, sweep_vals, sweep_name):
+        Z2, X2 = np.meshgrid(Z_vals, sweep_vals, indexing="ij")
 
-    stability_mean = float(np.nanmean(stability))
-    stability_high = float((stability > 0.6).mean())
+        # Use the swept variable as the one on the x-axis, others fixed at current sliders
+        if sweep_name == "EM":
+            EM_use = np.maximum(X2, 1e-3)
+            S_use = max(S, 1e-3)
+            W_use = W
+        elif sweep_name == "S":
+            EM_use = max(EM, 1e-3)
+            S_use = np.maximum(X2, 1e-3)
+            W_use = W
+        elif sweep_name == "W":
+            EM_use = max(EM, 1e-3)
+            S_use = max(S, 1e-3)
+            W_use = X2
+        else:
+            raise ValueError("Unknown sweep")
 
+        # Proxy terms
+        strong_term = np.exp(-np.abs(Z2 - 82) / (28.0 * S_use))
+        em_term = np.exp(-np.maximum(Z2 - 20, 0) / (40.0 / EM_use))
+        weak_term = np.exp(-((W_use - 1.0) ** 2) * 2.5)
+
+        stab = np.clip((0.55 + 0.45*np.exp(-np.abs(Z2 - 30) / 22.0)) * strong_term * em_term * weak_term, 0, 1)
+        return stab
+
+    # 1) Z vs EM
+    em_sweep = np.linspace(0.1, 10.0, res_3d)
+    stab_em = stability_map(Z_vals, em_sweep, "EM")
     show_surface_or_heatmap(
-        z=stability,
-        x=em_vals,
+        z=stab_em,
+        x=em_sweep,
         y=Z_vals,
-        title="Stability vs Z and EM",
+        title="Stability vs EM",
         xlab="EM Multiplier",
         ylab="Atomic Number Z",
         zlab="Stability",
-        fname_base="Periodic_Table_Stability",
-        colorscale="Viridis",
-        pdf_title="Periodic Table Stability",
-        pdf_text=(
-            f"Stability reflects a balance of cohesion and charge repulsion. "
-            f"With Strong={S:.2f} and EM={EM:.2f}, the stability field averages {stability_mean:.2f}. "
-            f"About {100*stability_high:.1f}% of the grid exceeds 0.60, implying a "
-            f"{'broad' if stability_high > 0.25 else 'limited'} zone of long-lived nuclei. "
-            f"Weak={W:.2f} shifts beta-decay pressure and changes how wide the stable band is."
-        )
+        fname_base="PT_Stability_EM",
+        colorscale="Viridis"
     )
-
     st.markdown(
-        "- Stability increases with stronger cohesion and decreases as charge repulsion grows.\n"
-        "- Weak force tuning changes beta-decay pressure and isotope lifetimes."
+        f"- Current universe: Strong={S:.2f}, Weak={W:.2f}\n"
+        f"- If EM increases, heavy nuclei lose stability faster from stronger Coulomb repulsion."
     )
 
+    st.divider()
 
+    # 2) Z vs Strong
+    s_sweep = np.linspace(0.1, 10.0, res_3d)
+    stab_s = stability_map(Z_vals, s_sweep, "S")
+    show_surface_or_heatmap(
+        z=stab_s,
+        x=s_sweep,
+        y=Z_vals,
+        title="Stability vs Strong",
+        xlab="Strong Multiplier",
+        ylab="Atomic Number Z",
+        zlab="Stability",
+        fname_base="PT_Stability_Strong",
+        colorscale="Viridis"
+    )
+    st.markdown(
+        f"- Current universe: EM={EM:.2f}, Weak={W:.2f}\n"
+        f"- Higher Strong generally boosts binding and pushes the stable region toward higher Z."
+    )
+
+    st.divider()
+
+    # 3) Z vs Weak
+    w_sweep = np.linspace(0.1, 10.0, res_3d)
+    stab_w = stability_map(Z_vals, w_sweep, "W")
+    show_surface_or_heatmap(
+        z=stab_w,
+        x=w_sweep,
+        y=Z_vals,
+        title="Stability vs Weak",
+        xlab="Weak Multiplier",
+        ylab="Atomic Number Z",
+        zlab="Stability",
+        fname_base="PT_Stability_Weak",
+        colorscale="Viridis"
+    )
+    st.markdown(
+        f"- Current universe: Strong={S:.2f}, EM={EM:.2f}\n"
+        f"- Weak sets beta-decay pacing in this proxy: far from 1.0 reduces long-lived isotopes."
+    )
 # -------------------------
 # Tab 1: Island of Instability
 # -------------------------
